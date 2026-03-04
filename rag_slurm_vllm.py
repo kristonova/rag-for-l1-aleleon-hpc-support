@@ -150,7 +150,7 @@ def main():
     # --- FASE 3: TANYA JAWAB (RETRIEVAL & GENERATION) ---
 
     # Setup Retriever
-    retriever = vectorstore.as_retriever(search_kwargs={"k": 15})
+    retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
 
     # ...existing code...
     # Buat Prompt dengan format ChatML (untuk Qwen)
@@ -228,6 +228,24 @@ Aturan:
         print("-" * 60)
         hasil = rag_chain.invoke(inp)
         print(hasil['answer'].strip())
+
+        # Tampilkan sumber dokumen yang digunakan
+        if 'context' in hasil and hasil['context']:
+            print(f"\n    📚 Sumber ({len(hasil['context'])} chunks):")
+            seen = []
+            for doc in hasil['context']:
+                title = doc.metadata.get("title", "Unknown")
+                source = doc.metadata.get("source", "")
+                header = doc.metadata.get("Header 2", doc.metadata.get("Header 3", ""))
+                key = (title, header)
+                if key not in seen:
+                    seen.append(key)
+                    label = f"    • {title}"
+                    if header:
+                        label += f" → {header}"
+                    if source:
+                        label += f"  ({source})"
+                    print(label)
 
     print(f"\n{'='*60}")
     print(f"Selesai — {len(inputs)} pertanyaan dijawab.")
