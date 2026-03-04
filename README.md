@@ -194,6 +194,7 @@ Set `HSA_OVERRIDE_GFX_VERSION` to match your GPU:
 |---|---|---|
 | RX 6800/6900 | gfx1030 (RDNA2) | 10.3.0 |
 | RX 7900 XTX | gfx1100 (RDNA3) | 11.0.0 |
+| RX 8060S | gfx1151 (RDNA3.5) | 11.5.1 |
 | RX 9070 XT | gfx1201 (RDNA4) | 12.0.1 |
 
 Check your GPU architecture:

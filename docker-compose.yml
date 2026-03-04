@@ -17,7 +17,7 @@ services:
   # ---- vLLM Server (ROCm) ----
   # Menjalankan LLM inference di GPU AMD
   vllm-server:
-    image: vllmproject/vllm-openai:latest-rocm
+    image: docker.io/rocm/vllm-dev:nightly
     container_name: vllm-rocm
     devices:
       - /dev/kfd:/dev/kfd       # Kernel Fusion Driver (wajib ROCm)
@@ -27,16 +27,17 @@ services:
       - render
     environment:
       # Sesuaikan dengan GPU Anda:
-      #   gfx1030  → RX 6800/6900   (RDNA2)
-      #   gfx1100  → RX 7900 XTX    (RDNA3)
-      #   gfx1151  → RX 9070 XT     (RDNA4) → 12.0.1
+      #   gfx1030  → RX 6800/6900                 (RDNA2)
+      #   gfx1100  → RX 7900 XTX                  (RDNA3)
+      #   gfx1151  → Radeon 8050S/8060S           (RDNA3.5)
+      #   gfx1201  → Radeon RX 9070/9070 XT/R9700 (RDNA4)
       - HSA_OVERRIDE_GFX_VERSION=12.0.1
     volumes:
       - ~/.cache/huggingface:/root/.cache/huggingface  # Cache model agar tidak download ulang
     ports:
       - "8000:8000"
     command: >
-      --model Qwen/Qwen3-Coder-30B-A3B-Instruct-FP8
+      --model Qwen/Qwen3.5-35B-A3B-GPTQ-Int4
       --quantization fp8
       --gpu-memory-utilization 0.90
       --max-model-len 4096
@@ -58,7 +59,7 @@ services:
     container_name: rag-kristo
     environment:
       - VLLM_BASE_URL=http://vllm-server:8000/v1
-      - MODEL_NAME=Qwen/Qwen3-Coder-30B-A3B-Instruct-FP8
+      - MODEL_NAME=Qwen/Qwen3.5-35B-A3B-GPTQ-Int4
     depends_on:
       vllm-server:
         condition: service_healthy

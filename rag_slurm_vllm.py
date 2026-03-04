@@ -131,16 +131,18 @@ def main():
 
     # Konfigurasi vLLM
     llm = VLLM(
-        model="Qwen/Qwen2.5-Coder-7B-Instruct",  # ← Ganti kembali
+        model="Qwen/Qwen3.5-35B-A3B-GPTQ-Int4",  # ← Ganti kembali
         trust_remote_code=True,
         max_new_tokens=1024,
-        temperature=0.5,                           
-        top_p=0.9,
+        temperature=0.7,                           
+        top_p=0.8,
+        top_k=20,
         tensor_parallel_size=1,
+        dtype="float16",
         vllm_kwargs={
             "gpu_memory_utilization": 0.80,
-            "enforce_eager": True,
             "max_model_len": 32768,
+            "enforce_eager": True
         }
     )
 
