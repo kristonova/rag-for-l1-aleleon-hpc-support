@@ -141,8 +141,6 @@ def main():
         tensor_parallel_size=1,
         dtype="float16",
         vllm_kwargs={
-            "min_p": 0.0,
-            "repetition_penalty": 1.0,
             "gpu_memory_utilization": 0.80,
             "max_model_len": 32768,
             "enforce_eager": True
