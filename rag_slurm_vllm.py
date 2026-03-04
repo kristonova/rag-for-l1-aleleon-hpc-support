@@ -134,12 +134,15 @@ def main():
         model="Qwen/Qwen3.5-35B-A3B-GPTQ-Int4",  # ← Ganti kembali
         trust_remote_code=True,
         max_new_tokens=1024,
-        temperature=0.7,                           
-        top_p=0.8,
+        temperature=0.6,                           
+        top_p=0.95,
         top_k=20,
+        presence_penalty=1.5,
         tensor_parallel_size=1,
         dtype="float16",
         vllm_kwargs={
+            "min_p": 0.0,
+            "repetition_penalty": 1.0,
             "gpu_memory_utilization": 0.80,
             "max_model_len": 32768,
             "enforce_eager": True
