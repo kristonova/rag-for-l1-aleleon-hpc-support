@@ -17,29 +17,25 @@ services:
   # ---- vLLM Server (ROCm) ----
   # Menjalankan LLM inference di GPU AMD
   vllm-server:
-    image: vllmproject/vllm-openai:latest-rocm
+    image: docker.io/rocm/vllm-dev:nightly
     container_name: vllm-rocm
     devices:
-      - /dev/kfd:/dev/kfd       # Kernel Fusion Driver (wajib ROCm)
-      - /dev/dri:/dev/dri       # Direct Rendering Infrastructure
+      - /dev/kfd       # Kernel Fusion Driver (wajib ROCm)
+      - /dev/dri       # Direct Rendering Infrastructure
     group_add:
-      - video
-      - render
-    environment:
-      # Sesuaikan dengan GPU Anda:
-      #   gfx1030  → RX 6800/6900   (RDNA2)
-      #   gfx1100  → RX 7900 XTX    (RDNA3)
-      #   gfx1151  → RX 9070 XT     (RDNA4) → 12.0.1
-      - HSA_OVERRIDE_GFX_VERSION=12.0.1
+      - keep-groups
+    cap_add:
+      - SYS_PTRACE
     volumes:
       - ~/.cache/huggingface:/root/.cache/huggingface  # Cache model agar tidak download ulang
     ports:
       - "8000:8000"
     command: >
-      --model Qwen/Qwen3-Coder-30B-A3B-Instruct-FP8
-      --quantization fp8
-      --gpu-memory-utilization 0.90
-      --max-model-len 4096
+      --model Qwen/Qwen3.5-35B-A3B-GPTQ-Int4
+      --dtype float16
+      --gpu-memory-utilization 0.80
+      --max-model-len 32768
+      --enforce-eager
       --trust-remote-code
     restart: unless-stopped
     healthcheck:
@@ -58,7 +54,7 @@ services:
     container_name: rag-kristo
     environment:
       - VLLM_BASE_URL=http://vllm-server:8000/v1
-      - MODEL_NAME=Qwen/Qwen3-Coder-30B-A3B-Instruct-FP8
+      - MODEL_NAME=Qwen/Qwen3.5-35B-A3B-GPTQ-Int4
     depends_on:
       vllm-server:
         condition: service_healthy

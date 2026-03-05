@@ -34,7 +34,7 @@ A Retrieval-Augmented Generation (RAG) system that serves as an AI assistant for
 rag-for-l1-aleleon-hpc-support/
 ├── rag_slurm_vllm.py            # Main RAG application script
 ├── Dockerfile.rocm              # Container image for AMD ROCm GPUs
-├── docker-compose.yml           # Multi-container orchestration (optional)
+├── compose.yml           # Multi-container orchestration (optional)
 ├── pyproject.toml               # Python project metadata & dependencies
 ├── poetry.lock                  # Locked dependency versions
 ├── HOW IT WORKS.md              # Detailed explanation document
@@ -65,16 +65,17 @@ The application runs in three phases:
 
 ### Phase 2 — LLM Setup (vLLM on ROCm)
 
-8. **Model Loading** — Loads `Qwen/Qwen2.5-Coder-7B-Instruct` onto the AMD GPU using vLLM with these settings:
+8. **Model Loading** — Loads `Qwen/Qwen3.5-35B-A3B-GPTQ-Int4` onto the AMD GPU using vLLM with these settings:
 
    | Parameter | Value | Reason |
    |---|---|---|
    | `gpu_memory_utilization` | 0.80 | Use 80% of available VRAM |
    | `enforce_eager` | True | Avoids CUDAGraph issues on ROCm/RDNA4 |
    | `max_model_len` | 32768 | Full 32K context window for large prompts |
-   | `temperature` | 0.5 | Balanced factual/creative answers |
-   | `top_p` | 0.9 | Nucleus sampling |
-   | `max_new_tokens` | 1024 | Max response length |
+   | `temperature` | 0.6 | Balanced factual/creative answers |
+   | `top_p` | 0.95 | Nucleus sampling |
+   | `top_k` | 20 | "INSERT_REASON" |
+   | `max_new_tokens` | 32768 | Max response length |
 
 ### Phase 3 — Question Answering (RAG Chain)
 
@@ -98,9 +99,9 @@ The `if __name__ == '__main__'` guard is **required** because vLLM v1 uses `spaw
 
 | Component | Minimum | Tested On |
 |---|---|---|
-| GPU | AMD GPU with ROCm support | RX 9070 XT (gfx1201, 16GB VRAM) |
+| GPU | AMD GPU with ROCm support | Radeon AI PRO R9700 (gfx1201, 32GB VRAM) |
 | RAM | 16GB system RAM | 48GB DDR5 |
-| CPU | Any x86_64 | Intel i7-12700K |
+| CPU | Any x86_64 | Intel i7-12700K/Ryzen 7 9800X3D |
 | ROCm | 6.0+ | 7.0 (HIP 7.0.51831) |
 
 ### Software
@@ -108,7 +109,7 @@ The `if __name__ == '__main__'` guard is **required** because vLLM v1 uses `spaw
 - Podman or Docker
 - ROCm drivers installed on host
 - ~15GB disk for the container image
-- ~15GB disk for the Qwen2.5-7B model weights (auto-downloaded)
+- ~25GB disk for the Qwen3.5-35B-A3B-GPTQ-Int4 model weights (auto-downloaded)
 
 ## Quick Start
 
@@ -136,13 +137,12 @@ podman run -it --rm \
 
 ```bash
 podman run \
+  --cap-add=SYS_PTRACE \
   --device=/dev/kfd \
   --device=/dev/dri \
-  --group-add video \
-  --group-add render \
+  --group-add keep-groups \
   -v $(pwd):/app:Z \
-  -v ~/.cache/huggingface:/root/.cache/huggingface \
-  -e HSA_OVERRIDE_GFX_VERSION=12.0.1 \
+  -v ~/.cache/huggingface:/root/.cache/huggingface:Z \
   -it rag-kristo-rocm bash
 ```
 
@@ -216,6 +216,7 @@ Set `HSA_OVERRIDE_GFX_VERSION` to match your GPU:
 |---|---|---|
 | RX 6800/6900 | gfx1030 (RDNA2) | 10.3.0 |
 | RX 7900 XTX | gfx1100 (RDNA3) | 11.0.0 |
+| RX 8060S | gfx1151 (RDNA3.5) | 11.5.1 |
 | RX 9070 XT | gfx1201 (RDNA4) | 12.0.1 |
 
 Check your GPU architecture:

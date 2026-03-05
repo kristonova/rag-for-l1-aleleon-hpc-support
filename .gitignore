@@ -1,0 +1,5 @@
+# Ignore Roo code directory
+.roo/
+
+# Ignore VSCode settings and workspace
+.vscode/
