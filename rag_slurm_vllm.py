@@ -16,12 +16,11 @@ import time
 
 def load_wiki_documents(sitemap_url, requests_per_second=2):
     """
-    Document Structure-Based Loading:
+    Load seluruh artikel wiki sebagai 1 chunk per halaman (tanpa splitting).
     1. Parse sitemap XML → ambil semua URL
     2. Fetch setiap halaman
-    3. Ekstrak <div id="mw-content-text"> sebagai HTML (BUKAN plain text)
-    4. Split berdasarkan heading HTML (h2, h3)
-    5. Fallback ke RecursiveCharacterTextSplitter jika chunk masih terlalu besar
+    3. Ekstrak <div id="mw-content-text"> → ambil plain text
+    4. 1 artikel = 1 Document (tanpa split heading)
     """
 
     # --- Step 1: Parse sitemap ---
@@ -32,22 +31,8 @@ def load_wiki_documents(sitemap_url, requests_per_second=2):
     urls = [loc.text for loc in root.findall(".//ns:loc", ns)]
     print(f"    → {len(urls)} URL ditemukan")
 
-    # --- Step 2-3: Fetch & extract HTML content ---
-    headers_to_split_on = [
-        ("h1", "Header 1"),
-        ("h2", "Header 2"),
-        ("h3", "Header 3"),
-    ]
-    html_splitter = HTMLSectionSplitter(headers_to_split_on=headers_to_split_on)
-
-    # Fallback splitter untuk chunk yang masih terlalu besar
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=4500,
-        chunk_overlap=900,
-        separators=["\n---", "\n\n", "\n", " "],
-    )
-
-    all_splits = []
+    # --- Step 2-3: Fetch & extract sebagai 1 chunk per artikel ---
+    all_docs = []
 
     for i, url in enumerate(urls):
         try:
@@ -55,36 +40,34 @@ def load_wiki_documents(sitemap_url, requests_per_second=2):
             page_resp = requests.get(url, timeout=30)
             soup = BeautifulSoup(page_resp.content, "lxml")
 
-            # Ekstrak konten utama wiki (masih HTML!)
+            # Ekstrak konten utama wiki
             content_div = soup.find("div", {"id": "mw-content-text"})
             if not content_div:
                 continue
 
-            content_html = str(content_div)
+            # Ambil plain text dari HTML (1 artikel penuh = 1 chunk)
+            page_text = content_div.get_text(separator="\n", strip=True)
+            if not page_text.strip():
+                continue
+
             page_title = url.split("/wiki/")[-1].replace("_", " ") if "/wiki/" in url else url
 
-            # --- Step 4: Split berdasarkan heading HTML ---
-            html_docs = html_splitter.split_text(content_html)
+            doc = Document(
+                page_content=page_text,
+                metadata={
+                    "source": url,
+                    "title": page_title,
+                }
+            )
+            all_docs.append(doc)
 
-            for doc in html_docs:
-                # Tambahkan metadata
-                doc.metadata["source"] = url
-                doc.metadata["title"] = page_title
-
-                # --- Step 5: Fallback split jika chunk terlalu besar ---
-                if len(doc.page_content) > 4500:
-                    sub_splits = text_splitter.split_documents([doc])
-                    all_splits.extend(sub_splits)
-                else:
-                    all_splits.append(doc)
-
-            print(f"    [{i+1}/{len(urls)}] {page_title}: {len(html_docs)} sections")
+            print(f"    [{i+1}/{len(urls)}] {page_title}: {len(page_text)} chars")
 
         except Exception as e:
             print(f"    [{i+1}/{len(urls)}] ERROR {url}: {e}")
             continue
 
-    return all_splits
+    return all_docs
 
 
 def main():
@@ -159,6 +142,7 @@ def main():
 Kamu adalah agen AI asisten admin HPC Slurm yang ahli. Tugasmu adalah membantu user berdasarkan dokumen referensi yang diberikan. Gunakan Bahasa Indonesia yang jelas.
 
 Aturan:
+0. Tidak perlu bilang kalo berdasarkan dokumen referensi yang diberikan, langsung saja menyapa klien dengan sopan. Jangan outputkan chain of thought atau proses berpikirmu, langsung saja jawab dengan ringkas dan jelas.
 1. Jawab HANYA berdasarkan dokumen referensi. KUTIP langkah-langkah dan perintah PERSIS seperti di dokumen. Jangan menambahkan langkah atau perintah yang tidak ada di dokumen.
 2. Sertakan angka, nama, versi, dan spesifikasi PERSIS seperti tertulis di dokumen. Jangan membulatkan atau menambah presisi. Contoh: jika dokumen bilang ">=11", jawab ">=11", BUKAN "11.0" atau "11.2".
 3. Jika informasi bisa DISIMPULKAN dari dokumen, berikan kesimpulan tersebut.
