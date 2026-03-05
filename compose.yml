@@ -23,24 +23,24 @@ services:
       - /dev/kfd:/dev/kfd       # Kernel Fusion Driver (wajib ROCm)
       - /dev/dri:/dev/dri       # Direct Rendering Infrastructure
     group_add:
-      - video
-      - render
+      - keep-groups
     environment:
       # Sesuaikan dengan GPU Anda:
       #   gfx1030  → RX 6800/6900                 (RDNA2)
       #   gfx1100  → RX 7900 XTX                  (RDNA3)
       #   gfx1151  → Radeon 8050S/8060S           (RDNA3.5)
       #   gfx1201  → Radeon RX 9070/9070 XT/R9700 (RDNA4)
-      - HSA_OVERRIDE_GFX_VERSION=12.0.1
+      # - HSA_OVERRIDE_GFX_VERSION=12.0.1
     volumes:
       - ~/.cache/huggingface:/root/.cache/huggingface  # Cache model agar tidak download ulang
     ports:
       - "8000:8000"
     command: >
       --model Qwen/Qwen3.5-35B-A3B-GPTQ-Int4
-      --quantization fp8
-      --gpu-memory-utilization 0.90
-      --max-model-len 4096
+      --dtype float16
+      --gpu-memory-utilization 0.80
+      --max-model-len 32768
+      --enforce-eager
       --trust-remote-code
     restart: unless-stopped
     healthcheck:
