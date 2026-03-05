@@ -1,0 +1,53 @@
+# =============================================================================
+# Dockerfile.rag-app — RAG Application Container
+# =============================================================================
+# Purpose: Container for RAG application that orchestrates embedding service,
+#          ChromaDB, and vLLM via API calls.
+# Usage: podman build -t rag-app -f services/rag/Dockerfile.rag-app .
+#        podman run --network rag-network rag-app
+# =============================================================================
+
+FROM python:3.11-slim
+
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Install Python dependencies
+RUN pip install --no-cache-dir \
+    langchain \
+    langchain-core \
+    langchain-community \
+    langchain-classic \
+    langchain-text-splitters \
+    langchain-huggingface \
+    langchain-chroma \
+    sentence-transformers \
+    chromadb \
+    beautifulsoup4 \
+    lxml \
+    requests \
+    fastapi \
+    uvicorn
+
+# Copy application code
+COPY services/rag/rag_app.py .
+COPY services/chromadb/chromadb_client.py .
+
+# Expose port (for potential API usage)
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# Run the RAG application
+CMD ["python", "rag_app.py"]

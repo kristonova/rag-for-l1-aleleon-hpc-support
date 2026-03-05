@@ -1,24 +1,51 @@
 # =============================================================================
-# docker-compose.yml — RAG + vLLM untuk AMD GPU (ROCm)
+# podman-compose.yml — RAG + vLLM + Embedding Service untuk AMD GPU (ROCm)
 # =============================================================================
-#
 # Cara pakai:
-#   docker compose up              → Jalankan vLLM server + RAG app
-#   docker compose up vllm-server  → Jalankan vLLM server saja
-#   docker compose run rag-app     → Jalankan RAG app saja (setelah server siap)
+#   podman-compose --profile embedding up embedding-service
+#   podman-compose --profile vllm-rocm up vllm-rocm
+#   podman-compose --profile chromadb up chromadb
+#   podman-compose --profile chromadb-local up chromadb-local (local dev)
+#   podman-compose --profile rag-app run rag-app
+#   podman-compose --profile embedding --profile vllm-rocm --profile chromadb --profile rag-app up
 #
 # Catatan:
-#   - Sesuaikan HSA_OVERRIDE_GFX_VERSION dengan GPU Anda
 #   - Model akan di-download otomatis ke ~/.cache/huggingface
 #   - vLLM server butuh waktu untuk load model (~2-5 menit)
+#   - Embedding service butuh waktu untuk load model (~1-2 menit)
 # =============================================================================
 
 services:
-  # ---- vLLM Server (ROCm) ----
-  # Menjalankan LLM inference di GPU AMD
-  vllm-server:
+  # ---- Embedding Service (intfloat/multilingual-e5-large) ----
+  # Menjalankan embedding model sebagai REST API
+  embedding-service:
+    build:
+      context: .
+      dockerfile: services/embedding/Dockerfile.embedding
+    container_name: embedding-service
+    profiles:
+      - embedding
+    ports:
+      - "8001:8001"
+    volumes:
+      - ~/.cache/huggingface:/root/.cache/huggingface
+    environment:
+      - MODEL_NAME=intfloat/multilingual-e5-large
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # ---- LLM Service (vLLM on ROCm) ----
+  # Menjalankan LLM inference di GPU AMD dengan OpenAI-compatible API
+  vllm-rocm:
     image: docker.io/rocm/vllm-dev:nightly
     container_name: vllm-rocm
+    profiles:
+      - vllm-rocm
     devices:
       - /dev/kfd       # Kernel Fusion Driver (wajib ROCm)
       - /dev/dri       # Direct Rendering Infrastructure
@@ -27,15 +54,22 @@ services:
     cap_add:
       - SYS_PTRACE
     volumes:
-      - ~/.cache/huggingface:/root/.cache/huggingface  # Cache model agar tidak download ulang
+      - ~/.cache/huggingface:/root/.cache/huggingface
     ports:
       - "8000:8000"
+    environment:
+      - FLASH_ATTENTION_TRITON_AMD_ENABLE=TRUE
+      - TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL=1
     command: >
+      vllm serve
       --model Qwen/Qwen3.5-35B-A3B-GPTQ-Int4
       --dtype float16
       --gpu-memory-utilization 0.80
       --max-model-len 32768
-      --enforce-eager
+      --tensor-parallel-size 1
+      --enable-auto-tool-choice
+      --tool-call-parser qwen3_coder
+      --reasoning-parser qwen3
       --trust-remote-code
     restart: unless-stopped
     healthcheck:
@@ -45,18 +79,56 @@ services:
       retries: 10
       start_period: 300s  # Model loading bisa lama
 
-  # ---- RAG App ----
-  # Menjalankan script RAG (LangChain + Chroma + Embedding)
+  # ---- ChromaDB Vector Store (Production) ----
+  # Persistent vector database untuk embeddings dengan authentication
+  chromadb:
+    image: docker.io/chromadb/chroma:latest
+    container_name: chromadb
+    profiles:
+      - chromadb
+    ports:
+      - "8002:8000"
+    volumes:
+      - chromadb-data:/chroma/data
+    environment:
+      - CHROMA_SERVER_AUTHN_CREDENTIALS=your-secret-key
+      - CHROMA_SERVER_AUTHN_PROVIDER=chromadb.server.auth.token.TokenAuthProvider
+    restart: unless-stopped
+
+  # ---- RAG Application ----
+  # Orkestrasi RAG chain menggunakan semua services di atas
   rag-app:
     build:
       context: .
-      dockerfile: Dockerfile.rocm
-    container_name: rag-kristo
+      dockerfile: services/rag/Dockerfile.rag-app
+    container_name: rag-app
+    profiles:
+      - rag-app
     environment:
-      - VLLM_BASE_URL=http://vllm-server:8000/v1
-      - MODEL_NAME=Qwen/Qwen3.5-35B-A3B-GPTQ-Int4
+      - EMBEDDING_API_URL=http://embedding-service:8001
+      - LLM_API_URL=http://vllm-rocm:8000/v1
+      - CHROMADB_URL=http://chromadb:8000
+      - EMBEDDING_MODEL=intfloat/multilingual-e5-large
+      - LLM_MODEL=Qwen/Qwen3.5-35B-A3B-GPTQ-Int4
+      - COLLECTION_NAME=wiki-embeddings
+      - RETRIEVE_K=3
+      - MAX_NEW_TOKENS=1024
+      - TEMPERATURE=0.6
+      - TOP_P=0.95
+      - TOP_K=20
     depends_on:
-      vllm-server:
+      embedding-service:
         condition: service_healthy
-    stdin_open: true   # Untuk mode interaktif nanti
+      vllm-rocm:
+        condition: service_healthy
+      chromadb:
+        condition: service_started
+    stdin_open: true
     tty: true
+
+volumes:
+  chromadb-data:
+
+networks:
+  rag-network:
+    driver: bridge
