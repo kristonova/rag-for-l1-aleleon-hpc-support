@@ -20,17 +20,12 @@ services:
     image: docker.io/rocm/vllm-dev:nightly
     container_name: vllm-rocm
     devices:
-      - /dev/kfd:/dev/kfd       # Kernel Fusion Driver (wajib ROCm)
-      - /dev/dri:/dev/dri       # Direct Rendering Infrastructure
+      - /dev/kfd       # Kernel Fusion Driver (wajib ROCm)
+      - /dev/dri       # Direct Rendering Infrastructure
     group_add:
       - keep-groups
-    environment:
-      # Sesuaikan dengan GPU Anda:
-      #   gfx1030  → RX 6800/6900                 (RDNA2)
-      #   gfx1100  → RX 7900 XTX                  (RDNA3)
-      #   gfx1151  → Radeon 8050S/8060S           (RDNA3.5)
-      #   gfx1201  → Radeon RX 9070/9070 XT/R9700 (RDNA4)
-      # - HSA_OVERRIDE_GFX_VERSION=12.0.1
+    cap_add:
+      - SYS_PTRACE
     volumes:
       - ~/.cache/huggingface:/root/.cache/huggingface  # Cache model agar tidak download ulang
     ports:
