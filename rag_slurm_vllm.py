@@ -82,16 +82,23 @@ def main():
         requests_per_second=2,
     )
 
-    # Tambahkan label sumber ke setiap chunk
-    for s in splits:
-        title = s.metadata.get("title", "Unknown")
-        header = s.metadata.get("Header 2", s.metadata.get("Header 3", ""))
-        prefix = f"[Sumber: {title}]"
-        if header:
-            prefix += f" [Section: {header}]"
-        s.page_content = f"{prefix}\n{s.page_content}"
-
-    print(f"\n    → Total chunks: {len(splits)}")
+    # === TAMBAHKAN: Split chunk besar menjadi lebih kecil ===
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=2000,
+        chunk_overlap=200,
+        separators=["\n\n", "\n", ". ", " "],
+    )
+    
+    final_splits = []
+    for doc in splits:
+        if len(doc.page_content) > 2500:
+            sub_docs = text_splitter.split_documents([doc])
+            final_splits.extend(sub_docs)
+        else:
+            final_splits.append(doc)
+    
+    splits = final_splits
+    print(f"    → Setelah splitting: {len(splits)} chunks")
 
     # DEBUG: Tampilkan isi setiap chunk
     for i, s in enumerate(splits):
@@ -114,19 +121,16 @@ def main():
 
     # Konfigurasi vLLM
     llm = VLLM(
-        model="Qwen/Qwen3.5-35B-A3B-GPTQ-Int4",  # ← Ganti kembali
+        model="Qwen/Qwen2.5-Coder-7B-Instruct",  # ← Ganti kembali
         trust_remote_code=True,
-        max_new_tokens=1024,
-        temperature=0.6,                           
-        top_p=0.95,
-        top_k=20,
-        presence_penalty=1.5,
+        max_new_tokens=2048,
+        temperature=0.3,                           
+        top_p=0.9,
         tensor_parallel_size=1,
-        dtype="float16",
         vllm_kwargs={
             "gpu_memory_utilization": 0.80,
+            "enforce_eager": True,
             "max_model_len": 32768,
-            "enforce_eager": True
         }
     )
 
@@ -134,7 +138,7 @@ def main():
     # --- FASE 3: TANYA JAWAB (RETRIEVAL & GENERATION) ---
 
     # Setup Retriever
-    retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
+    retriever = vectorstore.as_retriever(search_kwargs={"k": 5})
 
     # ...existing code...
     # Buat Prompt dengan format ChatML (untuk Qwen)
@@ -147,10 +151,11 @@ Aturan:
 2. Sertakan angka, nama, versi, dan spesifikasi PERSIS seperti tertulis di dokumen. Jangan membulatkan atau menambah presisi. Contoh: jika dokumen bilang ">=11", jawab ">=11", BUKAN "11.0" atau "11.2".
 3. Jika informasi bisa DISIMPULKAN dari dokumen, berikan kesimpulan tersebut.
 4. Jika informasi benar-benar TIDAK ADA di dokumen, katakan "Saya tidak menemukan informasi tersebut di sistem."
-5. Jangan mengarang angka, rumus, perintah, URL, atau prosedur yang tidak ada di dokumen.
+5. Jangan mengarang angka, rumus, perintah, URL, nama partisi, atau prosedur yang tidak ada di dokumen. KHUSUSNYA jangan mengarang nama partisi seperti "bigmem" jika tidak disebutkan di dokumen.
 6. JANGAN mengganti perintah dari dokumen dengan perintah alternatif. Contoh: jika dokumen menulis "source activate", JANGAN ganti dengan "conda activate".
-7. Bedakan "minimal" dan "maksimal". Jika dokumen hanya menyebutkan "minimal X" TANPA batas maksimal, jawab bahwa informasi batas maksimal tidak tersedia di dokumen.<im_end|>
-
+7. Bedakan "minimal" dan "maksimal". Jika dokumen hanya menyebutkan "minimal X" TANPA batas maksimal, jawab bahwa informasi batas maksimal tidak tersedia di dokumen.
+8. Perhatikan label LEGACY. Jika halaman bertanda LEGACY untuk versi lama (misal Mk.III), JANGAN terapkan info tersebut untuk versi baru (Mk.V).
+9. Jawab dengan LENGKAP termasuk contoh perintah dan kode jika ada di dokumen. Jangan hanya menjawab kalimat pembuka lalu berhenti.<|im_end|>
     <|im_start|>user
     Dokumen Referensi:
     {context}
