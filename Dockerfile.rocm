@@ -17,10 +17,17 @@ FROM docker.io/rocm/vllm-dev:nightly
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONUNBUFFERED=1
-ENV ROCM_HOME=/opt/rocm
-ENV PATH="${ROCM_HOME}/bin:${PATH}"
-ENV LD_LIBRARY_PATH="${ROCM_HOME}/lib:${LD_LIBRARY_PATH}"
-ENV HSA_OVERRIDE_GFX_VERSION=12.0.1
+# ENV ROCM_HOME=/opt/rocm
+# ENV PATH="${ROCM_HOME}/bin:${PATH}"
+# ENV LD_LIBRARY_PATH="${ROCM_HOME}/lib:${LD_LIBRARY_PATH}"
+# ENV HSA_OVERRIDE_GFX_VERSION=12.0.1
+ENV FLASH_ATTENTION_TRITON_AMD_ENABLE=TRUE
+ENV TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL=1
+
+# =============================================================================
+# Pip cache directory configuration
+# =============================================================================
+ENV PIP_CACHE_DIR=/root/.cache/pip
 
 RUN pip install --upgrade pip
 
@@ -34,7 +41,7 @@ print('GPU available:', torch.cuda.is_available())"
 # ============================================================
 # Install langchain (WITHOUT chromadb for now)
 # ============================================================
-RUN pip install --no-cache-dir \
+RUN pip install \
     langchain \
     langchain-core \
     langchain-community \
@@ -43,32 +50,32 @@ RUN pip install --no-cache-dir \
 # ============================================================
 # Chromadb: install WITHOUT dependencies (avoid onnxruntime pulling torch)
 # ============================================================
-RUN pip install --no-cache-dir --no-deps chromadb
-RUN pip install --no-cache-dir --no-deps langchain-chroma
+RUN pip install --no-deps chromadb
+RUN pip install --no-deps langchain-chroma
 
 # Safe chromadb dependencies (not torch)
-RUN pip install --no-cache-dir \
+RUN pip install \
     pypika overrides mmh3 bcrypt posthog \
     build importlib-resources kubernetes
 
 # ============================================================
 # SitemapLoader dependencies
 # ============================================================
-RUN pip install --no-cache-dir lxml beautifulsoup4
+RUN pip install lxml beautifulsoup4
 
 # onnxruntime WITHOUT dependencies (so it doesn't pull torch CUDA)
-RUN pip install --no-cache-dir --no-deps onnxruntime
-RUN pip install --no-cache-dir flatbuffers
+RUN pip install --no-deps onnxruntime
+RUN pip install flatbuffers
 
 # ============================================================
 # Sentence-transformers & langchain-huggingface WITHOUT torch dep
 # ============================================================
-RUN pip install --no-cache-dir --no-deps \
+RUN pip install --no-deps \
     sentence-transformers \
     langchain-huggingface
 
 # Safe sub-dependencies
-RUN pip install --no-cache-dir \
+RUN pip install \
     scikit-learn scipy Pillow
 
 # ============================================================
