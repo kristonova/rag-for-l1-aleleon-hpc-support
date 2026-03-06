@@ -24,6 +24,7 @@ services:
     container_name: embedding-service
     profiles:
       - model
+      - embedding
     ports:
       - "8001:8001"
     volumes:
@@ -45,6 +46,7 @@ services:
     container_name: vllm-rocm
     profiles:
       - model
+      - vllm-rocm
     devices:
       - /dev/kfd       # Kernel Fusion Driver (wajib ROCm)
       - /dev/dri       # Direct Rendering Infrastructure
@@ -88,7 +90,7 @@ services:
   # rag-app:
   #   build:
   #     context: .
-  #     dockerfile: Dockerfile.rag-app
+  #     dockerfile: /services/rag-app/Dockerfile.rag-app
   #   container_name: rag-app
   #   profiles:
   #     - rag-app
