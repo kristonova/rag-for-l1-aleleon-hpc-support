@@ -23,7 +23,7 @@ from typing import Optional
 class ServiceConfig:
     """Service endpoint configuration."""
     EMBEDDING_URL = os.getenv("EMBEDDING_API_URL", "http://localhost:8001")
-    LLM_URL = os.getenv("LLM_API_URL", "http://0.0.0.0:8000")
+    LLM_URL = os.getenv("LLM_API_URL", "http://localhost:8000")
     CHROMADB_URL = os.getenv("CHROMADB_URL", "http://localhost:8002")
     # ChromaDB authentication credentials (from compose.yml)
     CHROMADB_AUTH_TOKEN = os.getenv("CHROMADB_AUTH_TOKEN", "your-secret-key")

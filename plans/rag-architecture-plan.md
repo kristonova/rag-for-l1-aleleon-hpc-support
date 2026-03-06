@@ -8,9 +8,9 @@ This plan outlines the recommended architecture for serving the `intfloat/multil
 
 | Service | Status | Profile | Command |
 |---------|--------|---------|---------|
-| `embedding-service` | ✅ DONE | `embedding-service` | `podman-compose --podman-run-args="--replace" --profile embedding-service up -d` |
-| `vllm-rocm` | ✅ DONE | `vllm-rocm` | `podman-compose --podman-run-args="--replace" --profile vllm-rocm up -d` |
-| `model` (both services) | ✅ DONE | `model` | `podman-compose --podman-run-args="--replace" --profile model up -d` |
+| `embedding-service` | ✅ DONE | `embedding-service` | `podman-compose --profile embedding-service up -d` |
+| `vllm-rocm` | ✅ DONE | `vllm-rocm` | `podman-compose --profile vllm-rocm up -d` |
+| `model` (both services) | ✅ DONE | `model` | `podman-compose --profile model up -d` |
 | `chromadb` | 🚧 WIP | `chromadb` | Not yet implemented |
 | `rag-app` | 🚧 WIP | `rag-app` | Not yet implemented |
 
@@ -355,7 +355,7 @@ volumes:
 
 **Status**: Embedding service is fully operational and can be started with:
 ```bash
-podman-compose --podman-run-args="--replace" --profile embedding-service up -d
+podman-compose  --profile embedding-service up -d
 ```
 
 ### Phase 2: vLLM Service ✅ COMPLETED
@@ -366,7 +366,7 @@ podman-compose --podman-run-args="--replace" --profile embedding-service up -d
 
 **Status**: vLLM service is fully operational and can be started with:
 ```bash
-podman-compose --podman-run-args="--replace" --profile vllm-rocm up -d
+podman-compose  --profile vllm-rocm up -d
 ```
 
 ### Phase 3: ChromaDB Integration ✅ COMPLETED
@@ -409,17 +409,17 @@ podman-compose --profile embedding --profile vllm-rocm --profile chromadb --prof
 
 #### Embedding Service Only
 ```bash
-podman-compose --podman-run-args="--replace" --profile embedding-service up -d
+podman-compose --profile embedding-service up -d
 ```
 
 #### vLLM Service Only
 ```bash
-podman-compose --podman-run-args="--replace" --profile vllm-rocm up -d
+podman-compose --profile vllm-rocm up -d
 ```
 
 #### Both Embedding and vLLM Services
 ```bash
-podman-compose --podman-run-args="--replace" --profile model up -d
+podman-compose --profile model up -d
 ```
 
 ### Start ChromaDB (Not Yet Implemented)
@@ -487,17 +487,17 @@ podman-compose --profile model down
 The following services are fully operational and can be started independently:
 
 1. **Embedding Service** (`embedding-service`)
-   - Command: `podman-compose --podman-run-args="--replace" --profile embedding-service up -d`
+   - Command: `podman-compose --profile embedding-service up -d`
    - Status: ✅ Fully operational
    - Files: [`services/embedding/Dockerfile.embedding`](services/embedding/Dockerfile.embedding), [`services/embedding/embedding_api.py`](services/embedding/embedding_api.py)
 
 2. **vLLM Service** (`vllm-rocm`)
-   - Command: `podman-compose --podman-run-args="--replace" --profile vllm-rocm up -d`
+   - Command: `podman-compose --profile vllm-rocm up -d`
    - Status: ✅ Fully operational
    - Configuration: Already in [`compose.yml`](compose.yml)
 
 3. **Combined Model Services**
-   - Command: `podman-compose --podman-run-args="--replace" --profile model up -d`
+   - Command: `podman-compose --profile model up -d`
    - Status: ✅ Fully operational (starts both embedding-service and vllm-rocm)
 
 ### Remaining Work
@@ -506,7 +506,7 @@ The following services are fully operational and can be started independently:
    - Create persistent volume configuration
    - Add authentication setup
    - Add to `compose.yml` with profile `chromadb`
-   - Command (when ready): `podman-compose --podman-run-args="--replace" --profile chromadb up -d`
+   - Command (when ready): `podman-compose --profile chromadb up -d`
 
 2. **RAG Application** (`rag-app`) - 🚧 Work in Progress
    - Create `Dockerfile.rag-app`

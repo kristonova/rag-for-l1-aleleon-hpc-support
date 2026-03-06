@@ -18,11 +18,10 @@ services:
   # ---- Embedding Service (intfloat/multilingual-e5-large) ----
   # Menjalankan embedding model sebagai REST API (pasta networking)
   embedding-service:
-    network_mode: pasta
+    container_name: embedding-service
     build:
       context: .
       dockerfile: services/embedding/Dockerfile.embedding
-    container_name: embedding-service
     profiles:
       - model
       - backend
@@ -34,19 +33,12 @@ services:
     environment:
       - MODEL_NAME=intfloat/multilingual-e5-large
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 60s
 
   # ---- LLM Service (vLLM on ROCm) ----
   # Menjalankan LLM inference di GPU AMD dengan OpenAI-compatible API (pasta networking)
   vllm-rocm:
-    network_mode: pasta
     image: docker.io/rocm/vllm-dev:nightly
-    container_name: vllm-rocm
+    container_name: rocm
     profiles:
       - model
       - backend
@@ -87,7 +79,6 @@ services:
   # ---- ChromaDB Vector Store ----
   # Persistent vector database untuk embeddings (ChromaDB v2 API) (pasta networking)
   chromadb:
-    network_mode: pasta
     image: docker.io/chromadb/chroma:latest
     container_name: chromadb
     profiles:
@@ -102,12 +93,18 @@ services:
       - CHROMA_SERVER_AUTHN_CREDENTIALS=your-secret-key
       - CHROMA_ADMIN_USER=admin
       - CHROMA_ADMIN_PASSWORD=admin-password
+    command: ["run", "--host", "0.0.0.0", "--port", "8000"]
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'echo >/dev/tcp/localhost/8000 && exit 0 || exit 1'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
 
   # ---- RAG Application ----
   # Orkestrasi RAG chain menggunakan semua services (pasta networking)
   rag-app:
-    network_mode: pasta
     build:
       context: .
       dockerfile: services/rag-app/Dockerfile.rag-app
@@ -129,11 +126,9 @@ services:
     stdin_open: true
     tty: true
 
-# networks:
-#   rag-network:
-#     driver: bridge
-    # Podman pasta networking is the default from Podman 5.3+
-    # For rootless containers, pasta provides correct source IP handling
+networks:
+  rag-network:
+    driver: bridge
 
 volumes:
   chromadb-data:
