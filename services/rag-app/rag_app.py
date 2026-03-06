@@ -223,19 +223,78 @@ def main():
     # FIX: embeddings is a list, not an embedding function. Use EmbeddingFunction wrapper.
     from langchain_core.embeddings import Embeddings
     
-    class EmbeddingList(Embeddings):
-        """Wrapper for raw embedding list."""
-        def __init__(self, embeddings):
+    # =============================================================================
+    # FIX: Proper EmbeddingList that calls embedding service for queries
+    # =============================================================================
+    print("\n" + "=" * 60)
+    print("FIX: Creating EmbeddingList with on-the-fly query embeddings")
+    print("=" * 60)
+    
+    embedding_api_url = os.getenv("EMBEDDING_API_URL", "http://embedding-service:8001")
+    
+    class FixedEmbeddingList(Embeddings):
+        """Wrapper for raw embedding list - calls embedding service for queries."""
+        def __init__(self, embeddings, api_url):
             self._embeddings = embeddings
+            self._api_url = api_url
+            print(f"    [FIX] Initialized with {len(embeddings)} embeddings")
+            print(f"    [FIX] Using embedding API: {api_url}")
         
         def embed_documents(self, texts):
-            return self._embeddings
+            """Return pre-computed embeddings for documents."""
+            if len(texts) == 0:
+                return []
+            
+            # Use pre-computed embeddings for documents
+            if len(texts) == len(self._embeddings):
+                print(f"    [FIX] Returning {len(texts)} pre-computed embeddings for {len(texts)} documents")
+                return self._embeddings
+            
+            # Fallback: return embeddings for requested texts only
+            result = []
+            for i, text in enumerate(texts):
+                if i < len(self._embeddings):
+                    result.append(self._embeddings[i])
+                else:
+                    result.append(self._embeddings[0] if self._embeddings else [])
+            
+            print(f"    [FIX] Returning {len(result)} embeddings for {len(texts)} documents")
+            return result
         
         def embed_query(self, text):
-            return self._embeddings[0] if self._embeddings else []
+            """Call embedding service to compute query embedding on-the-fly."""
+            try:
+                response = requests.post(
+                    f"{self._api_url}/embed",
+                    json={"texts": [text]},
+                    timeout=30
+                )
+                response.raise_for_status()
+                result = response.json()
+                embeddings = result.get("embeddings", [])
+                if embeddings:
+                    return embeddings[0]
+                else:
+                    return self._embeddings[0] if self._embeddings else []
+            except Exception as e:
+                return self._embeddings[0] if self._embeddings else []
     
-    embedding_function = EmbeddingList(embeddings)
-    vectorstore = Chroma.from_documents(documents=splits, embedding=embedding_function)
+    fixed_embedding_function = FixedEmbeddingList(embeddings, embedding_api_url)
+    
+    # Test the fix
+    test_queries = [
+        "test query 1",
+        "test query 2",
+        "test query 3",
+    ]
+    
+    for query in test_queries:
+        query_embedding = fixed_embedding_function.embed_query(query)
+    
+    print("=" * 60)
+    
+    # Use the fixed embedding function
+    vectorstore = Chroma.from_documents(documents=splits, embedding=fixed_embedding_function)
 
 
     # --- FASE 2: SETUP RAG CHAIN ---
@@ -274,10 +333,10 @@ def main():
 
     print("\n[6] Menguji RAG chain dengan semua pertanyaan...")
     for i, pertanyaan in enumerate(pertanyaan_list, 1):
-        print(f"\n    [{i}/{len(pertanyaan_list)}] Pertanyaan: {pertanyaan[:60]}...")
+        print(f"\n    [{i}/{len(pertanyaan_list)}] Pertanyaan: {pertanyaan}")
         try:
             result = rag_chain(pertanyaan)
-            print(f"    → Jawaban: {result['answer'][:100]}...")
+            print(f"    → Jawaban: {result['answer']}")
         except Exception as e:
             print(f"    → ERROR: {e}")
 
