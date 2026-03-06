@@ -13,6 +13,35 @@ from langchain_core.prompts import PromptTemplate
 from langchain_core.documents import Document
 from bs4 import BeautifulSoup
 import time
+from typing import List
+
+
+# === KONFIGURASI PATH PENYIMPANAN ===
+CHROMA_PERSIST_DIR = "./chroma_db"  # Folder untuk menyimpan ChromaDB secara permanen
+CHROMA_COLLECTION_NAME = "wiki_aleleon"
+
+
+class E5Embeddings(HuggingFaceEmbeddings):
+    """
+    Wrapper untuk multilingual-e5-large yang otomatis menambahkan
+    prefix 'passage: ' saat embed dokumen dan 'query: ' saat embed pertanyaan.
+    
+    Ini penting karena model E5 dilatih dengan format:
+    - "query: <pertanyaan>"   → untuk teks pencarian user
+    - "passage: <dokumen>"    → untuk teks dokumen/konteks
+    
+    Tanpa prefix ini, akurasi retrieval turun signifikan.
+    """
+
+    def embed_documents(self, texts: List[str]) -> List[List[float]]:
+        """Tambahkan prefix 'passage: ' untuk setiap dokumen."""
+        prefixed = [f"passage: {t}" for t in texts]
+        return super().embed_documents(prefixed)
+
+    def embed_query(self, text: str) -> List[float]:
+        """Tambahkan prefix 'query: ' untuk pertanyaan user."""
+        return super().embed_query(f"query: {text}")
+
 
 def load_wiki_documents(sitemap_url, requests_per_second=2):
     """
@@ -70,25 +99,33 @@ def load_wiki_documents(sitemap_url, requests_per_second=2):
     return all_docs
 
 
-def main():
-    print("Memulai proses RAG dengan mesin vLLM...\n")
+def chroma_db_exists() -> bool:
+    """Cek apakah ChromaDB sudah ada di disk dan berisi data."""
+    if not os.path.exists(CHROMA_PERSIST_DIR):
+        return False
+    # Cek apakah folder tidak kosong (minimal ada file chroma.sqlite3)
+    contents = os.listdir(CHROMA_PERSIST_DIR)
+    return len(contents) > 0
 
-    # --- FASE 1: MEMASUKKAN DATA (INGESTION) ---
 
-    # 1. Load + Split dokumen dari wiki (Document Structure-Based)
+def build_vectorstore(embeddings) -> Chroma:
+    """
+    Scraping wiki → splitting → simpan ke ChromaDB permanen.
+    Hanya dijalankan SEKALI saat pertama kali.
+    """
     print("[1] Membaca & splitting halaman wiki berdasarkan struktur HTML...")
     splits = load_wiki_documents(
         sitemap_url="https://wiki.efisonlt.com/sitemap/sitemap-wiki.efisonlt.com-NS_0-0.xml",
         requests_per_second=2,
     )
 
-    # === TAMBAHKAN: Split chunk besar menjadi lebih kecil ===
+    # Split chunk besar menjadi lebih kecil
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=2000,
         chunk_overlap=200,
         separators=["\n\n", "\n", ". ", " "],
     )
-    
+
     final_splits = []
     for doc in splits:
         if len(doc.page_content) > 2500:
@@ -96,7 +133,7 @@ def main():
             final_splits.extend(sub_docs)
         else:
             final_splits.append(doc)
-    
+
     splits = final_splits
     print(f"    → Setelah splitting: {len(splits)} chunks")
 
@@ -105,13 +142,55 @@ def main():
         print(f"\n    [Chunk {i}] ({len(s.page_content)} chars):")
         print(f"    {s.page_content[:120]}...")
 
-    # 2. Setup Model Embedding (Lokal via HuggingFace - CPU/GPU)
-    print("[3] Load model embedding lokal...")
-    embeddings = HuggingFaceEmbeddings(model_name="intfloat/multilingual-e5-large")
+    # Simpan ke ChromaDB dengan persist_directory (PERMANEN di disk)
+    print(f"[4] Menyimpan vektor ke database Chroma di '{CHROMA_PERSIST_DIR}'...")
+    vectorstore = Chroma.from_documents(
+        documents=splits,
+        embedding=embeddings,
+        persist_directory=CHROMA_PERSIST_DIR,
+        collection_name=CHROMA_COLLECTION_NAME,
+    )
+    print(f"    ✅ ChromaDB tersimpan permanen di '{CHROMA_PERSIST_DIR}'")
 
-    # 4. Simpan ke Vector Database (Chroma)
-    print("[4] Menyimpan vektor ke database Chroma...")
-    vectorstore = Chroma.from_documents(documents=splits, embedding=embeddings)
+    return vectorstore
+
+
+## Jika ingin re-scrape (misal wiki berubah): 
+##rm -rf ./chroma_db && python rag_slurm_vllm.py
+def load_vectorstore(embeddings) -> Chroma:
+    """
+    Load ChromaDB yang sudah ada dari disk.
+    Tidak perlu scraping ulang.
+    """
+    print(f"[1] ⚡ Memuat ChromaDB dari disk '{CHROMA_PERSIST_DIR}' (tanpa scraping)...")
+    vectorstore = Chroma(
+        persist_directory=CHROMA_PERSIST_DIR,
+        embedding_function=embeddings,
+        collection_name=CHROMA_COLLECTION_NAME,
+    )
+    # Cek jumlah dokumen di database
+    count = vectorstore._collection.count()
+    print(f"    ✅ Berhasil memuat {count} chunks dari ChromaDB")
+
+    return vectorstore
+
+
+def main():
+    print("Memulai proses RAG dengan mesin vLLM...\n")
+
+    # --- FASE 1: MEMASUKKAN DATA (INGESTION) ---
+
+    # 1. Setup Model Embedding (harus load dulu sebelum cek DB)
+    print("[3] Load model embedding lokal...")
+    embeddings = E5Embeddings(
+        model_name="intfloat/multilingual-e5-large",
+    )
+
+    # 2. Cek apakah ChromaDB sudah ada → skip scraping jika sudah
+    if chroma_db_exists():
+        vectorstore = load_vectorstore(embeddings)
+    else:
+        vectorstore = build_vectorstore(embeddings)
 
 
     # --- FASE 2: SETUP vLLM (ENGINE INFERENCE) ---
@@ -121,7 +200,7 @@ def main():
 
     # Konfigurasi vLLM
     llm = VLLM(
-        model="Qwen/Qwen3.5-35B-A3B-GPTQ-Int4",  # ← Ganti kembali
+        model="Qwen/Qwen3.5-35B-A3B-GPTQ-Int4",
         trust_remote_code=True,
         max_new_tokens=2048,
         temperature=0.3,                           
@@ -141,7 +220,6 @@ def main():
     # Setup Retriever
     retriever = vectorstore.as_retriever(search_kwargs={"k": 5})
 
-    # ...existing code...
     # Buat Prompt dengan format ChatML (untuk Qwen)
     template_qwen = """<|im_start|>system
 Kamu adalah agen AI asisten admin HPC Slurm yang ahli. Tugasmu adalah membantu user berdasarkan dokumen referensi yang diberikan. Gunakan Bahasa Indonesia yang jelas.
