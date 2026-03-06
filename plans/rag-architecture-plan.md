@@ -4,6 +4,18 @@
 
 This plan outlines the recommended architecture for serving the `intfloat/multilingual-e5-large` embedding model, persisting embeddings to ChromaDB, and orchestrating the RAG chain using LangChain—all running on Podman with AMD ROCm GPU support.
 
+### Current Progress Status
+
+| Service | Status | Profile | Command |
+|---------|--------|---------|---------|
+| `embedding-service` | ✅ DONE | `embedding-service` | `podman-compose --podman-run-args="--replace" --profile embedding-service up -d` |
+| `vllm-rocm` | ✅ DONE | `vllm-rocm` | `podman-compose --podman-run-args="--replace" --profile vllm-rocm up -d` |
+| `model` (both services) | ✅ DONE | `model` | `podman-compose --podman-run-args="--replace" --profile model up -d` |
+| `chromadb` | 🚧 WIP | `chromadb` | Not yet implemented |
+| `rag-app` | 🚧 WIP | `rag-app` | Not yet implemented |
+
+For detailed progress documentation, see [`plans/service-progress.md`](plans/service-progress.md).
+
 ---
 
 ## Current Architecture Analysis
@@ -334,78 +346,129 @@ volumes:
 
 ## Implementation Plan
 
-### Phase 1: Embedding Service
+### Phase 1: Embedding Service ✅ COMPLETED
 
-1. Create `Dockerfile.embedding`
-2. Create `embedding_api.py` with FastAPI endpoints
-3. Test embedding service locally
-4. Add to `compose.yml` with profile `embedding`
+1. ✅ Create `Dockerfile.embedding` - Done
+2. ✅ Create `embedding_api.py` with FastAPI endpoints - Done
+3. ✅ Test embedding service locally - Done
+4. ✅ Add to `compose.yml` with profile `embedding-service` - Done
 
-### Phase 2: ChromaDB Integration
+**Status**: Embedding service is fully operational and can be started with:
+```bash
+podman-compose --podman-run-args="--replace" --profile embedding-service up -d
+```
+
+### Phase 2: vLLM Service ✅ COMPLETED
+
+1. ✅ Configure vLLM with ROCm support - Done
+2. ✅ Add to `compose.yml` with profile `vllm-rocm` - Done
+3. ✅ Test vLLM API endpoints - Done
+
+**Status**: vLLM service is fully operational and can be started with:
+```bash
+podman-compose --podman-run-args="--replace" --profile vllm-rocm up -d
+```
+
+### Phase 3: ChromaDB Integration 🚧 IN PROGRESS
 
 1. Create persistent volume `chromadb-data`
 2. Configure ChromaDB with authentication
 3. Create `chromadb_client.py` for API interactions
 4. Add to `compose.yml` with profile `chromadb`
 
-### Phase 3: RAG Application
+**Status**: Not yet implemented. Requires:
+- Persistent volume configuration
+- Authentication setup
+- API client integration
+
+### Phase 4: RAG Application 🚧 IN PROGRESS
 
 1. Create `Dockerfile.rag-app`
 2. Refactor `rag_slurm_vllm.py` into `rag_app.py`
 3. Update to use API clients for all services
 4. Add to `compose.yml` with profile `rag-app`
 
-### Phase 4: Testing & Validation
+**Status**: Not yet implemented. Requires:
+- Service orchestration logic
+- Integration with embedding-service, vllm-rocm, and chromadb
+
+### Phase 5: Testing & Validation 🚧 PENDING
 
 1. Test embedding service health check
 2. Test ChromaDB persistence across restarts
 3. Test full RAG pipeline end-to-end
 4. Document usage instructions
 
+**Status**: Pending completion of Phases 3 and 4.
+
 ---
 
 ## Usage Instructions
 
 ### Start All Services
+
 ```bash
 podman-compose --profile embedding --profile vllm-rocm --profile chromadb --profile rag-app up
 ```
 
-### Start Only Embedding Service
+### Start Individual Services
+
+#### Embedding Service Only
 ```bash
-podman-compose --profile embedding up embedding-service
+podman-compose --podman-run-args="--replace" --profile embedding-service up -d
 ```
 
-### Start Only LLM Service
+#### vLLM Service Only
 ```bash
-podman-compose --profile vllm-rocm up vllm-rocm
+podman-compose --podman-run-args="--replace" --profile vllm-rocm up -d
 ```
 
-### Start Only ChromaDB
+#### Both Embedding and vLLM Services
+```bash
+podman-compose --podman-run-args="--replace" --profile model up -d
+```
+
+### Start ChromaDB (Not Yet Implemented)
 ```bash
 podman-compose --profile chromadb up chromadb
 ```
 
-### Run RAG Application
+### Run RAG Application (Not Yet Implemented)
 ```bash
 podman-compose --profile rag-app run rag-app
 ```
 
-### Test Embedding API
+### Test Services
+
+#### Test Embedding API
 ```bash
 curl -X POST http://localhost:8001/embed \
   -H "Content-Type: application/json" \
   -d '{"texts": ["Hello world", "Test embedding"]}'
 ```
 
-### Test ChromaDB API
+#### Test ChromaDB API
 ```bash
 curl http://localhost:8002/api/v1/heartbeat
 ```
 
-### Test vLLM API
+#### Test vLLM API
 ```bash
 curl http://localhost:8000/health
+```
+
+### Check Service Status
+```bash
+podman-compose ps
+podman-compose logs embedding-service
+podman-compose logs vllm-rocm
+```
+
+### Stop Services
+```bash
+podman-compose --profile embedding-service down
+podman-compose --profile vllm-rocm down
+podman-compose --profile model down
 ```
 
 ---
@@ -425,12 +488,44 @@ curl http://localhost:8000/health
 
 ## Next Steps
 
-1. Review this architecture plan
-2. Confirm if any adjustments are needed
-3. If approved, I'll create the actual files in Code mode:
-   - `Dockerfile.embedding`
-   - `embedding_api.py`
-   - `Dockerfile.rag-app`
-   - `rag_app.py` (refactored from `rag_slurm_vllm.py`)
-   - `chromadb_client.py`
-   - Updated `compose.yml`
+### Completed Services
+
+The following services are fully operational and can be started independently:
+
+1. **Embedding Service** (`embedding-service`)
+   - Command: `podman-compose --podman-run-args="--replace" --profile embedding-service up -d`
+   - Status: ✅ Fully operational
+   - Files: [`services/embedding/Dockerfile.embedding`](services/embedding/Dockerfile.embedding), [`services/embedding/embedding_api.py`](services/embedding/embedding_api.py)
+
+2. **vLLM Service** (`vllm-rocm`)
+   - Command: `podman-compose --podman-run-args="--replace" --profile vllm-rocm up -d`
+   - Status: ✅ Fully operational
+   - Configuration: Already in [`compose.yml`](compose.yml)
+
+3. **Combined Model Services**
+   - Command: `podman-compose --podman-run-args="--replace" --profile model up -d`
+   - Status: ✅ Fully operational (starts both embedding-service and vllm-rocm)
+
+### Remaining Work
+
+1. **ChromaDB Service** (`chromadb`) - 🚧 Work in Progress
+   - Create persistent volume configuration
+   - Add authentication setup
+   - Add to `compose.yml` with profile `chromadb`
+   - Command (when ready): `podman-compose --podman-run-args="--replace" --profile chromadb up -d`
+
+2. **RAG Application** (`rag-app`) - 🚧 Work in Progress
+   - Create `Dockerfile.rag-app`
+   - Refactor `rag_slurm_vllm.py` into `rag_app.py`
+   - Integrate with all services via API
+   - Add to `compose.yml` with profile `rag-app`
+   - Command (when ready): `podman-compose --profile rag-app run rag-app`
+
+### Documentation Created
+
+- [`plans/service-progress.md`](plans/service-progress.md) - Detailed service progress documentation
+- [`plans/rag-architecture-plan.md`](plans/rag-architecture-plan.md) - Updated architecture plan with current progress
+
+### Review and Approval
+
+Please review the service progress documentation and architecture plan. Confirm if any adjustments are needed before proceeding with implementation of the remaining services (ChromaDB and RAG application).

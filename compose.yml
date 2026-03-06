@@ -24,7 +24,7 @@ services:
     container_name: embedding-service
     profiles:
       - model
-      - embedding
+      - embedding-service
     ports:
       - "8001:8001"
     volumes:
