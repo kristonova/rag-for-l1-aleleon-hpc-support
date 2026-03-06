@@ -16,14 +16,16 @@
 
 services:
   # ---- Embedding Service (intfloat/multilingual-e5-large) ----
-  # Menjalankan embedding model sebagai REST API
+  # Menjalankan embedding model sebagai REST API (pasta networking)
   embedding-service:
+    network_mode: pasta
     build:
       context: .
       dockerfile: services/embedding/Dockerfile.embedding
     container_name: embedding-service
     profiles:
       - model
+      - backend
       - embedding-service
     ports:
       - "8001:8001"
@@ -40,12 +42,14 @@ services:
       start_period: 60s
 
   # ---- LLM Service (vLLM on ROCm) ----
-  # Menjalankan LLM inference di GPU AMD dengan OpenAI-compatible API
+  # Menjalankan LLM inference di GPU AMD dengan OpenAI-compatible API (pasta networking)
   vllm-rocm:
+    network_mode: pasta
     image: docker.io/rocm/vllm-dev:nightly
     container_name: vllm-rocm
     profiles:
       - model
+      - backend
       - vllm-rocm
     devices:
       - /dev/kfd       # Kernel Fusion Driver (wajib ROCm)
@@ -81,34 +85,55 @@ services:
       start_period: 300s  # Model loading bisa lama
 
   # ---- ChromaDB Vector Store ----
-  # Persistent vector database untuk embeddings
-  # Not yet implemented
+  # Persistent vector database untuk embeddings (ChromaDB v2 API) (pasta networking)
+  chromadb:
+    network_mode: pasta
+    image: docker.io/chromadb/chroma:latest
+    container_name: chromadb
+    profiles:
+      - backend
+      - chromadb
+    ports:
+      - "8002:8000"
+    volumes:
+      - chromadb-data:/chroma/data
+    environment:
+      - CHROMA_SERVER_AUTHN_PROVIDER=chromadb.auth.token_authn.TokenAuthenticationServerProvider
+      - CHROMA_SERVER_AUTHN_CREDENTIALS=your-secret-key
+      - CHROMA_ADMIN_USER=admin
+      - CHROMA_ADMIN_PASSWORD=admin-password
+    restart: unless-stopped
 
   # ---- RAG Application ----
-  # Orkestrasi RAG chain menggunakan semua services
-  # Not yet implemented
-  # rag-app:
-  #   build:
-  #     context: .
-  #     dockerfile: /services/rag-app/Dockerfile.rag-app
-  #   container_name: rag-app
-  #   profiles:
-  #     - rag-app
-  #   environment:
-  #     - EMBEDDING_API_URL=http://embedding-service:8001
-  #     - LLM_API_URL=http://vllm-rocm:8000/v1
-  #     - CHROMADB_URL=http://chromadb:8000
-  #     - CHROMADB_AUTH_TOKEN=your-secret-key
-  #   depends_on:
-  #     embedding-service:
-  #       condition: service_healthy
-  #     vllm-rocm:
-  #       condition: service_healthy
-  #     chromadb:
-  #       condition: service_healthy
-  #   stdin_open: true
-  #   tty: true
+  # Orkestrasi RAG chain menggunakan semua services (pasta networking)
+  rag-app:
+    network_mode: pasta
+    build:
+      context: .
+      dockerfile: services/rag-app/Dockerfile.rag-app
+    container_name: rag-app
+    profiles:
+      - rag-app
+    environment:
+      - EMBEDDING_API_URL=http://embedding-service:8001
+      - LLM_API_URL=http://vllm-rocm:8000/v1
+      - CHROMADB_URL=http://chromadb:8000
+      - CHROMADB_AUTH_TOKEN=your-secret-key
+    # depends_on:
+    #   embedding-service:
+    #     condition: service_healthy
+    #   vllm-rocm:
+    #     condition: service_healthy
+    #   chromadb:
+    #     condition: service_healthy
+    stdin_open: true
+    tty: true
 
-networks:
-  rag-network:
-    driver: bridge
+# networks:
+#   rag-network:
+#     driver: bridge
+    # Podman pasta networking is the default from Podman 5.3+
+    # For rootless containers, pasta provides correct source IP handling
+
+volumes:
+  chromadb-data:

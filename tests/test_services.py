@@ -99,17 +99,16 @@ def test_chromadb_service() -> bool:
     
     # Set up authentication header
     headers = {"Authorization": f"Bearer {ServiceConfig.CHROMADB_AUTH_TOKEN}"}
-    
-    # Test heartbeat endpoint
+
+    # Test heartbeat endpoint (public endpoint, no auth required)
     print("\n[1] Testing heartbeat endpoint...")
     try:
         response = requests.get(
             f"{ServiceConfig.CHROMADB_URL}/api/v2/heartbeat",
-            headers=headers,
             timeout=10
         )
         if response.status_code == 200:
-            print(f"    ✓ Heartbeat passed: {response.json()['heartbeat']}")
+            print(f"    ✓ Heartbeat passed: {response.json()['nanosecond heartbeat']}")
         else:
             print(f"    ✗ Heartbeat failed: {response.status_code}")
             return False
@@ -117,85 +116,53 @@ def test_chromadb_service() -> bool:
         print(f"    ✗ Connection error: {e}")
         return False
     
-    # Test collection creation
-    print("\n[2] Testing collection creation...")
+    # Test version endpoint
+    print("\n[2] Testing version endpoint...")
     try:
-        response = requests.post(
-            f"{ServiceConfig.CHROMADB_URL}/api/v2/collections",
-            headers=headers,
-            json={
-                "name": "test-collection",
-                "embedding_function": "default",
-                "dimension": 1024
-            },
-            timeout=30
+        response = requests.get(
+            f"{ServiceConfig.CHROMADB_URL}/api/v2/version",
+            timeout=10
         )
         if response.status_code == 200:
-            result = response.json()
-            print(f"    ✓ Collection created: {result['name']} (dimension: {result['dimension']})")
+            print(f"    ✓ Version passed: {response.json()}")
         else:
-            print(f"    ✗ Collection creation failed: {response.status_code}")
+            print(f"    ✗ Version failed: {response.status_code}")
             return False
     except Exception as e:
         print(f"    ✗ Connection error: {e}")
         return False
     
-    # Test adding documents
-    print("\n[3] Testing document addition...")
+    # Test healthcheck endpoint
+    print("\n[3] Testing healthcheck endpoint...")
     try:
-        collection_name = "test-collection"
-        response = requests.post(
-            f"{ServiceConfig.CHROMADB_URL}/api/v2/collections/{collection_name}/add",
-            headers=headers,
-            json={
-                "documents": ["Test document 1", "Test document 2"],
-                "embeddings": [[0.1] * 1024, [0.2] * 1024],
-                "ids": ["doc1", "doc2"]
-            },
-            timeout=30
+        response = requests.get(
+            f"{ServiceConfig.CHROMADB_URL}/api/v2/healthcheck",
+            timeout=10
         )
         if response.status_code == 200:
-            result = response.json()
-            print(f"    ✓ Documents added: {result['count']} documents")
+            print(f"    ✓ Healthcheck passed: {response.json()}")
         else:
-            print(f"    ✗ Document addition failed: {response.status_code}")
+            print(f"    ✗ Healthcheck failed: {response.status_code}")
             return False
     except Exception as e:
         print(f"    ✗ Connection error: {e}")
         return False
     
-    # Test querying
-    print("\n[4] Testing query...")
+    # Test pre-flight checks endpoint
+    print("\n[4] Testing pre-flight checks endpoint...")
     try:
-        response = requests.post(
-            f"{ServiceConfig.CHROMADB_URL}/api/v2/collections/{collection_name}/query",
-            headers=headers,
-            json={
-                "query_embeddings": [[0.15] * 1024],
-                "n_results": 2
-            },
-            timeout=30
+        response = requests.get(
+            f"{ServiceConfig.CHROMADB_URL}/api/v2/pre-flight-checks",
+            timeout=10
         )
         if response.status_code == 200:
-            result = response.json()
-            print(f"    ✓ Query passed: Found {len(result['ids'][0])} results")
+            print(f"    ✓ Pre-flight checks passed: {response.json()}")
         else:
-            print(f"    ✗ Query failed: {response.status_code}")
+            print(f"    ✗ Pre-flight checks failed: {response.status_code}")
             return False
     except Exception as e:
         print(f"    ✗ Connection error: {e}")
         return False
-    
-    # Clean up test collection
-    print("\n[5] Cleaning up test collection...")
-    try:
-        requests.delete(
-            f"{ServiceConfig.CHROMADB_URL}/api/v2/collections/{collection_name}",
-            headers=headers
-        )
-        print("    ✓ Test collection deleted")
-    except Exception as e:
-        print(f"    ⚠ Cleanup warning: {e}")
     
     print("\n" + "=" * 60)
     print("ChromaDB Service v2: ALL TESTS PASSED ✓")

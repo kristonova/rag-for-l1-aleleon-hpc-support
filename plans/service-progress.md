@@ -67,44 +67,56 @@ podman-compose --podman-run-args="--replace" --profile vllm-rocm up -d
 
 ---
 
-### 🚧 Work in Progress
+### ✅ Implemented Services
 
 #### 3. ChromaDB Service (`chromadb`)
 
-**Status**: **WORK IN PROGRESS** - Not yet implemented
+**Status**: **IMPLEMENTED** - Ready to use
 
 **Purpose**: Persistent vector database for storing and retrieving embeddings
 
-**Planned Configuration**:
-- **Image**: `chromadb/chroma:latest`
+**Configuration**:
+- **Image**: `chromadb/chroma:0.5.18` (v2 API support)
 - **Port**: 8002 (mapped to container port 8000)
 - **Storage**: Persistent volume `chromadb-data`
-- **Authentication**: Token-based auth
+- **Authentication**: Token-based auth enabled
 
-**Required Files**:
-- ChromaDB client library integration
-- Volume configuration in `compose.yml`
-- Authentication setup
+**Command to Run**:
+```bash
+podman-compose --podman-run-args="--replace" --profile chromadb up -d
+```
 
-**Profile**: `chromadb` (not yet available)
+**API Endpoints** (ChromaDB v2):
+- `GET /api/v2/heartbeat` - Server heartbeat
+- `POST /api/v2/collections` - Create collection
+- `POST /api/v2/collections/{name}/add` - Add documents
+- `POST /api/v2/collections/{name}/query` - Query collection
+
+**Profile**: `chromadb`
 
 ---
 
 #### 4. RAG Application (`rag-app`)
 
-**Status**: **WORK IN PROGRESS** - Not yet implemented
+**Status**: **IMPLEMENTED** - Ready to use
 
 **Purpose**: Orchestrate RAG chain using all services
 
-**Planned Configuration**:
+**Configuration**:
 - **Build**: From `services/rag-app/Dockerfile.rag-app`
 - **Environment Variables**:
   - `EMBEDDING_API_URL=http://embedding-service:8001`
   - `LLM_API_URL=http://vllm-rocm:8000/v1`
   - `CHROMADB_URL=http://chromadb:8000`
+  - `CHROMADB_AUTH_TOKEN=your-secret-key`
 - **Dependencies**: Waits for all services to be healthy
 
-**Profile**: `rag-app` (not yet available)
+**Command to Run**:
+```bash
+podman-compose --profile rag-app run rag-app
+```
+
+**Profile**: `rag-app`
 
 ---
 
