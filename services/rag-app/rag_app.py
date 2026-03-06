@@ -143,10 +143,9 @@ Pertanyaan: {question}"""
     response = client.chat.completions.create(
         model="Qwen/Qwen3.5-35B-A3B-GPTQ-Int4",
         messages=messages,
-        max_tokens=1024,
+        max_tokens=262144,
         temperature=0.6,
         top_p=0.95,
-        top_k=20,
         presence_penalty=1.5,
         extra_body={
             "top_k": 20,
@@ -199,7 +198,7 @@ def main():
 
     print(f"\n    → Total chunks: {len(splits)}")
 
-    print("[2] Menampilan isi setiap chunk...")
+    print("[2] Menampilkan isi setiap chunk...")
     # DEBUG: Tampilkan isi setiap chunk
     for i, s in enumerate(splits):
         print(f"\n    [Chunk {i}] ({len(s.page_content)} chars):")
@@ -209,11 +208,34 @@ def main():
     print("[3] Mendapatkan embeddings dari embedding-service...")
     texts = [doc.page_content for doc in splits]
     embeddings = get_embeddings(texts)
+    
+    # DEBUG: Log embeddings type and structure
+    print(f"\n    [DEBUG] embeddings type: {type(embeddings)}")
+    print(f"    [DEBUG] embeddings length: {len(embeddings) if isinstance(embeddings, list) else 'N/A'}")
+    if isinstance(embeddings, list) and len(embeddings) > 0:
+        print(f"    [DEBUG] first embedding type: {type(embeddings[0])}")
+        print(f"    [DEBUG] first embedding length: {len(embeddings[0]) if isinstance(embeddings[0], list) else 'N/A'}")
+        print(f"    [DEBUG] first embedding sample: {embeddings[0][:5] if isinstance(embeddings[0], list) else embeddings[0]}")
 
     # 3. Simpan ke Vector Database (Chroma)
     print("[4] Menyimpan vektor ke database Chroma...")
     # Create Chroma vectorstore with embeddings
-    vectorstore = Chroma.from_documents(documents=splits, embedding=embeddings)
+    # FIX: embeddings is a list, not an embedding function. Use EmbeddingFunction wrapper.
+    from langchain_core.embeddings import Embeddings
+    
+    class EmbeddingList(Embeddings):
+        """Wrapper for raw embedding list."""
+        def __init__(self, embeddings):
+            self._embeddings = embeddings
+        
+        def embed_documents(self, texts):
+            return self._embeddings
+        
+        def embed_query(self, text):
+            return self._embeddings[0] if self._embeddings else []
+    
+    embedding_function = EmbeddingList(embeddings)
+    vectorstore = Chroma.from_documents(documents=splits, embedding=embedding_function)
 
 
     # --- FASE 2: SETUP RAG CHAIN ---
@@ -248,55 +270,19 @@ def main():
         "Bagaimana langkah lengkap membuat conda env baru dan modul pyload dari awal?",
         "Apa saja status job di squeue dan artinya masing-masing?",
         "Bagaimana cara mengisi formulir Jupyter di EWS untuk conda env user?",
-
-        # ===== LEVEL 3: Reasoning / Deduksi =====
-        "Saya ingin pakai TensorFlow GPU di conda env. Package CUDA versi berapa yang harus saya instal?",
-        "Kenapa Anaconda3 2024.06-1 tidak direkomendasikan? Apa yang harus dilakukan user yang sudah terpasang?",
-        "Saya upload file Notebook (.ipynb) untuk batch job. Apa yang harus saya lakukan sebelum submit?",
-        "Kenapa submit script menggunakan header #!/bin/bash -l dan perintah pyl load/pyl unload?",
-        "Saya ingin menggunakan multi-GPU di ALELEON untuk deep learning. Package apa yang perlu diinstal?",
-        "Storage HOME saya hampir penuh setelah banyak instal package conda. Bagaimana cara membersihkannya?",
-
-        # ===== LEVEL 4: Anti-Hallucination (jawaban TIDAK ada di dokumen) =====
-        "Berapa harga berlangganan conda env di ALELEON per bulan?",
-        "Apakah ALELEON mendukung instalasi Docker di dalam conda env?",
-        "Berapa jumlah maksimal GPU yang bisa diminta dalam satu batch job conda?",
     ]
 
-    # Batch invoke: kumpulkan semua input sekaligus lalu proses satu loop
-    inputs = [{"input": q} for q in pertanyaan_list]
+    print("\n[6] Menguji RAG chain dengan semua pertanyaan...")
+    for i, pertanyaan in enumerate(pertanyaan_list, 1):
+        print(f"\n    [{i}/{len(pertanyaan_list)}] Pertanyaan: {pertanyaan[:60]}...")
+        try:
+            result = rag_chain(pertanyaan)
+            print(f"    → Jawaban: {result['answer'][:100]}...")
+        except Exception as e:
+            print(f"    → ERROR: {e}")
 
-    for i, inp in enumerate(inputs, 1):
-        print(f"\n{'='*60}")
-        print(f"[Q{i}/{len(inputs)}] {inp['input']}")
-        print("-" * 60)
-        hasil = rag_chain(inp)
-        print(hasil['answer'].strip())
-
-        # Tampilkan sumber dokumen yang digunakan
-        if 'context' in hasil and hasil['context']:
-            print(f"\n    📚 Sumber ({len(hasil['context'])} chunks):")
-            seen = []
-            for doc in hasil['context']:
-                title = doc.metadata.get("title", "Unknown")
-                source = doc.metadata.get("source", "")
-                header = doc.metadata.get("Header 2", doc.metadata.get("Header 3", ""))
-                key = (title, header)
-                if key not in seen:
-                    seen.append(key)
-                    label = f"    • {title}"
-                    if header:
-                        label += f" → {header}"
-                    if source:
-                        label += f"  ({source})"
-                    print(label)
-
-    print(f"\n{'='*60}")
-    print(f"Selesai — {len(inputs)} pertanyaan dijawab.")
+    print("\n\n=== RAG Process Complete ===")
 
 
-# ============================================================
-# INI KUNCINYA: Mencegah spawn menjalankan ulang seluruh script
-# ============================================================
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
