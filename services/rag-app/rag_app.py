@@ -143,7 +143,7 @@ Pertanyaan: {question}"""
     response = client.chat.completions.create(
         model="Qwen/Qwen3.5-35B-A3B-GPTQ-Int4",
         messages=messages,
-        max_tokens=262144,
+        max_tokens=32768,
         temperature=0.6,
         top_p=0.95,
         presence_penalty=1.5,
