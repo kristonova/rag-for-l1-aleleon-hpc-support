@@ -1,0 +1,24 @@
+Memulai proses RAG dengan mesin vLLM...
+
+[1] Membaca & splitting halaman wiki berdasarkan struktur HTML...
+    Mengambil sitemap...
+    → 63 URL ditemukan
+    [1/63] ALELEON Supercomputer: 771 chars
+    [2/63] Submit Script ALELEON Supercomputer: 7660 chars
+    [3/63] Core Hour: 3615 chars
+    [4/63] Katalog Software ALELEON Supercomputer: 6932 chars
+    [5/63] Pendaftaran dan Biaya ALELEON Supercomputer: 5348 chars
+    [6/63] R: 12150 chars
+    [7/63] Spesifikasi ALELEON Supercomputer: 3325 chars
+    [8/63] GROMACS: 14179 chars
+    [9/63] NWChem: 5806 chars
+    [10/63] Quantum ESPRESSO: 8717 chars
+Traceback (most recent call last):
+  File "/app/rag_slurm_vllm.py", line 478, in <module>
+    main()
+  File "/app/rag_slurm_vllm.py", line 80, in main
+    splits = load_wiki_documents(
+             ^^^^^^^^^^^^^^^^^^^^
+  File "/app/rag_slurm_vllm.py", line 39, in load_wiki_documents
+    time.sleep(1.0 / requests_per_second)
+KeyboardInterrupt
