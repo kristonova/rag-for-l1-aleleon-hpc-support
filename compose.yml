@@ -1,18 +1,17 @@
 # =============================================================================
-# podman-compose.yml — RAG + vLLM + Embedding Service untuk AMD GPU (ROCm)
+# podman-compose.yml — RAG + vLLM + Embedding Service + ChromaDB for AMD GPU (ROCm)
 # =============================================================================
-# Cara pakai:
+# Usage:
+#   # Start all services with test profile
+#   podman-compose --profile test up
+#   
+#   # Start individual services
 #   podman-compose --profile embedding up embedding-service
 #   podman-compose --profile vllm-rocm up vllm-rocm
 #   podman-compose --profile chromadb up chromadb
-#   podman-compose --profile chromadb-local up chromadb-local (local dev)
-#   podman-compose --profile rag-app run rag-app
-#   podman-compose --profile embedding --profile vllm-rocm --profile chromadb --profile rag-app up
-#
-# Catatan:
-#   - Model akan di-download otomatis ke ~/.cache/huggingface
-#   - vLLM server butuh waktu untuk load model (~2-5 menit)
-#   - Embedding service butuh waktu untuk load model (~1-2 menit)
+#   
+#   # Run RAG application
+#   podman-compose --profile test run rag-app
 # =============================================================================
 
 services:
@@ -24,7 +23,7 @@ services:
       dockerfile: services/embedding/Dockerfile.embedding
     container_name: embedding-service
     profiles:
-      - embedding
+      - model
     ports:
       - "8001:8001"
     volumes:
@@ -45,7 +44,7 @@ services:
     image: docker.io/rocm/vllm-dev:nightly
     container_name: vllm-rocm
     profiles:
-      - vllm-rocm
+      - model
     devices:
       - /dev/kfd       # Kernel Fusion Driver (wajib ROCm)
       - /dev/dri       # Direct Rendering Infrastructure
@@ -79,55 +78,34 @@ services:
       retries: 10
       start_period: 300s  # Model loading bisa lama
 
-  # ---- ChromaDB Vector Store (Production) ----
-  # Persistent vector database untuk embeddings dengan authentication
-  chromadb:
-    image: docker.io/chromadb/chroma:latest
-    container_name: chromadb
-    profiles:
-      - chromadb
-    ports:
-      - "8002:8000"
-    volumes:
-      - chromadb-data:/chroma/data
-    environment:
-      - CHROMA_SERVER_AUTHN_CREDENTIALS=your-secret-key
-      - CHROMA_SERVER_AUTHN_PROVIDER=chromadb.server.auth.token.TokenAuthProvider
-    restart: unless-stopped
+  # ---- ChromaDB Vector Store ----
+  # Persistent vector database untuk embeddings
+  # Not yet implemented
 
   # ---- RAG Application ----
-  # Orkestrasi RAG chain menggunakan semua services di atas
-  rag-app:
-    build:
-      context: .
-      dockerfile: services/rag/Dockerfile.rag-app
-    container_name: rag-app
-    profiles:
-      - rag-app
-    environment:
-      - EMBEDDING_API_URL=http://embedding-service:8001
-      - LLM_API_URL=http://vllm-rocm:8000/v1
-      - CHROMADB_URL=http://chromadb:8000
-      - EMBEDDING_MODEL=intfloat/multilingual-e5-large
-      - LLM_MODEL=Qwen/Qwen3.5-35B-A3B-GPTQ-Int4
-      - COLLECTION_NAME=wiki-embeddings
-      - RETRIEVE_K=3
-      - MAX_NEW_TOKENS=1024
-      - TEMPERATURE=0.6
-      - TOP_P=0.95
-      - TOP_K=20
-    depends_on:
-      embedding-service:
-        condition: service_healthy
-      vllm-rocm:
-        condition: service_healthy
-      chromadb:
-        condition: service_started
-    stdin_open: true
-    tty: true
-
-volumes:
-  chromadb-data:
+  # Orkestrasi RAG chain menggunakan semua services
+  # Not yet implemented
+  # rag-app:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.rag-app
+  #   container_name: rag-app
+  #   profiles:
+  #     - rag-app
+  #   environment:
+  #     - EMBEDDING_API_URL=http://embedding-service:8001
+  #     - LLM_API_URL=http://vllm-rocm:8000/v1
+  #     - CHROMADB_URL=http://chromadb:8000
+  #     - CHROMADB_AUTH_TOKEN=your-secret-key
+  #   depends_on:
+  #     embedding-service:
+  #       condition: service_healthy
+  #     vllm-rocm:
+  #       condition: service_healthy
+  #     chromadb:
+  #       condition: service_healthy
+  #   stdin_open: true
+  #   tty: true
 
 networks:
   rag-network:

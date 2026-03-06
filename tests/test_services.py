@@ -1,11 +1,12 @@
 """
-test_services.py — Test utilities for embedding and ChromaDB services
+test_services.py — Test utilities for embedding, vLLM, and ChromaDB services
 
 Usage:
-  python tests/test_services.py                    # Run all tests
-  python tests/test_services.py --embedding        # Test only embedding service
-  python tests/test_services.py --chromadb         # Test only ChromaDB
-  python tests/test_services.py --all              # Test all services
+    python tests/test_services.py                    # Run all tests
+    python tests/test_services.py --embedding        # Test only embedding service
+    python tests/test_services.py --chromadb         # Test only ChromaDB
+    python tests/test_services.py --llm              # Test only vLLM service
+    python tests/test_services.py --all              # Test all services
 """
 
 import os
@@ -232,7 +233,7 @@ def main():
     parser = argparse.ArgumentParser(description="Test RAG services")
     parser.add_argument("--embedding", action="store_true", help="Test only embedding service")
     parser.add_argument("--chromadb", action="store_true", help="Test only ChromaDB service")
-    parser.add_argument("--llm", action="store_true", help="Test only LLM service")
+    parser.add_argument("--llm", action="store_true", help="Test only vLLM service")
     parser.add_argument("--all", action="store_true", help="Test all services")
     args = parser.parse_args()
     
