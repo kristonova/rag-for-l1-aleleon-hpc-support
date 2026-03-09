@@ -1,0 +1,46 @@
+# =============================================================================
+# Dockerfile.embedding — Embedding Service (intfloat/multilingual-e5-large)
+# =============================================================================
+# Purpose: Serve intfloat/multilingual-e5-large as a REST API
+# Usage: podman build -t embedding-service -f services/embedding/Dockerfile.embedding .
+#        podman run -d --name embedding-service -p 8001:8001 embedding-service
+# =============================================================================
+
+FROM docker.io/rocm/pytorch:rocm7.2_ubuntu24.04_py3.12_pytorch_release_2.9.1
+
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create the venv
+RUN python3 -m venv --system-site-packages /opt/venv
+
+# Set working directory
+WORKDIR /app
+
+# Install Python dependencies
+RUN --mount=type=cache,target=/root/.cache/pip,Z \
+    pip install \
+    fastapi \
+    uvicorn \
+    sentence-transformers \
+    chromadb \
+    requests
+
+# Copy application code
+COPY services/embedding/embedding_api.py .
+
+# Expose port
+EXPOSE 8001
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=5 \
+    CMD curl -f http://localhost:8001/health || exit 1
+
+# Run with uvicorn
+CMD ["python", "-m", "uvicorn", "embedding_api:app", "--host", "0.0.0.0", "--port", "8001"]

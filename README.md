@@ -34,7 +34,7 @@ A Retrieval-Augmented Generation (RAG) system that serves as an AI assistant for
 rag-for-l1-aleleon-hpc-support/
 ├── rag_slurm_vllm.py            # Main RAG application script
 ├── Dockerfile.rocm              # Container image for AMD ROCm GPUs
-├── docker-compose.yml           # Multi-container orchestration (optional)
+├── compose.yml           # Multi-container orchestration (optional)
 ├── pyproject.toml               # Python project metadata & dependencies
 ├── poetry.lock                  # Locked dependency versions
 ├── HOW IT WORKS.md              # Detailed explanation document

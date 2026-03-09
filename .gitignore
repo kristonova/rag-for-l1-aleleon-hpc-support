@@ -1,0 +1,8 @@
+# Ignore Roo code directory
+.roo/
+
+# Ignore VSCode settings and workspace
+.vscode/
+
+# Ignore model dir
+.models/
