@@ -200,13 +200,13 @@ def main():
 
     # Konfigurasi vLLM
     llm = VLLM(
-        model="Qwen/Qwen3.5-35B-A3B-GPTQ-Int4",
+        model="openai/gpt-oss-safeguard-20b",
         trust_remote_code=True,
         max_new_tokens=2048,
         temperature=0.3,                           
         top_p=0.9,
         tensor_parallel_size=1,
-        dtype="float16",
+        #dtype="float16",
         vllm_kwargs={
             "gpu_memory_utilization": 0.85,
             "enforce_eager": True,
