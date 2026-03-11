@@ -23,7 +23,7 @@ graph TB
         direction TB
         
         subgraph "Core Services"
-            EMB["embedding-service<br/>Port 8001<br/>intfloat/multilingual-e5-large"]
+            EMB["embedding-service<br/>Port 8001<br/>BAAI/bge-m3"]
             VLLM["vllm-rocm<br/>Port 8000<br/>Qwen/Qwen3.5-35B-A3B-GPTQ-Int4"]
             CHROMA["chromadb<br/>Port 8002<br/>Persistent Vector Store"]
         end
@@ -53,7 +53,7 @@ graph TB
 
 **Status**: ✅ READY - Fully implemented and tested
 
-**Purpose**: Serve `intfloat/multilingual-e5-large` embedding model via REST API
+**Purpose**: Serve `BAAI/bge-m3` embedding model via REST API
 
 **Implementation**: [`services/embedding/embedding_api.py`](services/embedding/embedding_api.py)
 
@@ -64,7 +64,7 @@ graph TB
 
 **Configuration**:
 - Port: 8001
-- Model: `intfloat/multilingual-e5-large` (configurable via `MODEL_NAME` env var)
+- Model: `BAAI/bge-m3` (configurable via `MODEL_NAME` env var)
 - Embedding dimensions: 1024
 
 **Dockerfile**: [`services/embedding/Dockerfile.embedding`](services/embedding/Dockerfile.embedding)

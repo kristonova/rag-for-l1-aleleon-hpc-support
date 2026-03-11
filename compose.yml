@@ -15,7 +15,7 @@
 # =============================================================================
 
 services:
-  # ---- Embedding Service (intfloat/multilingual-e5-large) ----
+  # ---- Embedding Service (BAAI/bge-m3) ----
   # Menjalankan embedding model sebagai REST API (pasta networking)
   embedding-service:
     container_name: embedding-service
@@ -31,7 +31,7 @@ services:
     volumes:
       - ~/.cache/huggingface:/root/.cache/huggingface
     environment:
-      - MODEL_NAME=intfloat/multilingual-e5-large
+      - MODEL_NAME=BAAI/bge-m3
     restart: unless-stopped
 
   # ---- LLM Service (vLLM on ROCm) ----

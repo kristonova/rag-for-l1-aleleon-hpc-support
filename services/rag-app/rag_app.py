@@ -30,26 +30,30 @@ EMBEDDING_API_URL = os.getenv("EMBEDDING_API_URL", "http://embedding-service:800
 class EmbeddingServiceClient(Embeddings):
     """
     LangChain-compatible wrapper yang memanggil embedding-service REST API.
-    Prefix query/passage ditangani oleh embedding-service via field text_type.
     """
 
     def __init__(self, api_url: str = EMBEDDING_API_URL):
         self.api_url = api_url
 
-    def _call_api(self, texts: List[str], text_type: str) -> List[List[float]]:
+    def _call_api(self, texts: List[str]) -> List[List[float]]:
         response = requests.post(
             f"{self.api_url}/embed",
-            json={"texts": texts, "text_type": text_type},
-            timeout=120,
+            json={"texts": texts},
+            timeout=600,
         )
         response.raise_for_status()
         return response.json()["embeddings"]
 
-    def embed_documents(self, texts: List[str]) -> List[List[float]]:
-        return self._call_api(texts, text_type="passage")
+    def embed_documents(self, texts: List[str], batch_size: int = 32) -> List[List[float]]:
+        all_embeddings = []
+        for i in range(0, len(texts), batch_size):
+            batch = texts[i : i + batch_size]
+            print(f"  Embedding batch {i // batch_size + 1}/{(len(texts) + batch_size - 1) // batch_size} ({len(batch)} texts)...")
+            all_embeddings.extend(self._call_api(batch))
+        return all_embeddings
 
     def embed_query(self, text: str) -> List[float]:
-        return self._call_api([text], text_type="query")[0]
+        return self._call_api([text])[0]
 
 
 def load_wiki_documents(sitemap_url, requests_per_second=2):

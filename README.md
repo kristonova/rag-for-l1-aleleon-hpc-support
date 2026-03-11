@@ -11,7 +11,7 @@ A Retrieval-Augmented Generation (RAG) system that serves as an AI assistant for
 │  ┌───────────────────┐  ┌──────────────────┐  ┌───────────────────┐  │
 │  │  Wiki Sitemap     │─▶│ HTMLSectionSplit │─▶│  Embedding Model. │  │
 │  │  Loader (XML→HTML)│  │ (h1/h2/h3)       │  │  (multilingual-   │  │
-│  │  + BeautifulSoup  │  │ fallback: 4500ch │  │   e5-large)       │  │
+│  │  + BeautifulSoup  │  │ fallback: 4500ch │  │   bge-m3)         │  │
 │  └───────────────────┘  └──────────────────┘  └────────┬──────────┘  │
 │                                                         │            │
 │                                               ┌─────────▼────────┐   │
@@ -60,7 +60,7 @@ The application runs in three phases:
 3. **Structure-Based Splitting** — Uses `HTMLSectionSplitter` to split content by heading tags (`h1`, `h2`, `h3`), preserving document structure.
 4. **Fallback Splitting** — Chunks larger than 4500 characters are further split using `RecursiveCharacterTextSplitter` (chunk size: 4500, overlap: 900).
 5. **Metadata Enrichment** — Each chunk gets labeled with `[Sumber: <page_title>] [Section: <heading>]` prefix for source attribution.
-6. **Embedding** — Converts each chunk into a vector using `intfloat/multilingual-e5-large` (~1.2GB multilingual model, runs on CPU/GPU).
+6. **Embedding** — Converts each chunk into a vector using `BAAI/bge-m3` (multilingual model, runs on CPU/GPU).
 7. **Vector Storage** — Stores embeddings in an in-memory ChromaDB instance for fast similarity search.
 
 ### Phase 2 — LLM Setup (vLLM on ROCm)

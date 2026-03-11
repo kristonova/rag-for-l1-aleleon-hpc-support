@@ -1,7 +1,7 @@
 """
 embedding_api.py — FastAPI Embedding Service
 
-Serves intfloat/multilingual-e5-large embedding model via REST API.
+Serves BAAI/bge-m3 embedding model via REST API.
 Usage: podman run -d --name embedding-service -p 8001:8001 embedding-service
 """
 
@@ -14,12 +14,12 @@ import os
 # Initialize FastAPI app
 app = FastAPI(
     title="Embedding Service",
-    description="Serves intfloat/multilingual-e5-large embedding model",
+    description="Serves BAAI/bge-m3 embedding model",
     version="1.0.0"
 )
 
 # Load embedding model at startup
-MODEL_NAME = os.getenv("MODEL_NAME", "intfloat/multilingual-e5-large")
+MODEL_NAME = os.getenv("MODEL_NAME", "BAAI/bge-m3")
 print(f"Loading embedding model: {MODEL_NAME}")
 embedding_model = SentenceTransformer(MODEL_NAME)
 print("Embedding model loaded successfully")
@@ -29,9 +29,6 @@ class EmbedRequest(BaseModel):
     """Request model for embedding endpoint."""
     texts: List[str]
     normalize: bool = True
-    prefix: str = ""
-    # Shortcut: "query" → "query: ", "passage"/"document" → "passage: "
-    text_type: str = ""
 
 
 class EmbedResponse(BaseModel):
@@ -64,20 +61,8 @@ async def embed(request: EmbedRequest):
           -d '{"texts": ["Hello world", "Test embedding"]}'
     """
     try:
-        # Determine prefix: explicit prefix takes priority, then text_type shortcut
-        prefix = request.prefix
-        if not prefix and request.text_type:
-            type_map = {
-                "query": "query: ",
-                "passage": "passage: ",
-                "document": "passage: ",
-            }
-            prefix = type_map.get(request.text_type.lower(), "")
-
-        texts = [f"{prefix}{t}" for t in request.texts] if prefix else request.texts
-
         embeddings = embedding_model.encode(
-            texts,
+            request.texts,
             normalize_embeddings=request.normalize,
             show_progress_bar=False
         )
