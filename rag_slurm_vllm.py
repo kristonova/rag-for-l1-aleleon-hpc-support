@@ -200,7 +200,7 @@ def main():
 
     # Konfigurasi vLLM
     llm = VLLM(
-        model="openai/gpt-oss-safeguard-20b",
+        model="lovedheart/Qwen3.5-9B-FP8",
         trust_remote_code=True,
         max_new_tokens=2048,
         temperature=0.3,                           
@@ -210,7 +210,7 @@ def main():
         vllm_kwargs={
             "gpu_memory_utilization": 0.85,
             "enforce_eager": True,
-            "max_model_len": 50000,
+            "max_model_len": 200000,
         }
     )
 
@@ -218,7 +218,7 @@ def main():
     # --- FASE 3: TANYA JAWAB (RETRIEVAL & GENERATION) ---
 
     # Setup Retriever
-    retriever = vectorstore.as_retriever(search_kwargs={"k": 5})
+    retriever = vectorstore.as_retriever(search_kwargs={"k": 10})
 
     # Buat Prompt dengan format ChatML (untuk Qwen)
     template_qwen = """<|im_start|>system
