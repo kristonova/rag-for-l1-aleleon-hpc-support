@@ -29,6 +29,9 @@ class EmbedRequest(BaseModel):
     """Request model for embedding endpoint."""
     texts: List[str]
     normalize: bool = True
+    prefix: str = ""
+    # Shortcut: "query" → "query: ", "passage"/"document" → "passage: "
+    text_type: str = ""
 
 
 class EmbedResponse(BaseModel):
@@ -61,8 +64,20 @@ async def embed(request: EmbedRequest):
           -d '{"texts": ["Hello world", "Test embedding"]}'
     """
     try:
+        # Determine prefix: explicit prefix takes priority, then text_type shortcut
+        prefix = request.prefix
+        if not prefix and request.text_type:
+            type_map = {
+                "query": "query: ",
+                "passage": "passage: ",
+                "document": "passage: ",
+            }
+            prefix = type_map.get(request.text_type.lower(), "")
+
+        texts = [f"{prefix}{t}" for t in request.texts] if prefix else request.texts
+
         embeddings = embedding_model.encode(
-            request.texts,
+            texts,
             normalize_embeddings=request.normalize,
             show_progress_bar=False
         )

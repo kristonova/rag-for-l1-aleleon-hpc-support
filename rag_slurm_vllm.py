@@ -4,7 +4,7 @@ import torch
 import requests
 from xml.etree import ElementTree
 from langchain_text_splitters import HTMLSectionSplitter, RecursiveCharacterTextSplitter
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_core.embeddings import Embeddings
 from langchain_chroma import Chroma
 from langchain_community.llms import VLLM
 from langchain_classic.chains import create_retrieval_chain
@@ -21,26 +21,32 @@ CHROMA_PERSIST_DIR = "./chroma_db"  # Folder untuk menyimpan ChromaDB secara per
 CHROMA_COLLECTION_NAME = "wiki_aleleon"
 
 
-class E5Embeddings(HuggingFaceEmbeddings):
+EMBEDDING_API_URL = os.getenv("EMBEDDING_API_URL", "http://localhost:8001")
+
+
+class EmbeddingServiceClient(Embeddings):
     """
-    Wrapper untuk multilingual-e5-large yang otomatis menambahkan
-    prefix 'passage: ' saat embed dokumen dan 'query: ' saat embed pertanyaan.
-    
-    Ini penting karena model E5 dilatih dengan format:
-    - "query: <pertanyaan>"   → untuk teks pencarian user
-    - "passage: <dokumen>"    → untuk teks dokumen/konteks
-    
-    Tanpa prefix ini, akurasi retrieval turun signifikan.
+    LangChain-compatible wrapper yang memanggil embedding-service REST API.
+    Prefix query/passage ditangani oleh embedding-service via field text_type.
     """
+
+    def __init__(self, api_url: str = EMBEDDING_API_URL):
+        self.api_url = api_url
+
+    def _call_api(self, texts: List[str], text_type: str) -> List[List[float]]:
+        response = requests.post(
+            f"{self.api_url}/embed",
+            json={"texts": texts, "text_type": text_type},
+            timeout=120,
+        )
+        response.raise_for_status()
+        return response.json()["embeddings"]
 
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
-        """Tambahkan prefix 'passage: ' untuk setiap dokumen."""
-        prefixed = [f"passage: {t}" for t in texts]
-        return super().embed_documents(prefixed)
+        return self._call_api(texts, text_type="passage")
 
     def embed_query(self, text: str) -> List[float]:
-        """Tambahkan prefix 'query: ' untuk pertanyaan user."""
-        return super().embed_query(f"query: {text}")
+        return self._call_api([text], text_type="query")[0]
 
 
 def load_wiki_documents(sitemap_url, requests_per_second=2):
@@ -180,11 +186,9 @@ def main():
 
     # --- FASE 1: MEMASUKKAN DATA (INGESTION) ---
 
-    # 1. Setup Model Embedding (harus load dulu sebelum cek DB)
-    print("[3] Load model embedding lokal...")
-    embeddings = E5Embeddings(
-        model_name="intfloat/multilingual-e5-large",
-    )
+    # 1. Setup Embedding Client (API-backed, model di embedding-service)
+    print("[3] Menghubungi embedding-service API...")
+    embeddings = EmbeddingServiceClient()
 
     # 2. Cek apakah ChromaDB sudah ada → skip scraping jika sudah
     if chroma_db_exists():

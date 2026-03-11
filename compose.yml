@@ -61,6 +61,7 @@ services:
       vllm serve
       --model Qwen/Qwen3.5-35B-A3B-GPTQ-Int4
       --dtype float16
+      --enforce-eager
       --gpu-memory-utilization 0.80
       --max-model-len 131072
       --tensor-parallel-size 1
@@ -111,6 +112,8 @@ services:
     container_name: rag-app
     profiles:
       - rag-app
+    volumes:
+      - rag-chroma-db:/app/chroma_db
     environment:
       - EMBEDDING_API_URL=http://embedding-service:8001
       - LLM_API_URL=http://vllm-rocm:8000/v1
@@ -132,3 +135,4 @@ networks:
 
 volumes:
   chromadb-data:
+  rag-chroma-db:
