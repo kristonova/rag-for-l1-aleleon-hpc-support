@@ -3,21 +3,44 @@
 ## Overall Architecture
 
 ```
-┌──────────────────────────────────────────────────────────────────────┐
-│                          RAG Pipeline                                │
-│                                                                      │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────┐  ┌─────────────┐  │
-│  │  INGESTION   │→ │  EMBEDDING   │→ │ RETRIEVAL │→ │ GENERATION  │  │
-│  │  (Wiki HTML) │  │  + Store     │  │  (Search) │  │   (LLM)     │  │
-│  └──────────────┘  └──────────────┘  └──────────┘  └─────────────┘  │
-│                                                                      │
-│  Phase 1: Fetch & Split   Phase 2: Vectorize   Phase 3: Answer      │
-└──────────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────┐
+│                     RAG Pipeline (Podman Containers)                     │
+│                                                                          │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────┐  ┌─────────────┐      │
+│  │  INGESTION   │→ │  EMBEDDING   │→ │ RETRIEVAL │→ │ GENERATION  │      │
+│  │  (Wiki HTML) │  │  + Store     │  │  (Search) │  │   (LLM)     │      │
+│  └──────────────┘  └──────────────┘  └──────────┘  └─────────────┘      │
+│                                                                          │
+│  Phase 1: Fetch & Split   Phase 2: Vectorize   Phase 3: Answer          │
+│                                                                          │
+│  Services:                                                               │
+│  ┌─────────────────┐ ┌─────────────┐ ┌──────────┐ ┌──────────────┐      │
+│  │ embedding-service│ │  vllm-rocm  │ │ chromadb │ │   rag-app    │      │
+│  │ (BAAI/bge-m3)   │ │ (Qwen3.5)   │ │ (Vector) │ │ (Orchestrator│      │
+│  │ Port 8001       │ │ Port 8000   │ │ Port 8002│ │              │      │
+│  └─────────────────┘ └─────────────┘ └──────────┘ └──────────────┘      │
+└──────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
 ## PHASE 1: Data Ingestion Pipeline
+
+### Persistence Check — Skip Scraping if ChromaDB Exists
+
+```python
+if chroma_db_exists():
+    vectorstore = load_vectorstore(embeddings)
+else:
+    vectorstore = build_vectorstore(embeddings)
+```
+
+**What happens:**
+- Before scraping, the system checks if a ChromaDB directory already exists on disk (`./chroma_db`).
+- If it exists and contains data → **skip scraping entirely** and load vectors from disk.
+- If it doesn't exist → proceed with full ingestion pipeline below.
+- ChromaDB is persisted via a Podman named volume (`rag-chroma-db:/app/chroma_db`), so data survives container restarts.
+- To force re-scraping (e.g., wiki content changed): delete the volume with `podman volume rm rag-for-l1-aleleon-hpc-support_rag-chroma-db`.
 
 ### Step 1 — Parse Sitemap XML
 
@@ -219,33 +242,85 @@ This is important for:
 
 ## PHASE 2: Embedding + Vector Database
 
-### Step 6 — Vector Embedding
+### Step 6 — Vector Embedding via API Service
 
 ```python
-embeddings = HuggingFaceEmbeddings(model_name="intfloat/multilingual-e5-large")
+embeddings = EmbeddingServiceClient()
 ```
 
-**Model used: `intfloat/multilingual-e5-large`**
+Embedding tidak lagi dijalankan secara lokal. Sekarang menggunakan **embedding-service** — sebuah container Podman terpisah yang melayani model `BAAI/bge-m3` via REST API.
+
+```python
+class EmbeddingServiceClient(Embeddings):
+    def _call_api(self, texts: List[str]) -> List[List[float]]:
+        response = requests.post(
+            f"{self.api_url}/embed",
+            json={"texts": texts},
+            timeout=600,
+        )
+        response.raise_for_status()
+        return response.json()["embeddings"]
+
+    def embed_documents(self, texts: List[str], batch_size: int = 32) -> List[List[float]]:
+        all_embeddings = []
+        for i in range(0, len(texts), batch_size):
+            batch = texts[i : i + batch_size]
+            all_embeddings.extend(self._call_api(batch))
+        return all_embeddings
+
+    def embed_query(self, text: str) -> List[float]:
+        return self._call_api([text])[0]
+```
+
+**Architecture:**
+
+```
+rag-app container                    embedding-service container
+┌──────────────────┐                ┌──────────────────────────┐
+│ EmbeddingService │  HTTP POST     │ FastAPI + SentenceTransf.│
+│ Client           │ ──────────→    │ BAAI/bge-m3              │
+│ (LangChain       │  /embed       │ model.encode(texts)      │
+│  Embeddings)     │ ←──────────    │                          │
+│                  │  JSON response │ Port 8001                │
+└──────────────────┘                └──────────────────────────┘
+```
+
+**Batching:** Dokumen di-embed dalam batch @32 teks per request, bukan semua sekaligus. Ini mencegah timeout karena model besar.
+
+```
+450 chunks total:
+  Batch  1/15: texts[  0: 32] → POST /embed → 32 vectors
+  Batch  2/15: texts[ 32: 64] → POST /embed → 32 vectors
+  ...
+  Batch 14/15: texts[416:448] → POST /embed → 32 vectors
+  Batch 15/15: texts[448:450] → POST /embed →  2 vectors
+  ───────────────────────────────────────────────────
+  Total: 450 vectors returned
+```
+
+**Model used: `BAAI/bge-m3`**
 
 | Property | Detail |
 |---|---|
-| Architecture | XLM-RoBERTa (multilingual transformer) |
-| Parameters | ~560M |
+| Architecture | XLM-RoBERTa based (multilingual transformer) |
+| Parameters | ~568M |
 | Output Dimensions | **1024 dimensions** |
-| Max Sequence | 512 tokens |
+| Max Sequence | 8192 tokens |
 | Languages | 100+ languages including **Bahasa Indonesia** |
-| Runs on | CPU or GPU (~1.2GB model) |
+| Features | Dense + Sparse + ColBERT multi-vector retrieval |
+| Runs on | CPU or GPU, served via embedding-service container |
 
-**Why `multilingual-e5-large` instead of `all-MiniLM-L6-v2`?**
+**Why `BAAI/bge-m3` instead of `intfloat/multilingual-e5-large`?**
 
-| Feature | all-MiniLM-L6-v2 (old) | multilingual-e5-large (current) |
+| Feature | multilingual-e5-large (old) | BAAI/bge-m3 (current) |
 |---|---|---|
-| Dimensions | 384 | **1024** (richer representation) |
-| Parameters | 22.7M | **~560M** (more capable) |
-| Indonesian | Weak | **Strong** (trained on 100+ languages) |
-| Semantic quality | Good for English | **Excellent for multilingual** |
+| Dimensions | 1024 | **1024** (same) |
+| Max Tokens | 512 | **8192** (16x longer context) |
+| Prefix Required | Yes ("query: " / "passage: ") | **No** (no prefix needed) |
+| Retrieval Modes | Dense only | **Dense + Sparse + ColBERT** |
+| MTEB Score | Strong | **Stronger** (state-of-the-art multilingual) |
 
-Since the wiki documents are in **Bahasa Indonesia**, a multilingual model is essential for accurate semantic matching.
+BGE-M3 tidak memerlukan prefix "query: " atau "passage: " seperti E5, sehingga kode lebih sederhana — teks dikirim langsung tanpa modifikasi.
 
 **What is an embedding?**
 
@@ -254,17 +329,17 @@ An embedding converts text into a **vector of numbers** in a 1024-dimensional sp
 ```
 "Cara membuat conda environment di ALELEON"
         │
-        ▼  multilingual-e5-large
+        ▼  BAAI/bge-m3
 [0.032, -0.118, 0.245, ..., 0.067]    ← 1024 numbers
 
 "Bagaimana membuat conda env baru?"
         │
-        ▼  multilingual-e5-large
+        ▼  BAAI/bge-m3
 [0.029, -0.121, 0.238, ..., 0.071]    ← 1024 numbers (SIMILAR!)
 
 "Berapa harga berlangganan ALELEON?"
         │
-        ▼  multilingual-e5-large
+        ▼  BAAI/bge-m3
 [-0.156, 0.089, -0.034, ..., 0.193]   ← 1024 numbers (DISTANT!)
 ```
 
@@ -284,22 +359,27 @@ Query: "Saya butuh banyak memori untuk job saya"
   │
   ├── TF-IDF/BM25: Search for word "memori" → NOT FOUND (document says "RAM")
   │
-  └── Dense (E5-large): Understands "memori" ≈ "RAM" semantically → FOUND ✅
+  └── Dense (bge-m3): Understands "memori" ≈ "RAM" semantically → FOUND ✅
 ```
 
-### Step 7 — Vector Database (Chroma)
+### Step 7 — Vector Database (Chroma — Persistent)
 
 ```python
-vectorstore = Chroma.from_documents(documents=splits, embedding=embeddings)
+vectorstore = Chroma.from_documents(
+    documents=splits,
+    embedding=embeddings,
+    persist_directory=CHROMA_PERSIST_DIR,
+    collection_name=CHROMA_COLLECTION_NAME,
+)
 ```
 
 **What happens:**
 
-1. Each chunk is embedded into a 1024D vector.
-2. The vector + original text + metadata is stored in the Chroma database (in-memory).
+1. Each chunk is embedded into a 1024D vector (via embedding-service API, in batches of 32).
+2. The vector + original text + metadata is stored in the Chroma database **on disk** (persistent).
 
 ```
-Chroma DB (in-memory)
+Chroma DB (persistent on disk — ./chroma_db)
 ┌─────────────────────────────────────────────────────────────────────┐
 │ ID │ Vector (1024D)             │ Original Text        │ Metadata  │
 ├────┼────────────────────────────┼──────────────────────┼───────────┤
@@ -314,9 +394,10 @@ Chroma DB (in-memory)
 ```
 
 **Chroma** is a vector database that is:
-- Lightweight, runs **in-memory** (no separate server needed).
+- Lightweight, runs as **persistent local storage** (using `persist_directory`).
+- Data survives container restarts via Podman named volume (`rag-chroma-db:/app/chroma_db`).
 - Supports **cosine similarity search**.
-- Suitable for prototyping (production usually uses Pinecone, Weaviate, Milvus).
+- On first run: scraping + embedding + storing (~450 chunks). On subsequent runs: loads from disk instantly.
 
 ---
 
@@ -325,7 +406,7 @@ Chroma DB (in-memory)
 ### Retrieval — Search Relevant Chunks
 
 ```python
-retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
+retriever = vectorstore.as_retriever(search_kwargs={"k": 10})
 ```
 
 **Retrieval type: Approximate Nearest Neighbor (ANN) with Cosine Similarity**
@@ -335,10 +416,10 @@ When a user asks a question, the process is:
 ```
 User: "Bagaimana cara membuat conda environment?"
          │
-         ▼ multilingual-e5-large
+         ▼ BAAI/bge-m3 (via embedding-service API)
 Query Vector: [0.029, -0.121, 0.238, ..., 0.071]    (1024D)
          │
-         ▼ Cosine Similarity against ALL chunks
+         ▼ Cosine Similarity against ALL chunks in Chroma
          │
 ┌────────┬──────────────────────────────────────────┬────────────┐
 │ Chunk  │ Content (with source label)              │ Similarity │
@@ -346,13 +427,16 @@ Query Vector: [0.029, -0.121, 0.238, ..., 0.071]    (1024D)
 │ 3      │ "[Sumber: Conda Env] Membuat Conda..."   │ 0.91 ← #1 │
 │ 7      │ "[Sumber: Conda Env] Module Pyload..."   │ 0.78 ← #2 │
 │ 1      │ "[Sumber: Spesifikasi] Compute Node..."  │ 0.65 ← #3 │
-│ 12     │ "[Sumber: MPI Guide] Running MPI..."     │ 0.32       │
+│ 12     │ "[Sumber: MPI Guide] Running MPI..."     │ 0.58 ← #4 │
 │ ...    │ ...                                      │ ...        │
+│ 22     │ "[Sumber: Job Script] GPU Slurm..."      │ 0.41 ← #10│
 └────────┴──────────────────────────────────────────┴────────────┘
          │
-         ▼ Get Top-K (k=3)
-    Chunks 3, 7, 1 → sent to LLM as context
+         ▼ Get Top-K (k=10)
+    Top 10 chunks → sent to LLM as context
 ```
+
+**Why k=10?** Memberikan lebih banyak konteks ke LLM sehingga jawaban lebih lengkap. Qwen3.5-35B memiliki context window 131072 tokens, cukup untuk menampung 10 chunks.
 
 **Cosine Similarity Formula:**
 
@@ -364,48 +448,73 @@ cos(θ) = ─────────────────── = ───�
 Result: -1 (opposite) to +1 (identical)
 ```
 
-### Prompt Template — ChatML Format (Bahasa Indonesia)
+### Prompt — OpenAI Messages Format (Bahasa Indonesia)
+
+Prompt tidak lagi menggunakan ChatML template string. Sekarang menggunakan format **OpenAI messages** — array of `{role, content}` objects yang dikirim ke vLLM via OpenAI-compatible API.
 
 ```python
-template_qwen = """<|im_start|>system
-Kamu adalah agen AI asisten admin HPC Slurm yang ahli...
+def generate_response(question: str, context: str) -> str:
+    messages = [
+        {
+            "role": "system",
+            "content": """Kamu adalah agen AI asisten admin HPC Slurm yang ahli.
 
 Aturan:
-1. Jawab HANYA berdasarkan dokumen referensi...
-2. Sertakan angka, nama, versi PERSIS seperti di dokumen...
-3. Jika informasi bisa DISIMPULKAN dari dokumen, berikan kesimpulan...
-4. Jika informasi TIDAK ADA, katakan "Saya tidak menemukan..."
-5. Jangan mengarang angka, rumus, perintah, URL...
-6. JANGAN mengganti perintah dari dokumen dengan alternatif...
-7. Bedakan "minimal" dan "maksimal"...<|im_end|>
+0. Berbicaralah dalam Bahasa Indonesia.
+1. Jawab HANYA berdasarkan dokumen referensi di bawah.
+2. Sertakan angka, nama, versi PERSIS seperti di dokumen.
+3. Jika informasi bisa DISIMPULKAN dari dokumen, berikan kesimpulan logis.
+4. Jika informasi TIDAK ADA, katakan "Saya tidak menemukan informasi tersebut."
+5. Jangan mengarang angka, rumus, perintah, URL, atau langkah-langkah.
+6. JANGAN mengganti perintah dari dokumen dengan alternatif.
+7. Bedakan "minimal" dan "maksimal".
+8. Langkah-langkah yang anda berikan harus diberikan dalam URUTAN yang BENAR sesuai dengan konteks yang diberikan.
+9. Untuk pertanyaan yang jawabannya berisi prosedur langkah-langkah, berikan langkah-langkah LENGKAP (jangan potong/ringkas).
+10. Berikan informasi semua yang ada di dalam dokumen secara LENGKAP.""",
+        },
+        {
+            "role": "user",
+            "content": f"Dokumen Referensi:\n{context}\n\nPertanyaan: {question}",
+        },
+    ]
 
+    response = client.chat.completions.create(
+        model=VLLM_MODEL_NAME,
+        messages=messages,
+        temperature=0.3,
+        top_p=0.9,
+        max_tokens=32768,
+        extra_body={"top_k": 20, "presence_penalty": 1.5, "enable_thinking": False},
+    )
+    return response.choices[0].message.content
+```
+
+**Format: OpenAI Messages (bukan ChatML string)**
+
+vLLM menyediakan OpenAI-compatible API. Kita menggunakan `openai.OpenAI` client untuk mengirim request — vLLM otomatis mengkonversi messages ke format ChatML yang dipahami Qwen.
+
+```
+client.chat.completions.create(
+    messages=[
+        {"role": "system", "content": "..."},    ← System prompt + rules
+        {"role": "user", "content": "..."},      ← Context + question
+    ]
+)
+        │
+        ▼ vLLM converts to ChatML internally
+        │
+<|im_start|>system
+...<|im_end|>
 <|im_start|>user
-Dokumen Referensi:
-{context}
-
-Pertanyaan: {input}<|im_end|>
+...<|im_end|>
 <|im_start|>assistant
-"""
 ```
 
-**Why the `<|im_start|>` / `<|im_end|>` format?**
-
-This is the **ChatML format** — the format used during Qwen model training to distinguish roles:
-
-```
-<|im_start|>system     ← Instructions for the model (persona, rules)
-...<|im_end|>
-<|im_start|>user       ← User input (context + question)
-...<|im_end|>
-<|im_start|>assistant   ← Model starts generating from here
-```
-
-**The 7 Anti-Hallucination Rules:**
-
-The system prompt includes 7 strict rules to prevent the model from making things up:
+**The 11 Anti-Hallucination Rules (0-10):**
 
 | Rule | Purpose |
 |---|---|
+| 0. Bahasa Indonesia | Ensures responses are in Indonesian |
 | 1. Answer ONLY from documents | Prevents generating info from pre-training knowledge |
 | 2. Exact numbers/versions | Prevents rounding ">=11" to "11.0" |
 | 3. Allow deduction | Lets LLM infer logical conclusions from data |
@@ -413,55 +522,49 @@ The system prompt includes 7 strict rules to prevent the model from making thing
 | 5. No fabrication | Blocks fake commands, URLs, procedures |
 | 6. No command substitution | Prevents replacing `source activate` with `conda activate` |
 | 7. Min vs Max distinction | Prevents confusing "at least X" with "at most X" |
+| 8. Correct ordering | Steps must be in the RIGHT ORDER from context |
+| 9. Complete procedures | Don't truncate/summarize step-by-step procedures |
+| 10. Complete information | Include ALL information from documents fully |
 
-**Template variables:**
-- `{context}` → Automatically filled by LangChain with the 3 retrieved chunks.
-- `{input}` → Filled with the user's question.
-
-### Generation — vLLM + Qwen2.5
+### Generation — vLLM + Qwen3.5 via OpenAI API
 
 ```python
-llm = VLLM(
-    model="Qwen/Qwen2.5-Coder-7B-Instruct",
-    trust_remote_code=True,
-    max_new_tokens=1024,
-    temperature=0.5,
-    top_p=0.9,
-    tensor_parallel_size=1,
-    vllm_kwargs={
-        "gpu_memory_utilization": 0.80,
-        "enforce_eager": True,
-        "max_model_len": 32768,
-    }
-)
+from openai import OpenAI
+
+client = OpenAI(base_url=VLLM_API_URL, api_key="not-needed")
+```
+
+Model dijalankan di container **vllm-rocm** pada AMD GPU menggunakan vLLM dengan OpenAI-compatible API.
+
+**vLLM launch command (from compose.yml):**
+
+```bash
+vllm serve Qwen/Qwen3.5-35B-A3B-GPTQ-Int4 \
+    --dtype float16 \
+    --enforce-eager \
+    --max-model-len 131072
 ```
 
 **Generation flow:**
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│ Prompt sent to LLM:                                          │
+│ OpenAI API call to vLLM:                                     │
 │                                                              │
-│ <|im_start|>system                                           │
-│ Kamu adalah agen AI asisten admin HPC Slurm yang ahli...     │
-│ Aturan: 1. Jawab HANYA berdasarkan dokumen... (7 rules)      │
-│ <|im_end|>                                                   │
-│ <|im_start|>user                                             │
-│ Dokumen Referensi:                                           │
-│ [Sumber: Conda Env] [Section: Membuat Conda Environment]    │
-│ Untuk membuat conda env, jalankan: module load anaconda3...  │
-│                                                              │
-│ [Sumber: Conda Env] [Section: Module Pyload]                 │
-│ Setelah conda env aktif, buat modul pyload...                │
-│                                                              │
-│ [Sumber: Spesifikasi] [Section: Compute Node]                │
-│ Partisi GPU: gpu-a100, gpu-rtx...                            │
-│                                                              │
-│ Pertanyaan: Bagaimana cara membuat conda environment?        │
-│ <|im_end|>                                                   │
-│ <|im_start|>assistant                                        │
-│                                                              │
-│         ▼ Model generates token by token                     │
+│ client.chat.completions.create(                              │
+│   model="Qwen/Qwen3.5-35B-A3B-GPTQ-Int4",                   │
+│   messages=[                                                 │
+│     {"role": "system", "content": "Kamu adalah agen AI...    │
+│      Aturan: 0-10 (11 anti-hallucination rules)"},           │
+│     {"role": "user", "content": "Dokumen Referensi:\n...     │
+│      Pertanyaan: Bagaimana cara membuat conda environment?"}│
+│   ],                                                         │
+│   temperature=0.3, top_p=0.9, max_tokens=32768,             │
+│   extra_body={top_k=20, presence_penalty=1.5,                │
+│               enable_thinking=False}                         │
+│ )                                                            │
+│         │                                                    │
+│         ▼ vLLM converts to ChatML + generates                │
 │                                                              │
 │ "Untuk membuat conda environment di ALELEON,                 │
 │  jalankan perintah berikut:                                  │
@@ -474,37 +577,49 @@ llm = VLLM(
 
 | Parameter | Value | Meaning |
 |---|---|---|
-| `temperature=0.5` | Moderate → balanced between factual and natural phrasing | Good for RAG with Indonesian text |
-| `top_p=0.9` | Nucleus sampling — only select tokens from the top 90% probability | Reduces random answers |
-| `max_new_tokens=1024` | Max 1024 output tokens | Allows longer, more detailed answers |
-| `max_model_len=32768` | Max 32K total tokens (prompt + output) | Full context window for large prompts |
-| `gpu_memory_utilization=0.80` | Use 80% VRAM | Save 20% for overhead and stability |
-| `enforce_eager=True` | Disable CUDAGraph | ROCm / RDNA4 compatibility |
-| `tensor_parallel_size=1` | Single GPU | No multi-GPU parallelism |
+| `temperature=0.3` | Low → more deterministic, factual | Best for RAG — reduces hallucination |
+| `top_p=0.9` | Nucleus sampling — top 90% probability | Reduces random answers |
+| `top_k=20` | Only consider top 20 tokens at each step | Further constrains randomness |
+| `presence_penalty=1.5` | Strongly penalize repeating tokens | Prevents repetitive output |
+| `max_tokens=32768` | Max 32K output tokens | Allows very detailed answers |
+| `enable_thinking=False` | Disable Qwen3.5 "thinking" mode | Direct answers without reasoning trace |
+| `--max-model-len 131072` | Max 128K total tokens (prompt + output) | Full context window for large prompts |
+| `--dtype float16` | FP16 precision | Required for GPTQ models on ROCm |
+| `--enforce-eager` | Disable CUDAGraph | ROCm / AMD GPU compatibility |
+
+**Model: Qwen/Qwen3.5-35B-A3B-GPTQ-Int4**
+
+| Property | Detail |
+|---|---|
+| Parameters | 35B total, ~3B active (MoE architecture) |
+| Quantization | GPTQ 4-bit |
+| Context Window | 131072 tokens (128K) |
+| Architecture | Mixture of Experts (MoE) |
+| Served via | vLLM on AMD ROCm GPU |
 
 ### Source Attribution — Showing Document Sources
 
 ```python
 for i, inp in enumerate(inputs, 1):
-    hasil = rag_chain.invoke(inp)
-    print(hasil['answer'].strip())
+    context_text, relevant_docs = create_rag_chain(inp, retriever)
+    answer = generate_response(inp, context_text)
+    print(answer)
 
     # Tampilkan sumber dokumen yang digunakan
-    if 'context' in hasil and hasil['context']:
-        seen = []
-        for doc in hasil['context']:
-            title = doc.metadata.get("title", "Unknown")
-            source = doc.metadata.get("source", "")
-            header = doc.metadata.get("Header 2", doc.metadata.get("Header 3", ""))
-            key = (title, header)
-            if key not in seen:
-                seen.append(key)
-                label = f"    • {title}"
-                if header:
-                    label += f" → {header}"
-                if source:
-                    label += f"  ({source})"
-                print(label)
+    seen = []
+    for doc in relevant_docs:
+        title = doc.metadata.get("title", "Unknown")
+        source = doc.metadata.get("source", "")
+        header = doc.metadata.get("Header 2", doc.metadata.get("Header 3", ""))
+        key = (title, header)
+        if key not in seen:
+            seen.append(key)
+            label = f"    • {title}"
+            if header:
+                label += f" → {header}"
+            if source:
+                label += f"  ({source})"
+            print(label)
 ```
 
 **What happens:**
@@ -518,117 +633,156 @@ Output example:
 ------------------------------------------------------------
 Untuk membuat conda environment di ALELEON, jalankan...
 
-    📚 Sumber (3 chunks):
+    📚 Sumber (10 chunks):
     • Komputasi Python dengan Conda Environment User → Membuat Conda Environment
       (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
     • Komputasi Python dengan Conda Environment User → Module Pyload
       (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • ...
 ```
 
-### RAG Chain — Combining Everything
+### RAG Chain — Custom Python Function
+
+Tidak lagi menggunakan `create_stuff_documents_chain` atau `create_retrieval_chain` dari LangChain. Sekarang menggunakan fungsi Python sederhana:
 
 ```python
-question_answer_chain = create_stuff_documents_chain(llm, prompt)
-rag_chain = create_retrieval_chain(retriever, question_answer_chain)
+def create_rag_chain(question: str, retriever):
+    """Retrieve relevant docs and build context string."""
+    relevant_docs = retriever.invoke(question)
+
+    context_parts = []
+    for doc in relevant_docs:
+        context_parts.append(doc.page_content)
+
+    context_text = "\n\n".join(context_parts)
+    return context_text, relevant_docs
 ```
 
-**`create_stuff_documents_chain`** — Strategy: **"Stuff"**
+**Strategy: "Stuff" (manual)**
 
-"Stuff" means: **put ALL chunks into 1 prompt at once**.
-
-```
-Other strategies (not used in this code):
-┌─────────────────────────────────────────────────────────┐
-│ Stuff     : All chunks → 1 prompt → 1 answer      ✅   │
-│ Map-Reduce: Each chunk → answer → combine all          │
-│ Refine    : Chunk 1 → answer → + Chunk 2 → refine      │
-│ Map-Rerank: Each chunk → answer + score → pick best    │
-└─────────────────────────────────────────────────────────┘
-```
-
-**Note:** These chain functions come from `langchain_classic` (not `langchain`), because the LangChain 1.x API moved `create_retrieval_chain` and `create_stuff_documents_chain` to the `langchain-classic` package.
-
-**`create_retrieval_chain`** combines the retriever + stuff chain:
+Sama seperti sebelumnya — semua chunks digabung ke 1 prompt. Bedanya, sekarang dilakukan secara eksplisit dengan Python, bukan via LangChain chain abstraction.
 
 ```
-User Input
+User Question
     │
     ▼
-┌──────────┐     ┌──────────────┐     ┌──────────────────┐
-│ Retriever│ ──→ │ Stuff Chain  │ ──→ │     Output       │
-│ (Top-3)  │     │ (Prompt+LLM) │     │ {answer, context}│
-└──────────┘     └──────────────┘     └──────────────────┘
-    │                    │                      │
-    │ 3 relevant         │ Prompt with          │ answer = LLM text
-    │ chunks             │ context + question   │ context = Document[]
-    ▼                    ▼                      ▼
- From Chroma        To vLLM/GPU          Source attribution
+┌──────────────┐     ┌────────────────────┐     ┌──────────────────┐
+│ retriever    │ ──→ │ create_rag_chain() │ ──→ │ generate_response│
+│ .invoke(q)   │     │ join chunks        │     │ (OpenAI client)  │
+│ (Top-10)     │     │ → context_text     │     │ → answer text    │
+└──────────────┘     └────────────────────┘     └──────────────────┘
+    │                        │                          │
+    │ 10 relevant            │ context_text =           │ answer = LLM text
+    │ Documents              │ chunk1\n\nchunk2\n\n...  │ relevant_docs for
+    ▼                        ▼                          ▼ source attribution
+ From Chroma           To generate_response()     Display to user
 ```
+
+**Why custom function instead of LangChain chains?**
+
+- Lebih transparan — bisa di-debug dengan print statement
+- Tidak perlu `langchain_classic` dependency
+- Mudah dikustomisasi (filter, reranking, etc.)
+- `generate_response()` menggunakan OpenAI client langsung
+
+### Wait for vLLM — Health Check
+
+Sebelum memulai RAG, sistem menunggu vLLM siap:
+
+```python
+def wait_for_vllm(url, timeout=600, interval=10):
+    start = time.time()
+    while time.time() - start < timeout:
+        try:
+            r = requests.get(f"{url}/health")
+            if r.status_code == 200:
+                return True
+        except requests.ConnectionError:
+            pass
+        time.sleep(interval)
+    raise TimeoutError("vLLM did not become healthy")
+```
+
+Model besar (35B params) memerlukan waktu loading ke VRAM. Fungsi ini polling `/health` setiap 10 detik, timeout setelah 10 menit.
 
 ---
 
 ## Full End-to-End Diagram
 
 ```
-Wiki Sitemap XML
-(https://wiki.efisonlt.com/sitemap/...)
-        │
-   [1] Parse XML → extract all wiki page URLs
-        │
-        ▼
-   [2] For each URL:
-       requests.get() → BeautifulSoup → extract <div id="mw-content-text">
-        │
-        ▼
-   [3] HTMLSectionSplitter (split by h1/h2/h3 headings)
-       → Fallback: RecursiveCharacterTextSplitter (4500 chars, 900 overlap)
-        │
-        ▼
-   [4] Add source labels: "[Sumber: title] [Section: header]"
-        │
-        ▼
-  N Chunks (variable, depends on wiki content)
-        │
-   [5] intfloat/multilingual-e5-large (~560M params)
-       Each chunk → 1024-dimensional vector
-        │
-        ▼
-   [6] Chroma DB (in-memory)
-       N vectors + N texts + metadata stored
-        │
-        │
-   [7] vLLM + Qwen2.5-Coder-7B-Instruct (GPU, 7B params)
-       Model loaded into VRAM
-        │
-        │
-  ══════╪══════════════════════════════════════
-  Per Question:
-        │
-  User: "Bagaimana cara membuat conda env?"
-        │
-        ▼
-  [a] Embed question → 1024D vector (multilingual-e5-large)
-        │
-  [b] Cosine similarity vs N chunks in Chroma
-        │
-  [c] Retrieve top-3 most relevant chunks
-        │
-  [d] Insert into ChatML prompt template (Bahasa Indonesia)
-      with 7 anti-hallucination rules
-        │
-  [e] Send prompt to Qwen2.5 via vLLM (GPU)
-        │
-  [f] Model generates answer token-by-token
-        │
-  [g] Display answer + source attribution
-      (de-duplicated title/section/URL)
-        │
-        ▼
-  "Untuk membuat conda environment di ALELEON:
-   1. module load anaconda3/2025.06-1
-   2. conda create -n myenv python=3.12..."
-
-    📚 Sumber (3 chunks):
-    • Conda Environment User → Membuat Conda Environment
-      (https://wiki.efisonlt.com/wiki/...)
+┌─────────────────────────────────────────────────────────────┐
+│                    STARTUP PHASE                             │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  [0] wait_for_vllm() — poll /health every 10s (max 10min)  │
+│         │                                                   │
+│         ▼                                                   │
+│  [1] chroma_db_exists()? ────── YES ──→ load_vectorstore() │
+│         │                                   (skip to [7])  │
+│         NO                                                  │
+│         │                                                   │
+│  Wiki Sitemap XML                                           │
+│  (https://wiki.efisonlt.com/sitemap/...)                    │
+│         │                                                   │
+│  [2] Parse XML → extract all wiki page URLs                │
+│         │                                                   │
+│  [3] For each URL:                                          │
+│      requests.get() → BeautifulSoup                        │
+│      → extract <div id="mw-content-text">                  │
+│         │                                                   │
+│  [4] HTMLSectionSplitter (split by h1/h2/h3 headings)      │
+│      → Fallback: RecursiveCharacterTextSplitter            │
+│        (4500 chars, 900 overlap)                            │
+│         │                                                   │
+│  [5] Add source labels:                                     │
+│      "[Sumber: title] [Section: header]"                   │
+│         │                                                   │
+│  ~450 Chunks                                                │
+│         │                                                   │
+│  [6] BAAI/bge-m3 via embedding-service API                 │
+│      Batched @32 chunks per request                        │
+│      Each chunk → 1024-dimensional vector                  │
+│         │                                                   │
+│      build_vectorstore() →                                  │
+│  [7] Chroma DB (persistent — ./chroma_db)                  │
+│      ~450 vectors + texts + metadata stored on disk        │
+│      Podman volume: rag-chroma-db:/app/chroma_db           │
+│                                                             │
+├─────────────────────────────────────────────────────────────┤
+│                    PER-QUESTION PHASE                        │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  User: "Bagaimana cara membuat conda env?"                  │
+│         │                                                   │
+│  [a] Embed question → 1024D vector                         │
+│      (BAAI/bge-m3 via embedding-service API)               │
+│         │                                                   │
+│  [b] Cosine similarity vs ~450 chunks in Chroma            │
+│         │                                                   │
+│  [c] Retrieve top-10 most relevant chunks                  │
+│         │                                                   │
+│  [d] create_rag_chain() → join chunks into context_text    │
+│         │                                                   │
+│  [e] generate_response() → OpenAI messages format          │
+│      with 11 anti-hallucination rules (0-10)               │
+│         │                                                   │
+│  [f] Send to Qwen3.5-35B-A3B-GPTQ-Int4 via vLLM           │
+│      (OpenAI-compatible API, AMD ROCm GPU)                 │
+│      temperature=0.3, presence_penalty=1.5                 │
+│         │                                                   │
+│  [g] Model generates answer                                │
+│         │                                                   │
+│  [h] Display answer + source attribution                   │
+│      (de-duplicated title/section/URL)                     │
+│         │                                                   │
+│         ▼                                                   │
+│  "Untuk membuat conda environment di ALELEON:               │
+│   1. module load anaconda3/2025.06-1                        │
+│   2. conda create -n myenv python=3.12..."                  │
+│                                                             │
+│      📚 Sumber (10 chunks):                                 │
+│      • Conda Environment User → Membuat Conda Environment  │
+│        (https://wiki.efisonlt.com/wiki/...)                 │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
 ```

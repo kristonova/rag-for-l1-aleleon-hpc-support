@@ -1,23 +1,40 @@
+import os
+import requests
 from langchain_chroma import Chroma
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_core.embeddings import Embeddings
 from typing import List
 
 CHROMA_PERSIST_DIR = "./chroma_db"
 CHROMA_COLLECTION_NAME = "wiki_aleleon"
+EMBEDDING_API_URL = os.getenv("EMBEDDING_API_URL", "http://localhost:8001")
 
 
-class E5Embeddings(HuggingFaceEmbeddings):
+class EmbeddingServiceClient(Embeddings):
+    """Memanggil embedding-service REST API (BAAI/bge-m3)."""
+
+    def __init__(self, api_url: str = EMBEDDING_API_URL):
+        self.api_url = api_url
+
+    def _call_api(self, texts: List[str]) -> List[List[float]]:
+        response = requests.post(
+            f"{self.api_url}/embed",
+            json={"texts": texts},
+            timeout=600,
+        )
+        response.raise_for_status()
+        return response.json()["embeddings"]
+
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
-        prefixed = [f"passage: {t}" for t in texts]
-        return super().embed_documents(prefixed)
+        return self._call_api(texts)
 
     def embed_query(self, text: str) -> List[float]:
-        return super().embed_query(f"query: {text}")
+        return self._call_api([text])[0]
 
 
 def main():
-    print("Loading ChromaDB...")
-    embeddings = E5Embeddings(model_name="intfloat/multilingual-e5-large")
+    print(f"Loading ChromaDB dari '{CHROMA_PERSIST_DIR}'...")
+    print(f"Embedding API: {EMBEDDING_API_URL}")
+    embeddings = EmbeddingServiceClient()
 
     vectorstore = Chroma(
         persist_directory=CHROMA_PERSIST_DIR,
