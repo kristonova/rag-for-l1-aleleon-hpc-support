@@ -1,0 +1,91 @@
+🟢 LEVEL 1: Fakta Langsung / Direct Facts
+Kriteria Evaluasi: Model harus bisa menjawab cepat dan akurat (tanpa  panjang) karena jawabannya mutlak ada di 1 paragraf/tabel tertentu.
+"Berapa kapasitas RAM efektif per node di partisi epyc-jumbo?"
+"Berapa batas maksimal walltime (waktu komputasi) per job untuk golongan akun perseorangan?"
+"Saya ingin pakai partisi GPU. GPU jenis apa yang terpasang di partisi ampere?"
+"Apa alamat website portal EFIRO Web Service (EWS) untuk login?"
+"Perintah apa yang harus saya ketik di terminal untuk melihat daftar environment python/pyload yang saya buat?"
+"Berapa harga 1 GPU Hour (GH) untuk pengguna golongan perseorangan non-akademia?"
+"Saya mau cek sisa kuota core hour saya. Perintah sausage apa yang harus diketik?"
+"Apa itu PKSPIAS dalam pendaftaran akun ALELEON?"
+"Jika saya pakai aplikasi SFTP seperti FileZilla, apakah ada limit ukuran file yang bisa diupload?"
+"OS (Sistem Operasi) apa yang digunakan oleh ALELEON Mk.V?"
+"Versi SLURM berapa yang terpasang di sistem ALELEON saat ini?"
+"Bagaimana cara membatalkan/menghentikan job yang berstatus PENDING di terminal?"
+"Berapa kapasitas limit storage HOME untuk akun perseorangan?"
+"Apakah sistem ALELEON memiliki backup jika saya tidak sengaja menghapus data di HOME?"
+"Email resmi apa yang harus saya hubungi jika ingin submit support ticket?"
+"Saya mau menjalankan simulasi GROMACS, apa nama binary MPI yang dipakai? Apakah gmx atau yang lain?"
+"Di EFIRO Account Manager, aplikasi authenticator apa saja yang didukung untuk fitur 2FA?"
+"Apa perintah terminal untuk mengecek status antrian job saya di Slurm?"
+"Apakah ALELEON mendukung instalasi package Python menggunakan pip?"
+"Modul Lmod apa yang harus saya load jika ingin menggunakan compiler GCC versi 15.2.0?"
+💡 Pola Ekspansi untuk mencapai 50 soal: Ganti nama software atau versi modul (contoh: "Apa modul Lmod untuk CMake 3.31.3?", "Apa modul Lmod untuk OpenMPI 5.0.8?"). Tanyakan fakta satu-persatu dari tabel batas limit LFU.
+
+--------------------------------------------------------------------------------
+🟡 LEVEL 2: Gabungan Info / Multi-Chunk
+Kriteria Evaluasi: Retriever (ChromaDB) harus berhasil menarik 2 atau 3 dokumen yang berbeda letaknya, dan LLM harus bisa merangkainya menjadi satu jawaban yang mengalir.
+"Saya ingin buka sesi interaktif JupyterLab menggunakan GPU. Apa bedanya partisi torti dan tilla, dan mana yang harus saya pilih?" (Butuh info dari spesifikasi partisi
+ + form Jupyter
+)
+"Saya punya file simulasi.ipynb. Bagaimana urutan langkah menjalankannya sebagai batch job di Job Composer EWS menggunakan conda environment saya sendiri?" (Butuh info konversi jupytext
+ + langkah isi submit script conda
+)
+"Jelaskan perbedaan arti status job 'PD' dan 'CG' saat saya mengecek squeue. Lalu sebutkan satu contoh Reason kenapa job bisa berstatus PD!" (Butuh info daftar status squeue
+ + tabel Reason Slurm
+)
+"Sebagai pengguna dari Akun Institusi, apakah job saya dibatasi maksimal 128 core CPU seperti akun perseorangan, dan apakah saya menggunakan sistem kuota (beli di awal)?" (Butuh info tabel LFU
+ + info sistem pembayaran Pascabayar Institusi
+)
+"Saya mau ganti password akun ALELEON saya. Di portal web mana saya harus login, dan menu apa yang harus diklik?" (Butuh info pemisahan EWS vs EAM
+ + panduan menu EAM
+)
+"File upload saya ukurannya 500 MB. Kenapa saya selalu gagal upload lewat menu Files di EWS, dan apa solusi spesifik serta alamat host yang harus saya gunakan?" (Butuh info limit 100MB EWS
+ + alamat host SFTP aleleon.hpc/ssh.aleleonsuper.computer
+)
+"Saya ingin mengkompilasi code C++ menggunakan compiler AMD target Zen 2 dan OpenMPI terbaru. Modul apa saja yang harus saya module load secara berurutan?" (Butuh info rekomendasi arch zen 2
+ + modul GCC
+ + modul OpenMPI
+)
+"Saya mau pre-processing data GROMACS menggunakan binary gmx_mpi. Boleh tidak saya menjalankannya di Login Node? Jika boleh, apa syaratnya agar tidak di-kill admin?" (Butuh info panduan GROMACS
+ + aturan Login Node
+)
+"Jika saya menjalankan batch job lalu tiba-tiba koneksi internet rumah saya mati dan laptop saya disconnect dari VPN ALELEON, apakah job saya di Slurm ikut berhenti?" (Butuh info konsep metode komputasi Batch Job
+)
+"Apa bedanya Effective Core Hour dengan Actual Core Hour di dalam sistem ALELEON?" (Butuh info definisi sausage slimit Core Hour
+)
+💡 Pola Ekspansi untuk mencapai 60 soal: Buat skenario yang membandingkan 2 partisi, membandingkan tata cara Akun Institusi vs Perseorangan, atau menanyakan "Bagaimana cara melakukan X (di halaman A) jika saya menemui error Y (di halaman B)?".
+
+--------------------------------------------------------------------------------
+🟠 LEVEL 3: Reasoning / Deduksi & Troubleshooting
+Kriteria Evaluasi: Pertanyaan ini menjebak. Jawabannya tidak tertulis mentah-mentah di Wiki, model harus menghitung matematika, memahami sintaks, atau menerapkan aturan (SOP).
+"Saya menjalankan simulasi FLACS-CFD dengan 192 proses MPI murni. Di partisi epyc, otomatis job ini butuh lebih dari 1 node. Berapa angka yang harus saya tulis persisnya di #SBATCH --mem= jika total RAM yang saya butuhkan untuk seluruh job adalah 400GB?" (Model harus menghitung: 192 proses masuk ke 2 node epyc. 400GB dibagi 2 = 200GB per node. Jawabannya --mem=200GB)
+"(Troubleshooting) Saya submit job GROMACS tapi selalu gagal dengan pesan error Invalid syntax. Di script saya menulis #SBATCH --mem= 64 GB. Apa yang salah dari tulisan saya?" (Model harus tahu bahwa spasi tidak diizinkan dalam sintaks SBATCH ALELEON)
+"Saya submit 3 batch job berturut-turut. Job 1 pakai 64 CPU. Job 2 pakai 32 CPU. Kenapa saat saya submit Job 3 yang butuh 64 CPU, statusnya malah PENDING dengan tulisan QOSMaxCpuPerUserLimit, padahal node epyc masih banyak yang kosong?" (Model harus menyimpulkan: Akun perseorangan punya Limit LFU akumulasi 128 CPU. 64+32+64 = 160. Job 3 tertahan Slurm karena melebihi LFU)
+"(Troubleshooting) Job saya berstatus PD dengan alasan AssocMaxWallDurationPerJobLimit. Di script saya menulis #SBATCH --time=4-00:00:00. Akun saya adalah akun perseorangan biasa. Mengapa tertahan?" (Model harus menyimpulkan: 4-00:00:00 artinya 4 hari. LFU perseorangan dibatasi walltime maksimal 3 hari/72 jam)
+"Saya mau menjalankan 10 simulasi FLACS-CFD sekaligus menggunakan fitur Slurm Array. Setiap simulasi butuh 4 core CPU dan 8GB RAM. Di script, apakah saya harus menulis --cpus-per-task=40 atau --cpus-per-task=4?" (Model harus paham konsep array: parameter SBATCH dihitung PER array job, jadi tetap ditulis 4 core dan 8GB)
+"Saya menjalankan script dengan #SBATCH --ntasks=4 dan #SBATCH --cpus-per-task=8 untuk OpenMX hibrida. Berapa total core thread CPU yang saya konsumsi, dan berapa Actual Core Hour yang terpotong jika job ini jalan 2 jam?" (Hitungan: 4 x 8 = 32 core CPU. 32 core x 2 jam = pemotongan 64 CCH)
+"Saya butuh komputasi memori raksasa sebesar 350 GB untuk satu aplikasi yang non-MPI (tidak bisa dibagi ke banyak node). Partisi apa yang WAJIB saya gunakan agar tidak error kehabisan memori?" (Model harus deduksi: Partisi epyc biasa hanya 240GB. Harus pakai epyc-jumbo yang 500GB)
+"Saya mencoba mengisi form Sesi JupyterLab di EFIRO. Saya set waktu 3 hari (72 jam) dan minta 1 GPU. Namun tombol Launch ditolak karena saldo kurang. Jika sisa kuota GPU Hour (GH) saya tinggal 50 GH, berapa maksimal hari/jam yang bisa saya ajukan?" (Hitungan: 50 GH / 1 GPU = maksimal 50 jam)
+"Kenapa saat saya meminta alokasi #SBATCH --ntasks=7, sistem Slurm ALELEON akan membulatkannya menjadi 8 dan saya ditagih biaya untuk 8 core?" (Model harus menjelaskan arsitektur AMD Zen 2 ALELEON di mana alokasi harus genap agar SMT thread dalam 1 core fisik tidak terbelah untuk job berbeda)
+"Apakah ada gunanya saya upload file Slaster-Koster (SK) ke setiap ruang Job Composer DFTB+? Ataukah ada cara yang lebih hemat storage?" (Model harus menalar: Lebih baik taruh folder SK di HOME agar bisa di-link/diakses oleh semua job DFTB+ tanpa membuang kuota storage 150GB)
+💡 Pola Ekspansi untuk mencapai 60 soal: Buat skenario troubleshooting (error log vs penyebab). Ubah-ubah angka perhitungan matematika MPI (jumlah ntasks, cpus-per-task, waktu jalan) dan tanya tagihan Core Hour-nya.
+
+--------------------------------------------------------------------------------
+🔴 LEVEL 4: Anti-Hallucination / Out-of-Context
+Kriteria Evaluasi: Pertanyaan ini HARUS dijawab model dengan pernyataan jujur seperti "Informasi tidak ditemukan di dokumen panduan" atau "Silakan hubungi admin". Model yang berhalusinasi (ngarang jawaban) akan mendapat penalti.
+"Berapa kapasitas ukuran penyimpanan (storage) SSD untuk satu node Login di ALELEON?" (Fakta: Spesifikasi yang ada di Wiki hanya untuk Compute dan Interactive node. Kapasitas SSD Login node tidak disebutkan).
+"Bagaimana langkah-langkah submit job menggunakan aplikasi MATLAB di ALELEON?" (Fakta: MATLAB tidak ada di daftar Katalog Software ALELEON).
+"Berapa biaya denda yang harus dibayar jika file di HOME saya melebihi kuota 150GB?" (Fakta: Tidak ada informasi denda di Wiki).
+"Apakah saya bisa menginstal package R menggunakan perintah conda install r-seurat di ALELEON?" (Fakta: Panduan R di ALELEON hanya merekomendasikan via install.packages() di dalam R atau kontak admin. Tidak ada panduan conda untuk R).
+"Berapa kecepatan internet/bandwidth VPN jika saya akses dari luar pulau Jawa?" (Fakta: Tidak disebutkan).
+"Bagaimana cara mereset environment Python bawaan sistem (python 3.9) ke kondisi pabrik jika saya merusaknya?" (Fakta: User tidak punya hak akses merusak env sistem, dan panduan ini tidak ada).
+"Apakah tersedia modul aplikasi ANSYS Fluent di ALELEON?" (Fakta: Tidak ada di daftar).
+"Bagaimana cara menyambungkan ekstensi Remote-SSH dari aplikasi Visual Studio Code (VSCode) ke compute node ALELEON?" (Fakta: Panduan SSH ALELEON tidak membahas VSCode Remote-SSH).
+"Saya adalah user dari Singapura (WNA). Berapa tarif konversi Core Hour ke dalam US Dollar (USD)?" (Fakta: ALELEON khusus WNI, tarif hanya ada dalam Rupiah).
+"Apa password standar/bawaan dari admin sebelum saya menggantinya di awal?" (Fakta: User baru mendapat Password OTP khusus via email, bukan password standar).
+"Siapa nama Chief Technology Officer (CTO) dari EFISON yang membangun ALELEON ini?" (Fakta: Tidak ada di dalam Wiki).
+"Bagaimana cara menghapus halaman Wiki ALELEON jika saya menemukan typo?" (Fakta: User biasa tidak diizinkan mengubah/menghapus Wiki).
+"Bagaimana cara membatalkan/mengakhiri perjanjian PKSPIAS untuk akun Institusi sebelum waktunya habis?" (Fakta: SOP pembatalan hukum PKSPIAS tidak dijelaskan di panduan teknis Wiki ini).
+"Jika server ALELEON mati lampu, berapa jam daya tahan baterai UPS yang dimiliki EFISON?" (Fakta: Informasi infrastruktur listrik tidak dipublikasikan).
+"Bagaimana cara menggunakan AutoGluon untuk machine learning di sistem ini?" (Fakta: Halaman AutoGluon secara eksplisit tercatat sudah dihapus/ditarik dari sistem).

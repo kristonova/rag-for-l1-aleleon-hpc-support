@@ -13,6 +13,35 @@ from langchain_core.prompts import PromptTemplate
 from langchain_core.documents import Document
 from bs4 import BeautifulSoup
 import time
+from typing import List
+
+
+# === KONFIGURASI PATH PENYIMPANAN ===
+CHROMA_PERSIST_DIR = "./chroma_db"  # Folder untuk menyimpan ChromaDB secara permanen
+CHROMA_COLLECTION_NAME = "wiki_aleleon"
+
+
+class E5Embeddings(HuggingFaceEmbeddings):
+    """
+    Wrapper untuk multilingual-e5-large yang otomatis menambahkan
+    prefix 'passage: ' saat embed dokumen dan 'query: ' saat embed pertanyaan.
+    
+    Ini penting karena model E5 dilatih dengan format:
+    - "query: <pertanyaan>"   → untuk teks pencarian user
+    - "passage: <dokumen>"    → untuk teks dokumen/konteks
+    
+    Tanpa prefix ini, akurasi retrieval turun signifikan.
+    """
+
+    def embed_documents(self, texts: List[str]) -> List[List[float]]:
+        """Tambahkan prefix 'passage: ' untuk setiap dokumen."""
+        prefixed = [f"passage: {t}" for t in texts]
+        return super().embed_documents(prefixed)
+
+    def embed_query(self, text: str) -> List[float]:
+        """Tambahkan prefix 'query: ' untuk pertanyaan user."""
+        return super().embed_query(f"query: {text}")
+
 
 def load_wiki_documents(sitemap_url, requests_per_second=2):
     """
@@ -70,25 +99,33 @@ def load_wiki_documents(sitemap_url, requests_per_second=2):
     return all_docs
 
 
-def main():
-    print("Memulai proses RAG dengan mesin vLLM...\n")
+def chroma_db_exists() -> bool:
+    """Cek apakah ChromaDB sudah ada di disk dan berisi data."""
+    if not os.path.exists(CHROMA_PERSIST_DIR):
+        return False
+    # Cek apakah folder tidak kosong (minimal ada file chroma.sqlite3)
+    contents = os.listdir(CHROMA_PERSIST_DIR)
+    return len(contents) > 0
 
-    # --- FASE 1: MEMASUKKAN DATA (INGESTION) ---
 
-    # 1. Load + Split dokumen dari wiki (Document Structure-Based)
+def build_vectorstore(embeddings) -> Chroma:
+    """
+    Scraping wiki → splitting → simpan ke ChromaDB permanen.
+    Hanya dijalankan SEKALI saat pertama kali.
+    """
     print("[1] Membaca & splitting halaman wiki berdasarkan struktur HTML...")
     splits = load_wiki_documents(
         sitemap_url="https://wiki.efisonlt.com/sitemap/sitemap-wiki.efisonlt.com-NS_0-0.xml",
         requests_per_second=2,
     )
 
-    # === TAMBAHKAN: Split chunk besar menjadi lebih kecil ===
+    # Split chunk besar menjadi lebih kecil
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=2000,
         chunk_overlap=200,
         separators=["\n\n", "\n", ". ", " "],
     )
-    
+
     final_splits = []
     for doc in splits:
         if len(doc.page_content) > 2500:
@@ -96,7 +133,7 @@ def main():
             final_splits.extend(sub_docs)
         else:
             final_splits.append(doc)
-    
+
     splits = final_splits
     print(f"    → Setelah splitting: {len(splits)} chunks")
 
@@ -105,13 +142,55 @@ def main():
         print(f"\n    [Chunk {i}] ({len(s.page_content)} chars):")
         print(f"    {s.page_content[:120]}...")
 
-    # 2. Setup Model Embedding (Lokal via HuggingFace - CPU/GPU)
-    print("[3] Load model embedding lokal...")
-    embeddings = HuggingFaceEmbeddings(model_name="intfloat/multilingual-e5-large")
+    # Simpan ke ChromaDB dengan persist_directory (PERMANEN di disk)
+    print(f"[4] Menyimpan vektor ke database Chroma di '{CHROMA_PERSIST_DIR}'...")
+    vectorstore = Chroma.from_documents(
+        documents=splits,
+        embedding=embeddings,
+        persist_directory=CHROMA_PERSIST_DIR,
+        collection_name=CHROMA_COLLECTION_NAME,
+    )
+    print(f"    ✅ ChromaDB tersimpan permanen di '{CHROMA_PERSIST_DIR}'")
 
-    # 4. Simpan ke Vector Database (Chroma)
-    print("[4] Menyimpan vektor ke database Chroma...")
-    vectorstore = Chroma.from_documents(documents=splits, embedding=embeddings)
+    return vectorstore
+
+
+## Jika ingin re-scrape (misal wiki berubah): 
+##rm -rf ./chroma_db && python rag_slurm_vllm.py
+def load_vectorstore(embeddings) -> Chroma:
+    """
+    Load ChromaDB yang sudah ada dari disk.
+    Tidak perlu scraping ulang.
+    """
+    print(f"[1] ⚡ Memuat ChromaDB dari disk '{CHROMA_PERSIST_DIR}' (tanpa scraping)...")
+    vectorstore = Chroma(
+        persist_directory=CHROMA_PERSIST_DIR,
+        embedding_function=embeddings,
+        collection_name=CHROMA_COLLECTION_NAME,
+    )
+    # Cek jumlah dokumen di database
+    count = vectorstore._collection.count()
+    print(f"    ✅ Berhasil memuat {count} chunks dari ChromaDB")
+
+    return vectorstore
+
+
+def main():
+    print("Memulai proses RAG dengan mesin vLLM...\n")
+
+    # --- FASE 1: MEMASUKKAN DATA (INGESTION) ---
+
+    # 1. Setup Model Embedding (harus load dulu sebelum cek DB)
+    print("[3] Load model embedding lokal...")
+    embeddings = E5Embeddings(
+        model_name="intfloat/multilingual-e5-large",
+    )
+
+    # 2. Cek apakah ChromaDB sudah ada → skip scraping jika sudah
+    if chroma_db_exists():
+        vectorstore = load_vectorstore(embeddings)
+    else:
+        vectorstore = build_vectorstore(embeddings)
 
 
     # --- FASE 2: SETUP vLLM (ENGINE INFERENCE) ---
@@ -121,17 +200,17 @@ def main():
 
     # Konfigurasi vLLM
     llm = VLLM(
-        model="Qwen/Qwen3.5-35B-A3B-GPTQ-Int4",  # ← Ganti kembali
+        model="lovedheart/Qwen3.5-9B-FP8",
         trust_remote_code=True,
         max_new_tokens=2048,
         temperature=0.3,                           
         top_p=0.9,
         tensor_parallel_size=1,
-        dtype="float16",
+        #dtype="float16",
         vllm_kwargs={
             "gpu_memory_utilization": 0.85,
             "enforce_eager": True,
-            "max_model_len": 16384,
+            "max_model_len": 200000,
         }
     )
 
@@ -139,9 +218,8 @@ def main():
     # --- FASE 3: TANYA JAWAB (RETRIEVAL & GENERATION) ---
 
     # Setup Retriever
-    retriever = vectorstore.as_retriever(search_kwargs={"k": 5})
+    retriever = vectorstore.as_retriever(search_kwargs={"k": 10})
 
-    # ...existing code...
     # Buat Prompt dengan format ChatML (untuk Qwen)
     template_qwen = """<|im_start|>system
 Kamu adalah agen AI asisten admin HPC Slurm yang ahli. Tugasmu adalah membantu user berdasarkan dokumen referensi yang diberikan. Gunakan Bahasa Indonesia yang jelas.
@@ -183,264 +261,83 @@ Aturan:
     # --- UJI COBA: BATCH SEMUA PERTANYAAN ---
     pertanyaan_list = [
         # =============================================================
-        # LEVEL 1: Fakta Langsung (50 pertanyaan)
+        # LEVEL 1: Fakta Langsung / Direct Facts (20 pertanyaan)
         # Jawaban bisa ditemukan langsung di satu chunk/paragraf
         # =============================================================
 
-        # --- Umum ALELEON ---
-        "Apa itu ALELEON Supercomputer?",
-        "Apa email support admin ALELEON?",
-        "Jam kerja support EFISON kapan?",
-        "ALELEON Mk.V menggunakan platform apa?",
-        "Sistem operasi apa yang digunakan ALELEON?",
-        "Versi Slurm yang digunakan ALELEON berapa?",
-        "Apa nama portal web untuk menggunakan ALELEON?",
-        "Apa URL untuk login ke EFIRO Web Service?",
-        "Apa itu EFIRO Account Manager?",
-        "Bagaimana cara mengganti password akun ALELEON?",
-
-        # --- Spesifikasi ---
-        "Berapa jumlah node di partisi epyc?",
-        "CPU apa yang digunakan di partisi epyc?",
-        "Berapa RAM efektif per node di partisi epyc?",
-        "Berapa RAM efektif di partisi epyc-jumbo?",
-        "GPU apa yang digunakan di partisi ampere?",
-        "Berapa jumlah GPU di compute node ampere?",
-        "Apa interkoneksi yang digunakan di partisi epyc?",
-        "Berapa kapasitas hot storage SSD di ALELEON?",
-        "Berapa kapasitas cold storage HDD di ALELEON?",
-        "Apakah ALELEON mendukung CUDA 11 ke bawah di partisi ampere?",
-
-        # --- Core Hour & Biaya ---
-        "Apa itu CCH?",
-        "Apa itu GH?",
-        "Berapa harga CCH untuk golongan perseorangan akademia?",
-        "Berapa harga GH untuk golongan perseorangan non-akademia?",
-        "Berapa storage HOME yang didapatkan pengguna perseorangan?",
-        "Berapa masa aktif akun perseorangan?",
-        "Apa rumus menghitung CPU Core Hour?",
-
-        # --- Software ---
-        "Apa nama modul GROMACS versi CPU 2025.3?",
-        "Apa nama modul GROMACS versi GPU 2025.3?",
-        "Versi ORCA berapa yang tersedia di ALELEON?",
-        "Apa nama modul Quantum ESPRESSO 7.4.1?",
-        "Apa nama modul CP2K versi GPU?",
-        "Versi LAMMPS berapa yang tersedia di ALELEON?",
-        "Apa nama modul SIESTA yang tersedia?",
-        "Apa nama modul OpenMX 3.9?",
-        "Apa nama modul PHASE/0 2025?",
-        "Versi COMCOT berapa yang tersedia?",
-        "Apa nama modul DFTB+ yang tersedia?",
-        "Apa nama modul NAMD versi GPU?",
-        "Apa nama modul NWChem yang tersedia?",
-
-        # --- Python & Conda ---
-        "Versi Python default dari Anaconda3 2025.06-1 apa?",
-        "Perintah apa untuk mengaktifkan Mamba 23.11.0-0?",
-        "Bagaimana cara membuat modul pyload setelah conda env aktif?",
-        "Perintah apa untuk melihat daftar modul pyload yang tersedia?",
-        "Apa perintah untuk mengaktifkan conda env dengan pyload?",
-        "Di mana conda env dibuat secara default?",
-
-        # --- Lmod & Module ---
-        "Apa perintah untuk mencari modul software berdasarkan keyword?",
-        "Apa perintah untuk menonaktifkan semua modul software aktif?",
-        "Apa perintah untuk mengganti modul software aktif?",
-        "Versi GCC berapa saja yang tersedia di ALELEON?",
+        "Berapa kapasitas RAM efektif per node di partisi epyc-jumbo?",
+        "Berapa batas maksimal walltime (waktu komputasi) per job untuk golongan akun perseorangan?",
+        "Saya ingin pakai partisi GPU. GPU jenis apa yang terpasang di partisi ampere?",
+        "Apa alamat website portal EFIRO Web Service (EWS) untuk login?",
+        "Perintah apa yang harus saya ketik di terminal untuk melihat daftar environment python/pyload yang saya buat?",
+        "Berapa harga 1 GPU Hour (GH) untuk pengguna golongan perseorangan non-akademia?",
+        "Saya mau cek sisa kuota core hour saya. Perintah sausage apa yang harus diketik?",
+        "Apa itu PKSPIAS dalam pendaftaran akun ALELEON?",
+        "Jika saya pakai aplikasi SFTP seperti FileZilla, apakah ada limit ukuran file yang bisa diupload?",
+        "OS (Sistem Operasi) apa yang digunakan oleh ALELEON Mk.V?",
+        "Versi SLURM berapa yang terpasang di sistem ALELEON saat ini?",
+        "Bagaimana cara membatalkan/menghentikan job yang berstatus PENDING di terminal?",
+        "Berapa kapasitas limit storage HOME untuk akun perseorangan?",
+        "Apakah sistem ALELEON memiliki backup jika saya tidak sengaja menghapus data di HOME?",
+        "Email resmi apa yang harus saya hubungi jika ingin submit support ticket?",
+        "Saya mau menjalankan simulasi GROMACS, apa nama binary MPI yang dipakai? Apakah gmx atau yang lain?",
+        "Di EFIRO Account Manager, aplikasi authenticator apa saja yang didukung untuk fitur 2FA?",
+        "Apa perintah terminal untuk mengecek status antrian job saya di Slurm?",
+        "Apakah ALELEON mendukung instalasi package Python menggunakan pip?",
+        "Modul Lmod apa yang harus saya load jika ingin menggunakan compiler GCC versi 15.2.0?",
 
         # =============================================================
-        # LEVEL 2: Gabungan Info / Multi-Chunk (60 pertanyaan)
+        # LEVEL 2: Gabungan Info / Multi-Chunk (10 pertanyaan)
         # Butuh menggabungkan info dari beberapa bagian dokumen
         # =============================================================
 
-        # --- Alur Kerja Umum ---
-        "Apa saja pilihan cara menjalankan komputasi Python dengan conda env di ALELEON?",
-        "Apa perbedaan antara menjalankan batch job via Job Composer EWS dan via terminal Slurm?",
-        "Bagaimana langkah lengkap membuat conda env baru dan modul pyload dari awal?",
-        "Apa saja status job di squeue dan artinya masing-masing?",
-        "Bagaimana cara mengisi formulir Jupyter di EWS untuk conda env user?",
-        "Apa saja opsi login yang tersedia untuk mengakses ALELEON?",
-        "Bagaimana langkah login pertama kali di ALELEON?",
-        "Apa saja menu dan aplikasi yang tersedia di EFIRO Web Service?",
-        "Bagaimana cara upload file ke ALELEON?",
-        "Apa saja opsi transfer data di ALELEON?",
-
-        # --- Submit Script ---
-        "Apa saja parameter SBATCH esensial yang harus diisi dalam submit script?",
-        "Bagaimana cara menulis SBATCH time untuk job 2 hari?",
-        "Apa perbedaan SBATCH output dan SBATCH error?",
-        "Bagaimana cara mengaktifkan notifikasi email untuk status job?",
-        "Apa saja pilihan mail-type yang tersedia di SBATCH?",
-        "Bagaimana format penulisan SBATCH yang benar?",
-        "Apa itu sausage slimit dan bagaimana cara menggunakannya?",
-        "Bagaimana cara mengisi template submit script yang ditandai 4 garing?",
-
-        # --- MPI ---
-        "Apa perbedaan Pure MPI dan Hybrid MPI/OpenMP?",
-        "Bagaimana sintaks menjalankan MPI di ALELEON?",
-        "Apa fungsi flag --use-hwthread-cpus pada mpirun?",
-        "Bagaimana Slurm ALELEON menyebar proses MPI ke node?",
-        "Berapa proses MPI maksimal yang bisa berjalan di 1 node partisi epyc?",
-        "Bagaimana cara menjalankan Pure MPI pada core fisik?",
-        "Apa itu CUDA-aware MPI dan modul apa yang tersedia?",
-        "Bagaimana cara menjalankan MPI GPU dengan proses MPI langsung ke GPU?",
-
-        # --- Software Spesifik ---
-        "Bagaimana langkah menjalankan GROMACS di ALELEON via terminal?",
-        "Apa perbedaan GROMACS versi CPU dan GPU dalam hal submit script?",
-        "Bagaimana cara pre-processing GROMACS di Login Node?",
-        "Apa itu binary gmx_mpi dan kenapa bukan gmx?",
-        "Bagaimana langkah menjalankan Quantum ESPRESSO via Job Composer?",
-        "Bagaimana langkah menjalankan ORCA via terminal Slurm?",
-        "Apa perbedaan parameter !PAL dan %PAL NPROCS di ORCA?",
-        "Bagaimana langkah menjalankan CP2K versi GPU?",
-        "Bagaimana cara menjalankan LAMMPS versi GPU dengan Kokkos?",
-        "Bagaimana cara menjalankan OpenMX secara hybrid MPI/OMP?",
-        "Apa itu DATA.PATH di OpenMX dan apa nilainya untuk versi 3.9?",
-        "Bagaimana langkah menjalankan PHASE/0 via terminal?",
-        "Bagaimana langkah menjalankan NAMD versi GPU?",
-        "Bagaimana cara menjalankan FLACS-CFD dengan array di ALELEON?",
-        "Apa perbedaan menjalankan FLACS-CFD satu simulasi dan array?",
-        "Bagaimana langkah menjalankan SIESTA di ALELEON?",
-
-        # --- Monitoring & Troubleshooting ---
-        "Bagaimana cara melihat utilisasi CPU dan memori job di Grafana?",
-        "Apa saja menu sausage yang tersedia untuk monitoring?",
-        "Bagaimana cara membatalkan job yang sedang berjalan?",
-        "Apa arti NODELIST REASON 'Resources' pada squeue?",
-        "Apa arti NODELIST REASON 'QOSMaxCpuPerUserLimit'?",
-        "Apa arti NODELIST REASON 'AssocMaxWallDurationPerJobLimit'?",
-        "Bagaimana langkah troubleshooting ketika job tertahan lama?",
-        "Bagaimana cara download file output dari ALELEON?",
-
-        # --- Limitasi & Fair Usage ---
-        "Berapa limit maksimal CPU untuk akun perseorangan di LFU?",
-        "Berapa limit walltime maksimal untuk akun perseorangan?",
-        "Berapa limit GPU untuk akun uji coba?",
-        "Bagaimana cara mengajukan pembukaan LFU sementara?",
-        "Apa itu sausage sfair?",
-
-        # --- Pendaftaran & Akun ---
-        "Apa saja golongan pengguna ALELEON?",
-        "Apa perbedaan golongan perseorangan dan institusi?",
-        "Apa itu PKSPIAS?",
-        "Bagaimana alur transaksi top-up kuota core hour?",
-        "Apa saja hak pengguna ALELEON selain layanan komputasi?",
+        "Saya ingin buka sesi interaktif JupyterLab menggunakan GPU. Apa bedanya partisi torti dan tilla, dan mana yang harus saya pilih?",
+        "Saya punya file simulasi.ipynb. Bagaimana urutan langkah menjalankannya sebagai batch job di Job Composer EWS menggunakan conda environment saya sendiri?",
+        "Jelaskan perbedaan arti status job 'PD' dan 'CG' saat saya mengecek squeue. Lalu sebutkan satu contoh Reason kenapa job bisa berstatus PD!",
+        "Sebagai pengguna dari Akun Institusi, apakah job saya dibatasi maksimal 128 core CPU seperti akun perseorangan, dan apakah saya menggunakan sistem kuota (beli di awal)?",
+        "Saya mau ganti password akun ALELEON saya. Di portal web mana saya harus login, dan menu apa yang harus diklik?",
+        "File upload saya ukurannya 500 MB. Kenapa saya selalu gagal upload lewat menu Files di EWS, dan apa solusi spesifik serta alamat host yang harus saya gunakan?",
+        "Saya ingin mengkompilasi code C++ menggunakan compiler AMD target Zen 2 dan OpenMPI terbaru. Modul apa saja yang harus saya module load secara berurutan?",
+        "Saya mau pre-processing data GROMACS menggunakan binary gmx_mpi. Boleh tidak saya menjalankannya di Login Node? Jika boleh, apa syaratnya agar tidak di-kill admin?",
+        "Jika saya menjalankan batch job lalu tiba-tiba koneksi internet rumah saya mati dan laptop saya disconnect dari VPN ALELEON, apakah job saya di Slurm ikut berhenti?",
+        "Apa bedanya Effective Core Hour dengan Actual Core Hour di dalam sistem ALELEON?",
 
         # =============================================================
-        # LEVEL 3: Reasoning / Deduksi (60 pertanyaan)
+        # LEVEL 3: Reasoning / Deduksi & Troubleshooting (10 pertanyaan)
         # Butuh menyimpulkan dari informasi yang tersedia
         # =============================================================
 
-        # --- Python & GPU ---
-        "Saya ingin pakai TensorFlow GPU di conda env. Package CUDA versi berapa yang harus saya instal?",
-        "Kenapa Anaconda3 2024.06-1 tidak direkomendasikan? Apa yang harus dilakukan user yang sudah terpasang?",
-        "Saya upload file Notebook (.ipynb) untuk batch job. Apa yang harus saya lakukan sebelum submit?",
-        "Saya ingin menggunakan multi-GPU di ALELEON untuk deep learning. Package apa yang perlu diinstal?",
-        "Storage HOME saya hampir penuh setelah banyak instal package conda. Bagaimana cara membersihkannya?",
-        "Saya ingin menjalankan PyTorch dengan GPU di conda env. Apa saja yang perlu diperhatikan?",
-        "Apa perintah pycheck dan kapan saya harus menggunakannya?",
-        "Kenapa submit script Python menggunakan pyl load dan pyl unload?",
-
-        # --- Job Scheduling & Resource ---
-        "Job saya status PENDING dengan reason QOSMaxMemoryPerUserLimit. Apa yang harus saya lakukan?",
-        "Saya menjalankan 3 job masing-masing 64 core CPU. Kenapa job ke-3 tertahan?",
-        "Saya menulis #SBATCH --time = 01:00:00 tapi job tidak jalan. Kenapa?",
-        "Saya ingin menjalankan job lebih dari 72 jam. Apakah bisa?",
-        "Job saya berhenti tiba-tiba sebelum selesai. Apa yang mungkin terjadi?",
-        "Saya menulis #SBATCH --mem= 64 GB tapi job gagal submit. Kenapa?",
-        "Bagaimana cara memperkirakan alokasi memori yang tepat untuk job saya?",
-        "Apa yang terjadi jika job berjalan melebihi SBATCH time?",
-        "Saya akun institusi, user A dan B menjalankan job dan habiskan LFU. Kenapa job saya (user C) tertahan?",
-        "Reason MaxCPUPerAccount muncul di job saya. Apa artinya dan bagaimana solusinya?",
-
-        # --- MPI & Paralel ---
-        "Saya ingin menjalankan 192 proses MPI di partisi epyc. Berapa SBATCH mem yang harus saya isi jika butuh total 400GB RAM?",
-        "Kenapa ALELEON memilih Open MPI dan bukan MPICH?",
-        "Saya ingin menjalankan GROMACS dengan 2 GPU. Bagaimana submit scriptnya?",
-        "Program saya menggunakan OpenBLAS threading. Bagaimana cara set OMP thread yang benar?",
-        "Apa bedanya menjalankan MPI di core thread vs core fisik? Kapan saya pakai yang mana?",
-        "Saya menjalankan program hybrid MPI/OMP dengan ntasks=4 dan cpus-per-task=8. Berapa total CPU yang dialokasikan?",
-        "Bagaimana cara menjalankan CP2K secara multi-node di ALELEON?",
-        "Saya ingin run GROMACS 1 GPU saja. Apa perintahnya berbeda dengan multi-GPU?",
-
-        # --- Software Spesifik ---
-        "ORCA saya berjalan single core saja padahal saya minta 32 core. Apa yang mungkin salah?",
-        "Saya ingin menjalankan DFTB+ dengan Pure OMP tanpa MPI. Bagaimana SBATCH-nya?",
-        "Kenapa GROMACS ALELEON menggunakan gmx_mpi bukan gmx? Apa yang harus saya ubah di script saya?",
-        "Saya ingin post-processing Quantum ESPRESSO dengan XCrySDen. Bagaimana caranya?",
-        "Bagaimana cara menggunakan BoltzTraP2 setelah kalkulasi Quantum ESPRESSO?",
-        "Saya ingin pre-processing GROMACS dengan ACPYPE. Bagaimana langkahnya?",
-        "Saya ingin menjalankan FLACS-CFD 8 simulasi sekaligus. Berapa total CPU dan memori jika masing-masing 4 core dan 8GB?",
-        "Program R saya gagal karena package belum terinstal. Bagaimana cara mengetahui package mana yang kurang?",
-        "Saya ingin menjalankan R di Jupyter. Apa saja yang perlu disiapkan terlebih dahulu?",
-        "Bagaimana cara instal library R secara mandiri di ALELEON?",
-        "Saya ingin menggunakan OpenMX. Apa yang harus saya definisikan di file input selain parameter komputasi?",
-
-        # --- Infrastruktur & Keamanan ---
-        "Saya tidak sengaja menghapus data penting. Apakah bisa di-recovery?",
-        "Apa itu SSH Key dan kenapa diperlukan?",
-        "Bagaimana cara registrasi SSH Key di ALELEON?",
-        "Saya ingin menjalankan software sendiri yang tidak ada di ALELEON. Apa opsi yang tersedia?",
-        "Apa itu EasyBuild dan bagaimana cara instal software dengannya?",
-        "Apa itu Apptainer dan bagaimana cara menjalankan container di ALELEON?",
-
-        # --- Migrasi & Legacy ---
-        "Saya user lama Mk.III. Bagaimana cara migrasi ke Mk.V?",
-        "Apakah VPN masih diperlukan untuk ALELEON Mk.V?",
-
-        # --- Deduksi dari Spesifikasi ---
-        "Saya ingin menjalankan job yang butuh 400GB RAM. Partisi mana yang harus saya gunakan?",
-        "Saya butuh lebih dari 128 core CPU. Apakah ALELEON mendukung multi-node?",
-        "Apakah ALELEON mendukung Python 2?",
-        "Saya menggunakan software yang butuh GCC 15. Apakah tersedia di ALELEON?",
-        "Compiler Fortran apa saja yang tersedia di ALELEON?",
-        "Apakah ALELEON mendukung Intel MKL?",
-        "Saya butuh library FFTW untuk kompilasi software. Versi apa yang tersedia?",
-        "Apakah ALELEON mendukung NVIDIA NCCL untuk multi-GPU training?",
-
-        # --- Layanan ---
-        "Saya ingin instalasi software baru di ALELEON. Apakah gratis?",
-        "Apa saja persyaratan layanan instalasi software gratis?",
-        "Bagaimana cara submit support ticket di EWS?",
-        "Apakah tim admin bisa membalas support di luar jam kerja?",
+        "Saya menjalankan simulasi FLACS-CFD dengan 192 proses MPI murni. Di partisi epyc, otomatis job ini butuh lebih dari 1 node. Berapa angka yang harus saya tulis persisnya di #SBATCH --mem= jika total RAM yang saya butuhkan untuk seluruh job adalah 400GB?",
+        "(Troubleshooting) Saya submit job GROMACS tapi selalu gagal dengan pesan error Invalid syntax. Di script saya menulis #SBATCH --mem= 64 GB. Apa yang salah dari tulisan saya?",
+        "Saya submit 3 batch job berturut-turut. Job 1 pakai 64 CPU. Job 2 pakai 32 CPU. Kenapa saat saya submit Job 3 yang butuh 64 CPU, statusnya malah PENDING dengan tulisan QOSMaxCpuPerUserLimit, padahal node epyc masih banyak yang kosong?",
+        "(Troubleshooting) Job saya berstatus PD dengan alasan AssocMaxWallDurationPerJobLimit. Di script saya menulis #SBATCH --time=4-00:00:00. Akun saya adalah akun perseorangan biasa. Mengapa tertahan?",
+        "Saya mau menjalankan 10 simulasi FLACS-CFD sekaligus menggunakan fitur Slurm Array. Setiap simulasi butuh 4 core CPU dan 8GB RAM. Di script, apakah saya harus menulis --cpus-per-task=40 atau --cpus-per-task=4?",
+        "Saya menjalankan script dengan #SBATCH --ntasks=4 dan #SBATCH --cpus-per-task=8 untuk OpenMX hibrida. Berapa total core thread CPU yang saya konsumsi, dan berapa Actual Core Hour yang terpotong jika job ini jalan 2 jam?",
+        "Saya butuh komputasi memori raksasa sebesar 350 GB untuk satu aplikasi yang non-MPI (tidak bisa dibagi ke banyak node). Partisi apa yang WAJIB saya gunakan agar tidak error kehabisan memori?",
+        "Saya mencoba mengisi form Sesi JupyterLab di EFIRO. Saya set waktu 3 hari (72 jam) dan minta 1 GPU. Namun tombol Launch ditolak karena saldo kurang. Jika sisa kuota GPU Hour (GH) saya tinggal 50 GH, berapa maksimal hari/jam yang bisa saya ajukan?",
+        "Kenapa saat saya meminta alokasi #SBATCH --ntasks=7, sistem Slurm ALELEON akan membulatkannya menjadi 8 dan saya ditagih biaya untuk 8 core?",
+        "Apakah ada gunanya saya upload file Slaster-Koster (SK) ke setiap ruang Job Composer DFTB+? Ataukah ada cara yang lebih hemat storage?",
 
         # =============================================================
-        # LEVEL 4: Anti-Hallucination (30 pertanyaan)
+        # LEVEL 4: Anti-Hallucination / Out-of-Context (15 pertanyaan)
         # Jawaban TIDAK ada di dokumen, model harus jujur
         # =============================================================
 
-        "Berapa harga berlangganan conda env di ALELEON per bulan?",
-        "Apakah ALELEON mendukung instalasi Docker di dalam conda env?",
-        "Berapa jumlah maksimal GPU yang bisa diminta dalam satu batch job conda?",
-        "Apakah ALELEON menyediakan layanan cloud storage seperti Google Drive?",
-        "Berapa kecepatan internet di ALELEON Supercomputer?",
-        "Apakah ALELEON mendukung GPU AMD Radeon?",
-        "Berapa biaya maintenance bulanan ALELEON Supercomputer?",
-        "Apakah ALELEON mendukung Windows Subsystem for Linux (WSL)?",
-        "Berapa jumlah total pengguna aktif ALELEON saat ini?",
-        "Apakah ALELEON menyediakan layanan dedicated node untuk user tertentu?",
-        "Berapa latency jaringan antar node di ALELEON?",
-        "Apakah ALELEON mendukung Kubernetes untuk orchestration container?",
-        "Berapa versi CUDA tertinggi yang pernah diinstal di ALELEON?",
-        "Apakah ALELEON menyediakan layanan backup otomatis ke cloud?",
-        "Berapa bandwidth NVLink antara 2 GPU RTX 3090 di ALELEON?",
-        "Apakah user bisa mengubah konfigurasi Slurm sendiri?",
-        "Berapa waktu rata-rata antrian job di ALELEON?",
-        "Apakah ALELEON support InfiniBand?",
-        "Berapa jumlah core fisik per CPU AMD EPYC 7702P?",
-        "Apakah ALELEON menyediakan layanan pelatihan HPC untuk pemula?",
-        "Berapa uptime SLA yang dijamin oleh EFISON?",
-        "Apakah ALELEON mendukung remote desktop via RDP?",
-        "Berapa jumlah mahasiswa yang pernah menggunakan EUREKA?",
-        "Apakah pengguna bisa mengakses BIOS atau firmware node?",
-        "Apakah ALELEON menyediakan API untuk submit job secara programmatic?",
-        "Berapa jumlah penelitian yang sedang berjalan di ALELEON saat ini?",
-        "Apakah ALELEON mendukung Singularity selain Apptainer?",
-        "Berapa total daya listrik yang dikonsumsi ALELEON Supercomputer?",
-        "Apakah ada diskon untuk pembelian core hour dalam jumlah besar?",
-        "Apakah ALELEON berencana upgrade ke GPU NVIDIA H100?",
+        "Berapa kapasitas ukuran penyimpanan (storage) SSD untuk satu node Login di ALELEON?",
+        "Bagaimana langkah-langkah submit job menggunakan aplikasi MATLAB di ALELEON?",
+        "Berapa biaya denda yang harus dibayar jika file di HOME saya melebihi kuota 150GB?",
+        "Apakah saya bisa menginstal package R menggunakan perintah conda install r-seurat di ALELEON?",
+        "Berapa kecepatan internet/bandwidth VPN jika saya akses dari luar pulau Jawa?",
+        "Bagaimana cara mereset environment Python bawaan sistem (python 3.9) ke kondisi pabrik jika saya merusaknya?",
+        "Apakah tersedia modul aplikasi ANSYS Fluent di ALELEON?",
+        "Bagaimana cara menyambungkan ekstensi Remote-SSH dari aplikasi Visual Studio Code (VSCode) ke compute node ALELEON?",
+        "Saya adalah user dari Singapura (WNA). Berapa tarif konversi Core Hour ke dalam US Dollar (USD)?",
+        "Apa password standar/bawaan dari admin sebelum saya menggantinya di awal?",
+        "Siapa nama Chief Technology Officer (CTO) dari EFISON yang membangun ALELEON ini?",
+        "Bagaimana cara menghapus halaman Wiki ALELEON jika saya menemukan typo?",
+        "Bagaimana cara membatalkan/mengakhiri perjanjian PKSPIAS untuk akun Institusi sebelum waktunya habis?",
+        "Jika server ALELEON mati lampu, berapa jam daya tahan baterai UPS yang dimiliki EFISON?",
+        "Bagaimana cara menggunakan AutoGluon untuk machine learning di sistem ini?",
     ]
 
 

@@ -1,3 +1,6 @@
+#Ignore ChromaDB directory
+chroma_db/
+
 # Ignore Roo code directory
 .roo/
 
