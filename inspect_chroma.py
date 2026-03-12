@@ -1,11 +1,12 @@
 import os
 import requests
-from langchain_chroma import Chroma
+from langchain_qdrant import QdrantVectorStore
+from qdrant_client import QdrantClient
 from langchain_core.embeddings import Embeddings
 from typing import List
 
-CHROMA_PERSIST_DIR = "./chroma_db"
-CHROMA_COLLECTION_NAME = "wiki_aleleon"
+QDRANT_PERSIST_DIR = "./qdrant_db"
+QDRANT_COLLECTION_NAME = "wiki_aleleon"
 EMBEDDING_API_URL = os.getenv("EMBEDDING_API_URL", "http://localhost:8001")
 
 
@@ -32,33 +33,43 @@ class EmbeddingServiceClient(Embeddings):
 
 
 def main():
-    print(f"Loading ChromaDB dari '{CHROMA_PERSIST_DIR}'...")
+    print(f"Loading Qdrant dari '{QDRANT_PERSIST_DIR}'...")
     print(f"Embedding API: {EMBEDDING_API_URL}")
     embeddings = EmbeddingServiceClient()
 
-    vectorstore = Chroma(
-        persist_directory=CHROMA_PERSIST_DIR,
-        embedding_function=embeddings,
-        collection_name=CHROMA_COLLECTION_NAME,
+    client = QdrantClient(path=QDRANT_PERSIST_DIR)
+    vectorstore = QdrantVectorStore(
+        client=client,
+        embedding=embeddings,
+        collection_name=QDRANT_COLLECTION_NAME,
     )
-
-    collection = vectorstore._collection
 
     # === 1. Jumlah total chunks ===
-    count = collection.count()
+    collection_info = client.get_collection(QDRANT_COLLECTION_NAME)
+    count = collection_info.points_count
     print(f"\n📊 Total chunks tersimpan: {count}")
 
-    # === 2. Ambil semua data (tanpa embedding, biar cepat) ===
-    data = collection.get(
-        include=["documents", "metadatas"]
-    )
+    # === 2. Ambil semua data menggunakan scroll ===
+    all_points = []
+    offset = None
+    while True:
+        points, offset = client.scroll(
+            collection_name=QDRANT_COLLECTION_NAME,
+            limit=100,
+            offset=offset,
+            with_payload=True,
+            with_vectors=False,
+        )
+        all_points.extend(points)
+        if offset is None:
+            break
 
     # === 3. Tampilkan ringkasan setiap chunk ===
     print(f"\n{'='*70}")
-    for i in range(count):
-        doc_id = data["ids"][i]
-        text = data["documents"][i]
-        meta = data["metadatas"][i]
+    for i, point in enumerate(all_points):
+        doc_id = point.id
+        meta = point.payload.get("metadata", {})
+        text = point.payload.get("page_content", "")
         title = meta.get("title", "N/A")
         source = meta.get("source", "N/A")
 
@@ -73,7 +84,8 @@ def main():
     print(f"\n{'='*70}")
     print("📊 Statistik per halaman:")
     titles = {}
-    for meta in data["metadatas"]:
+    for point in all_points:
+        meta = point.payload.get("metadata", {})
         t = meta.get("title", "N/A")
         titles[t] = titles.get(t, 0) + 1
 

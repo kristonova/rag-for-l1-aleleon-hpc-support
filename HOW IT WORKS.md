@@ -15,9 +15,9 @@
 │                                                                          │
 │  Layanan:                                                                │
 │  ┌─────────────────┐ ┌─────────────┐ ┌──────────┐ ┌──────────────┐      │
-│  │ embedding-service│ │  vllm-rocm  │ │ chromadb │ │   rag-app    │      │
+│  │ embedding-service│ │  vllm-rocm  │ │  qdrant  │ │   rag-app    │      │
 │  │ (BAAI/bge-m3)   │ │ (Qwen3.5)   │ │ (Vektor) │ │ (Orkestrator)│      │
-│  │ Port 8001       │ │ Port 8000   │ │ Port 8002│ │              │      │
+│  │ Port 8001       │ │ Port 8000   │ │ Port 6333│ │              │      │
 │  └─────────────────┘ └─────────────┘ └──────────┘ └──────────────┘      │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
@@ -26,21 +26,21 @@
 
 ## FASE 1: Pipeline Ingesti Data
 
-### Pemeriksaan Persistensi — Lewati Scraping jika ChromaDB Sudah Ada
+### Pemeriksaan Persistensi — Lewati Scraping jika Koleksi Qdrant Sudah Ada
 
 ```python
-if chroma_db_exists():
+if qdrant_collection_exists():
     vectorstore = load_vectorstore(embeddings)
 else:
     vectorstore = build_vectorstore(embeddings)
 ```
 
 **Yang terjadi:**
-- Sebelum scraping, sistem memeriksa apakah direktori ChromaDB sudah ada di disk (`./chroma_db`).
-- Jika ada dan berisi data → **scraping dilewati sepenuhnya** dan vektor dimuat dari disk.
+- Sebelum scraping, sistem memeriksa apakah koleksi Qdrant (`wiki_aleleon`) sudah ada di server Qdrant.
+- Jika ada dan berisi data → **scraping dilewati sepenuhnya** dan vektor dimuat dari Qdrant.
 - Jika belum ada → lanjutkan ke pipeline ingesti lengkap di bawah.
-- ChromaDB dipersistenkan melalui named volume Podman (`rag-chroma-db:/app/chroma_db`), sehingga data tetap ada saat container restart.
-- Untuk memaksa scraping ulang (misalnya konten wiki berubah): hapus volume dengan `podman volume rm rag-for-l1-aleleon-hpc-support_rag-chroma-db`.
+- Qdrant dipersistenkan melalui named volume Podman (`qdrant-data:/qdrant/storage`), sehingga data tetap ada saat container restart.
+- Untuk memaksa scraping ulang (misalnya konten wiki berubah): hapus koleksi di Qdrant melalui dashboard (`http://localhost:6333/dashboard`) atau hapus volume dengan `podman volume rm rag-for-l1-aleleon-hpc-support_qdrant-data`.
 
 ### Langkah 1 — Parse Sitemap XML
 
@@ -362,24 +362,25 @@ Kueri: "Saya butuh banyak memori untuk job saya"
     └── Dense (bge-m3): Memahami "memori" ≈ "RAM" secara semantik → DITEMUKAN ✅
 ```
 
-### Langkah 7 — Basis Data Vektor (Chroma — Persisten)
+### Langkah 7 — Basis Data Vektor (Qdrant — Persisten)
 
 ```python
-vectorstore = Chroma.from_documents(
+vectorstore = QdrantVectorStore.from_documents(
     documents=splits,
     embedding=embeddings,
-    persist_directory=CHROMA_PERSIST_DIR,
-    collection_name=CHROMA_COLLECTION_NAME,
+    url=QDRANT_URL,
+    api_key=QDRANT_API_KEY,
+    collection_name=QDRANT_COLLECTION_NAME,
 )
 ```
 
 **Yang terjadi:**
 
-1. Each chunk is embedded into a 1024D vector (via embedding-service API, in batches of 32).
-2. Vektor + teks asli + metadata disimpan ke database Chroma **di disk** (persisten).
+1. Setiap chunk di-embed menjadi vektor 1024D (via embedding-service API, dalam batch @32).
+2. Vektor + teks asli + metadata disimpan ke database Qdrant **secara persisten** di server Qdrant.
 
 ```
-Chroma DB (persistent on disk — ./chroma_db)
+Qdrant (persistent — server di http://qdrant:6333)
 ┌─────────────────────────────────────────────────────────────────────┐
 │ ID │ Vector (1024D)             │ Original Text        │ Metadata  │
 ├────┼────────────────────────────┼──────────────────────┼───────────┤
@@ -393,11 +394,13 @@ Chroma DB (persistent on disk — ./chroma_db)
 └────┴────────────────────────────┴──────────────────────┴───────────┘
 ```
 
-**Chroma** adalah database vektor yang:
-- Lightweight, runs as **persistent local storage** (using `persist_directory`).
-- Data survives container restarts via Podman named volume (`rag-chroma-db:/app/chroma_db`).
-- Supports **cosine similarity search**.
-- Pada run pertama: scraping + embedding + penyimpanan (~450 chunk). Pada run berikutnya: langsung load dari disk.
+**Qdrant** adalah database vektor yang:
+- Berjalan sebagai **server terpisah** dalam container Podman (port 6333 REST, port 6334 gRPC).
+- Data dipersistenkan melalui named volume Podman (`qdrant-data:/qdrant/storage`).
+- Mendukung **cosine similarity search**, filtering, dan HNSW indexing.
+- Dilindungi oleh API key (`QDRANT__SERVICE__API_KEY`).
+- Pada run pertama: scraping + embedding + penyimpanan (~450 chunk). Pada run berikutnya: langsung load dari Qdrant.
+- Memiliki dashboard web di `http://localhost:6333/dashboard` untuk inspeksi data.
 
 ---
 
@@ -406,7 +409,7 @@ Chroma DB (persistent on disk — ./chroma_db)
 ### Retrieval — Cari Chunk yang Relevan
 
 ```python
-retriever = vectorstore.as_retriever(search_kwargs={"k": 10})
+docs = vectorstore.similarity_search(question, k=10)
 ```
 
 **Tipe retrieval: Approximate Nearest Neighbor (ANN) dengan kesamaan kosinus**
@@ -419,7 +422,7 @@ User: "Bagaimana cara membuat conda environment?"
          ▼ BAAI/bge-m3 (via embedding-service API)
 Query Vector: [0.029, -0.121, 0.238, ..., 0.071]    (1024D)
          │
-         ▼ Cosine Similarity against ALL chunks in Chroma
+         ▼ Cosine Similarity against ALL chunks in Qdrant
          │
 ┌────────┬──────────────────────────────────────────┬────────────┐
 │ Chunk  │ Content (with source label)              │ Similarity │
@@ -457,20 +460,21 @@ def generate_response(question: str, context: str) -> str:
     messages = [
         {
             "role": "system",
-            "content": """Kamu adalah agen AI asisten admin HPC Slurm yang ahli.
+            "content": """Kamu adalah agen AI asisten admin HPC Slurm yang ahli. Tugasmu adalah membantu user berdasarkan dokumen referensi yang diberikan. Gunakan Bahasa Indonesia yang jelas.
 
 Aturan:
-0. Berbicaralah dalam Bahasa Indonesia.
-1. Jawab HANYA berdasarkan dokumen referensi di bawah.
-2. Sertakan angka, nama, versi PERSIS seperti di dokumen.
-3. Jika informasi bisa DISIMPULKAN dari dokumen, berikan kesimpulan logis.
-4. Jika informasi TIDAK ADA, katakan "Saya tidak menemukan informasi tersebut."
-5. Jangan mengarang angka, rumus, perintah, URL, atau langkah-langkah.
-6. JANGAN mengganti perintah dari dokumen dengan alternatif.
-7. Bedakan "minimal" dan "maksimal".
-8. Langkah-langkah yang anda berikan harus diberikan dalam URUTAN yang BENAR sesuai dengan konteks yang diberikan.
-9. Untuk pertanyaan yang jawabannya berisi prosedur langkah-langkah, berikan langkah-langkah LENGKAP (jangan potong/ringkas).
-10. Berikan informasi semua yang ada di dalam dokumen secara LENGKAP.""",
+0. Tidak perlu bilang kalo berdasarkan dokumen referensi yang diberikan, langsung saja menyapa klien dengan sopan. Jangan outputkan chain of thought atau proses berpikirmu, langsung saja jawab dengan ringkas dan jelas.
+1. Jawab HANYA berdasarkan dokumen referensi. KUTIP langkah-langkah dan perintah PERSIS seperti di dokumen. Jangan menambahkan langkah atau perintah yang tidak ada di dokumen. Anda adalah L1 Support bot ALELEON. JANGAN PERNAH menyarankan solusi atau tool di luar dokumen yang diberikan. Jika di dokumen tidak ada, katakan Anda tidak tahu.
+2a. Sertakan angka, nama, versi, dan spesifikasi PERSIS seperti tertulis di dokumen. Jangan membulatkan atau menambah presisi. Contoh: jika dokumen bilang ">=11", jawab ">=11", BUKAN "11.0" atau "11.2".
+2b. Gunakan penomoran (1, 2, 3) untuk langkah-langkah, JANGAN gunakan bullet points/titik.
+3. Jika informasi bisa DISIMPULKAN dari dokumen, berikan kesimpulan tersebut.
+4. Jika informasi benar-benar TIDAK ADA di dokumen, katakan "Saya tidak menemukan informasi tersebut di sistem."
+5. Jangan mengarang angka, rumus, perintah, URL, nama partisi, atau prosedur yang tidak ada di dokumen. KHUSUSNYA jangan mengarang nama partisi seperti "bigmem" jika tidak disebutkan di dokumen.
+6. JANGAN mengganti perintah dari dokumen dengan perintah alternatif. Contoh: jika dokumen menulis "source activate", JANGAN ganti dengan "conda activate".
+7. Bedakan "minimal" dan "maksimal". Jika dokumen hanya menyebutkan "minimal X" TANPA batas maksimal, jawab bahwa informasi batas maksimal tidak tersedia di dokumen.
+8. Perhatikan label LEGACY. Jika halaman bertanda LEGACY untuk versi lama (misal Mk.III), JANGAN terapkan info tersebut untuk versi baru (Mk.V).
+9. Jawab dengan LENGKAP termasuk contoh perintah dan kode jika ada di dokumen. Jangan hanya menjawab kalimat pembuka lalu berhenti.
+10. WAJIB menjawab minimal 2 kalimat. Jangan mengeluarkan jawaban kosong.""",
         },
         {
             "role": "user",
@@ -484,7 +488,8 @@ Aturan:
         temperature=0.3,
         top_p=0.9,
         max_tokens=32768,
-        extra_body={"top_k": 20, "presence_penalty": 1.5, "enable_thinking": False},
+        presence_penalty=1.5,
+        extra_body={"top_k": 20, "chat_template_kwargs": {"enable_thinking": False}},
     )
     return response.choices[0].message.content
 ```
@@ -514,17 +519,18 @@ client.chat.completions.create(
 
 | Aturan | Tujuan |
 |---|---|
-| 0. Bahasa Indonesia | Memastikan jawaban dalam Bahasa Indonesia |
-| 1. Jawab HANYA dari dokumen | Mencegah generasi info dari pengetahuan pra-latih |
-| 2. Angka/versi harus presisi | Mencegah pembulatan ">=11" menjadi "11.0" |
+| 0. Langsung jawab, tanpa chain of thought | Menyapa klien dengan sopan, tidak menyebut "berdasarkan dokumen", jawab ringkas dan jelas |
+| 1. Jawab HANYA dari dokumen, KUTIP PERSIS | Mencegah generasi info dari pengetahuan pra-latih. L1 Support bot ALELEON |
+| 2a. Angka/versi harus presisi | Mencegah pembulatan ">=11" menjadi "11.0" |
+| 2b. Gunakan penomoran, bukan bullet | Langkah-langkah dalam format 1, 2, 3 |
 | 3. Deduksi diperbolehkan | Memungkinkan LLM menyimpulkan secara logis dari data |
-| 4. Respons "tidak ditemukan" | Memaksa model menolak saat info tidak tersedia |
-| 5. Dilarang mengarang | Memblokir perintah, URL, atau prosedur palsu |
+| 4. Respons "tidak ditemukan di sistem" | Memaksa model menolak saat info tidak tersedia |
+| 5. Dilarang mengarang, termasuk nama partisi | Memblokir perintah, URL, partisi palsu seperti "bigmem" |
 | 6. Jangan ganti perintah | Mencegah `source activate` diganti `conda activate` |
 | 7. Bedakan minimum vs maksimum | Mencegah salah tafsir "minimal X" dan "maksimal X" |
-| 8. Urutan harus benar | Langkah harus dalam URUTAN yang BENAR dari konteks |
-| 9. Prosedur harus lengkap | Jangan memotong/meringkas instruksi langkah demi langkah |
-| 10. Informasi lengkap | Sertakan SELURUH informasi dari dokumen secara utuh |
+| 8. Perhatikan label LEGACY | Jangan terapkan info Mk.III untuk Mk.V |
+| 9. Jawab LENGKAP dengan contoh | Jangan hanya kalimat pembuka lalu berhenti |
+| 10. Minimal 2 kalimat | Mencegah jawaban kosong |
 
 ### Generasi — vLLM + Qwen3.5 via OpenAI API
 
@@ -560,8 +566,9 @@ vllm serve Qwen/Qwen3.5-35B-A3B-GPTQ-Int4 \
 │      Pertanyaan: Bagaimana cara membuat conda environment?"}│
 │   ],                                                         │
 │   temperature=0.3, top_p=0.9, max_tokens=32768,             │
-│   extra_body={top_k=20, presence_penalty=1.5,                │
-│               enable_thinking=False}                         │
+│   presence_penalty=1.5,                                      │
+│   extra_body={top_k=20,                                      │
+│     chat_template_kwargs={"enable_thinking": False}}         │
 │ )                                                            │
 │         │                                                    │
 │         ▼ vLLM mengonversi ke ChatML + menghasilkan jawaban  │
@@ -582,7 +589,7 @@ vllm serve Qwen/Qwen3.5-35B-A3B-GPTQ-Int4 \
 | `top_k=20` | Hanya mempertimbangkan 20 token teratas tiap langkah | Semakin membatasi randomness |
 | `presence_penalty=1.5` | Penalti kuat untuk token berulang | Mencegah output repetitif |
 | `max_tokens=32768` | Maks 32K token output | Memungkinkan jawaban sangat detail |
-| `enable_thinking=False` | Menonaktifkan mode "thinking" Qwen3.5 | Jawaban langsung tanpa jejak reasoning |
+| `enable_thinking=False` | Menonaktifkan mode "thinking" Qwen3.5 (via `chat_template_kwargs`) | Jawaban langsung tanpa jejak reasoning |
 | `--max-model-len 131072` | Maks 128K token total (prompt + output) | Context window penuh untuk prompt besar |
 | `--dtype float16` | Presisi FP16 | Dibutuhkan model GPTQ di ROCm |
 | `--enforce-eager` | Menonaktifkan CUDAGraph | Kompatibilitas ROCm / GPU AMD |
@@ -600,26 +607,26 @@ vllm serve Qwen/Qwen3.5-35B-A3B-GPTQ-Int4 \
 ### Pelacakan Sumber — Menampilkan Sumber Dokumen
 
 ```python
-for i, inp in enumerate(inputs, 1):
-    context_text, relevant_docs = create_rag_chain(inp, retriever)
-    answer = generate_response(inp, context_text)
-    print(answer)
+for i, pertanyaan in enumerate(pertanyaan_list, 1):
+    result = rag_chain(pertanyaan)
+    print(result['answer'].strip())
 
     # Tampilkan sumber dokumen yang digunakan
-    seen = []
-    for doc in relevant_docs:
-        title = doc.metadata.get("title", "Unknown")
-        source = doc.metadata.get("source", "")
-        header = doc.metadata.get("Header 2", doc.metadata.get("Header 3", ""))
-        key = (title, header)
-        if key not in seen:
-            seen.append(key)
-            label = f"    • {title}"
-            if header:
-                label += f" → {header}"
-            if source:
-                label += f"  ({source})"
-            print(label)
+    if result.get('context'):
+        seen = []
+        for doc in result['context']:
+            title = doc.metadata.get("title", "Unknown")
+            source = doc.metadata.get("source", "")
+            header = doc.metadata.get("Header 2", doc.metadata.get("Header 3", ""))
+            key = (title, header)
+            if key not in seen:
+                seen.append(key)
+                label = f"    • {title}"
+                if header:
+                    label += f" → {header}"
+                if source:
+                    label += f"  ({source})"
+                print(label)
 ```
 
 **Yang terjadi:**
@@ -643,39 +650,46 @@ Untuk membuat conda environment di ALELEON, jalankan...
 
 ### RAG Chain — Fungsi Python Kustom
 
-Tidak lagi menggunakan `create_stuff_documents_chain` atau `create_retrieval_chain` dari LangChain. Sekarang menggunakan fungsi Python sederhana:
+Tidak lagi menggunakan `create_stuff_documents_chain` atau `create_retrieval_chain` dari LangChain. Sekarang menggunakan fungsi Python sederhana dengan pola *closure*:
 
 ```python
-def create_rag_chain(question: str, retriever):
-    """Retrieve relevant docs and build context string."""
-    relevant_docs = retriever.invoke(question)
+def create_rag_chain(vectorstore, llm_api_url=None):
+    """Create RAG chain using embedding service and vLLM API."""
 
-    context_parts = []
-    for doc in relevant_docs:
-        context_parts.append(doc.page_content)
+    def retrieve_and_answer(question):
+        # Retrieve relevant documents from Qdrant
+        docs = vectorstore.similarity_search(question, k=10)
+        context = "\n\n".join([doc.page_content for doc in docs])
 
-    context_text = "\n\n".join(context_parts)
-    return context_text, relevant_docs
+        # Generate response using vLLM API
+        answer = generate_response(question, context, llm_api_url)
+
+        return {
+            "answer": answer,
+            "context": docs
+        }
+
+    return retrieve_and_answer
 ```
 
 **Strategi: "Stuff" (manual)**
 
-Sama seperti sebelumnya — semua chunks digabung ke 1 prompt. Bedanya, sekarang dilakukan secara eksplisit dengan Python, bukan via LangChain chain abstraction.
+Sama seperti sebelumnya — semua chunks digabung ke 1 prompt. Bedanya, sekarang dilakukan secara eksplisit dengan Python, bukan via LangChain chain abstraction. Fungsi `create_rag_chain()` mengembalikan *closure* `retrieve_and_answer` yang menggabungkan retrieval dan generation dalam satu panggilan.
 
 ```
 Pertanyaan Pengguna
     │
     ▼
-┌──────────────┐     ┌────────────────────┐     ┌──────────────────┐
-│ retriever    │ ──→ │ create_rag_chain() │ ──→ │ generate_response│
-│ .invoke(q)   │     │ join chunks        │     │ (OpenAI client)  │
-│ (Top-10)     │     │ → context_text     │     │ → answer text    │
-└──────────────┘     └────────────────────┘     └──────────────────┘
+┌──────────────────┐     ┌─────────────────────┐     ┌──────────────────┐
+│ similarity_search│ ──→ │ retrieve_and_answer()│ ──→ │ generate_response│
+│ (k=10)           │     │ join chunks          │     │ (OpenAI client)  │
+│                  │     │ → context            │     │ → answer text    │
+└──────────────────┘     └─────────────────────┘     └──────────────────┘
     │                        │                          │
-    │ 10 relevant            │ context_text =           │ answer = LLM text
-    │ Documents              │ chunk1\n\nchunk2\n\n...  │ relevant_docs for
-    ▼                        ▼                          ▼ source attribution
- From Chroma           To generate_response()     Display to user
+    │ 10 relevant            │ context =                │ return {
+    │ Documents              │ chunk1\n\nchunk2\n\n...  │   "answer": ...,
+    ▼                        ▼                          ▼   "context": docs }
+ From Qdrant          To generate_response()       Return to caller
 ```
 
 **Mengapa fungsi kustom, bukan chain LangChain?**
@@ -690,17 +704,19 @@ Pertanyaan Pengguna
 Sebelum memulai RAG, sistem menunggu vLLM siap:
 
 ```python
-def wait_for_vllm(url, timeout=600, interval=10):
+def wait_for_vllm(api_url, timeout=600, interval=10):
+    base_url = api_url.rstrip("/").removesuffix("/v1")
+    health_url = f"{base_url}/health"
     start = time.time()
     while time.time() - start < timeout:
         try:
-            r = requests.get(f"{url}/health")
+            r = requests.get(health_url, timeout=5)
             if r.status_code == 200:
                 return True
         except requests.ConnectionError:
             pass
         time.sleep(interval)
-    raise TimeoutError("vLLM did not become healthy")
+    raise RuntimeError(f"vLLM tidak ready setelah {timeout}s")
 ```
 
 Model besar (35B params) memerlukan waktu loading ke VRAM. Fungsi ini polling `/health` setiap 10 detik, timeout setelah 10 menit.
@@ -717,7 +733,7 @@ Model besar (35B params) memerlukan waktu loading ke VRAM. Fungsi ini polling `/
 │  [0] wait_for_vllm() — polling /health tiap 10 dtk (maks 10 mnt) │
 │         │                                                   │
 │         ▼                                                   │
-│  [1] chroma_db_exists()? ────── YA ──→ load_vectorstore()   │
+│  [1] qdrant_collection_exists()? ── YA ──→ load_vectorstore()│
 │         │                                   (skip to [7])  │
 │         TIDAK                                               │
 │         │                                                   │
@@ -744,9 +760,9 @@ Model besar (35B params) memerlukan waktu loading ke VRAM. Fungsi ini polling `/
 │      Each chunk → 1024-dimensional vector                  │
 │         │                                                   │
 │      build_vectorstore() →                                  │
-│  [7] Chroma DB (persistent — ./chroma_db)                  │
-│      ~450 vectors + texts + metadata stored on disk        │
-│      Podman volume: rag-chroma-db:/app/chroma_db           │
+│  [7] Qdrant (persistent — http://qdrant:6333)              │
+│      ~450 vectors + texts + metadata stored                │
+│      Podman volume: qdrant-data:/qdrant/storage            │
 │                                                             │
 ├─────────────────────────────────────────────────────────────┤
 │                  FASE PER PERTANYAAN                         │
@@ -757,11 +773,11 @@ Model besar (35B params) memerlukan waktu loading ke VRAM. Fungsi ini polling `/
 │  [a] Embed question → 1024D vector                         │
 │      (BAAI/bge-m3 via embedding-service API)               │
 │         │                                                   │
-│  [b] Cosine similarity vs ~450 chunk di Chroma             │
+│  [b] Cosine similarity vs ~450 chunk di Qdrant            │
 │         │                                                   │
 │  [c] Ambil 10 chunk paling relevan                          │
 │         │                                                   │
-│  [d] create_rag_chain() → join chunks into context_text    │
+│  [d] rag_chain() → similarity_search + join chunks         │
 │         │                                                   │
 │  [e] generate_response() → OpenAI messages format          │
 │      with 11 anti-hallucination rules (0-10)               │

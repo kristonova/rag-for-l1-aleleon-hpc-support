@@ -3,7 +3,7 @@
 rag_app.py — RAG Application for Podman
 =============================================================================
 This application orchestrates the RAG chain using embedding-service, vllm-rocm,
-and chromadb services. It replaces the local embedding computation with API
+and qdrant services. It replaces the local embedding computation with API
 calls and uses OpenAI-compatible API for vLLM inference.
 =============================================================================
 """
@@ -14,7 +14,8 @@ from xml.etree import ElementTree
 from typing import List
 from langchain_text_splitters import HTMLSectionSplitter, RecursiveCharacterTextSplitter
 from langchain_core.embeddings import Embeddings
-from langchain_chroma import Chroma
+from langchain_qdrant import QdrantVectorStore
+from qdrant_client import QdrantClient
 from openai import OpenAI
 from langchain_core.documents import Document
 from bs4 import BeautifulSoup
@@ -22,8 +23,9 @@ import time
 
 
 # === KONFIGURASI ===
-CHROMA_PERSIST_DIR = os.getenv("CHROMA_PERSIST_DIR", "./chroma_db")
-CHROMA_COLLECTION_NAME = "wiki_aleleon"
+QDRANT_URL = os.getenv("QDRANT_URL", "http://qdrant:6333")
+QDRANT_API_KEY = os.getenv("QDRANT_API_KEY", None)
+QDRANT_COLLECTION_NAME = "wiki_aleleon"
 EMBEDDING_API_URL = os.getenv("EMBEDDING_API_URL", "http://embedding-service:8001")
 
 
@@ -129,17 +131,19 @@ def load_wiki_documents(sitemap_url, requests_per_second=2):
     return all_splits
 
 
-def chroma_db_exists() -> bool:
-    """Cek apakah ChromaDB sudah ada di disk dan berisi data."""
-    if not os.path.exists(CHROMA_PERSIST_DIR):
+def qdrant_collection_exists() -> bool:
+    """Cek apakah collection Qdrant sudah ada dan berisi data."""
+    try:
+        client = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY)
+        collections = client.get_collections().collections
+        return any(c.name == QDRANT_COLLECTION_NAME for c in collections)
+    except Exception:
         return False
-    contents = os.listdir(CHROMA_PERSIST_DIR)
-    return len(contents) > 0
 
 
-def build_vectorstore(embeddings) -> Chroma:
+def build_vectorstore(embeddings) -> QdrantVectorStore:
     """
-    Scraping wiki → splitting → simpan ke ChromaDB permanen.
+    Scraping wiki → splitting → simpan ke Qdrant permanen.
     Hanya dijalankan SEKALI saat pertama kali.
     """
     print("[1] Membaca & splitting halaman wiki berdasarkan struktur HTML...")
@@ -164,34 +168,36 @@ def build_vectorstore(embeddings) -> Chroma:
         print(f"\n    [Chunk {i}] ({len(s.page_content)} chars):")
         print(f"    {s.page_content[:120]}...")
 
-    # Simpan ke ChromaDB dengan persist_directory (PERMANEN di disk)
-    print(f"[2] Menyimpan vektor ke database Chroma di '{CHROMA_PERSIST_DIR}'...")
-    vectorstore = Chroma.from_documents(
+    # Simpan ke Qdrant
+    print(f"[2] Menyimpan vektor ke database Qdrant di '{QDRANT_URL}'...")
+    vectorstore = QdrantVectorStore.from_documents(
         documents=splits,
         embedding=embeddings,
-        persist_directory=CHROMA_PERSIST_DIR,
-        collection_name=CHROMA_COLLECTION_NAME,
+        url=QDRANT_URL,
+        api_key=QDRANT_API_KEY,
+        collection_name=QDRANT_COLLECTION_NAME,
     )
-    print(f"    ✅ ChromaDB tersimpan permanen di '{CHROMA_PERSIST_DIR}'")
+    print(f"    ✅ Qdrant tersimpan permanen di '{QDRANT_URL}'")
 
     return vectorstore
 
 
 ## Jika ingin re-scrape (misal wiki berubah):
-## rm -rf ./chroma_db && python rag_app.py
-def load_vectorstore(embeddings) -> Chroma:
+## Hapus collection di Qdrant lalu jalankan ulang rag_app.py
+def load_vectorstore(embeddings) -> QdrantVectorStore:
     """
-    Load ChromaDB yang sudah ada dari disk.
+    Load Qdrant collection yang sudah ada.
     Tidak perlu scraping ulang.
     """
-    print(f"[1] ⚡ Memuat ChromaDB dari disk '{CHROMA_PERSIST_DIR}' (tanpa scraping)...")
-    vectorstore = Chroma(
-        persist_directory=CHROMA_PERSIST_DIR,
-        embedding_function=embeddings,
-        collection_name=CHROMA_COLLECTION_NAME,
+    print(f"[1] ⚡ Memuat Qdrant dari '{QDRANT_URL}' (tanpa scraping)...")
+    client = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY)
+    vectorstore = QdrantVectorStore(
+        client=client,
+        embedding=embeddings,
+        collection_name=QDRANT_COLLECTION_NAME,
     )
-    count = vectorstore._collection.count()
-    print(f"    ✅ Berhasil memuat {count} chunks dari ChromaDB")
+    count = client.get_collection(QDRANT_COLLECTION_NAME).points_count
+    print(f"    ✅ Berhasil memuat {count} chunks dari Qdrant")
 
     return vectorstore
 
@@ -275,7 +281,7 @@ def create_rag_chain(vectorstore, llm_api_url=None):
     """Create RAG chain using embedding service and vLLM API."""
 
     def retrieve_and_answer(question):
-        # Retrieve relevant documents from ChromaDB
+        # Retrieve relevant documents from Qdrant
         docs = vectorstore.similarity_search(question, k=10)
         context = "\n\n".join([doc.page_content for doc in docs])
 
@@ -299,8 +305,8 @@ def main():
     print("[0] Menghubungi embedding-service API...")
     embeddings = EmbeddingServiceClient()
 
-    # 2. Cek apakah ChromaDB sudah ada → skip scraping jika sudah
-    if chroma_db_exists():
+    # 2. Cek apakah Qdrant collection sudah ada → skip scraping jika sudah
+    if qdrant_collection_exists():
         vectorstore = load_vectorstore(embeddings)
     else:
         vectorstore = build_vectorstore(embeddings)

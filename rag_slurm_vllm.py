@@ -5,7 +5,8 @@ import requests
 from xml.etree import ElementTree
 from langchain_text_splitters import HTMLSectionSplitter, RecursiveCharacterTextSplitter
 from langchain_core.embeddings import Embeddings
-from langchain_chroma import Chroma
+from langchain_qdrant import QdrantVectorStore
+from qdrant_client import QdrantClient
 from langchain_community.llms import VLLM
 from langchain_classic.chains import create_retrieval_chain
 from langchain_classic.chains.combine_documents import create_stuff_documents_chain
@@ -17,8 +18,8 @@ from typing import List
 
 
 # === KONFIGURASI PATH PENYIMPANAN ===
-CHROMA_PERSIST_DIR = "./chroma_db"  # Folder untuk menyimpan ChromaDB secara permanen
-CHROMA_COLLECTION_NAME = "wiki_aleleon"
+QDRANT_PERSIST_DIR = "./qdrant_db"  # Folder untuk menyimpan Qdrant secara permanen
+QDRANT_COLLECTION_NAME = "wiki_aleleon"
 
 
 EMBEDDING_API_URL = os.getenv("EMBEDDING_API_URL", "http://localhost:8001")
@@ -105,17 +106,17 @@ def load_wiki_documents(sitemap_url, requests_per_second=2):
 
 
 def chroma_db_exists() -> bool:
-    """Cek apakah ChromaDB sudah ada di disk dan berisi data."""
-    if not os.path.exists(CHROMA_PERSIST_DIR):
+    """Cek apakah Qdrant sudah ada di disk dan berisi data."""
+    if not os.path.exists(QDRANT_PERSIST_DIR):
         return False
-    # Cek apakah folder tidak kosong (minimal ada file chroma.sqlite3)
-    contents = os.listdir(CHROMA_PERSIST_DIR)
+    # Cek apakah folder tidak kosong
+    contents = os.listdir(QDRANT_PERSIST_DIR)
     return len(contents) > 0
 
 
-def build_vectorstore(embeddings) -> Chroma:
+def build_vectorstore(embeddings) -> QdrantVectorStore:
     """
-    Scraping wiki → splitting → simpan ke ChromaDB permanen.
+    Scraping wiki → splitting → simpan ke Qdrant permanen.
     Hanya dijalankan SEKALI saat pertama kali.
     """
     print("[1] Membaca & splitting halaman wiki berdasarkan struktur HTML...")
@@ -147,35 +148,36 @@ def build_vectorstore(embeddings) -> Chroma:
         print(f"\n    [Chunk {i}] ({len(s.page_content)} chars):")
         print(f"    {s.page_content[:120]}...")
 
-    # Simpan ke ChromaDB dengan persist_directory (PERMANEN di disk)
-    print(f"[4] Menyimpan vektor ke database Chroma di '{CHROMA_PERSIST_DIR}'...")
-    vectorstore = Chroma.from_documents(
+    # Simpan ke Qdrant dengan persist (PERMANEN di disk)
+    print(f"[4] Menyimpan vektor ke database Qdrant di '{QDRANT_PERSIST_DIR}'...")
+    vectorstore = QdrantVectorStore.from_documents(
         documents=splits,
         embedding=embeddings,
-        persist_directory=CHROMA_PERSIST_DIR,
-        collection_name=CHROMA_COLLECTION_NAME,
+        path=QDRANT_PERSIST_DIR,
+        collection_name=QDRANT_COLLECTION_NAME,
     )
-    print(f"    ✅ ChromaDB tersimpan permanen di '{CHROMA_PERSIST_DIR}'")
+    print(f"    ✅ Qdrant tersimpan permanen di '{QDRANT_PERSIST_DIR}'")
 
     return vectorstore
 
 
 ## Jika ingin re-scrape (misal wiki berubah): 
-##rm -rf ./chroma_db && python rag_slurm_vllm.py
-def load_vectorstore(embeddings) -> Chroma:
+##rm -rf ./qdrant_db && python rag_slurm_vllm.py
+def load_vectorstore(embeddings) -> QdrantVectorStore:
     """
-    Load ChromaDB yang sudah ada dari disk.
+    Load Qdrant yang sudah ada dari disk.
     Tidak perlu scraping ulang.
     """
-    print(f"[1] ⚡ Memuat ChromaDB dari disk '{CHROMA_PERSIST_DIR}' (tanpa scraping)...")
-    vectorstore = Chroma(
-        persist_directory=CHROMA_PERSIST_DIR,
-        embedding_function=embeddings,
-        collection_name=CHROMA_COLLECTION_NAME,
+    print(f"[1] ⚡ Memuat Qdrant dari disk '{QDRANT_PERSIST_DIR}' (tanpa scraping)...")
+    client = QdrantClient(path=QDRANT_PERSIST_DIR)
+    vectorstore = QdrantVectorStore(
+        client=client,
+        embedding=embeddings,
+        collection_name=QDRANT_COLLECTION_NAME,
     )
     # Cek jumlah dokumen di database
-    count = vectorstore._collection.count()
-    print(f"    ✅ Berhasil memuat {count} chunks dari ChromaDB")
+    count = client.get_collection(QDRANT_COLLECTION_NAME).points_count
+    print(f"    ✅ Berhasil memuat {count} chunks dari Qdrant")
 
     return vectorstore
 
@@ -189,7 +191,7 @@ def main():
     print("[3] Menghubungi embedding-service API...")
     embeddings = EmbeddingServiceClient()
 
-    # 2. Cek apakah ChromaDB sudah ada → skip scraping jika sudah
+    # 2. Cek apakah Qdrant sudah ada → skip scraping jika sudah
     if chroma_db_exists():
         vectorstore = load_vectorstore(embeddings)
     else:
