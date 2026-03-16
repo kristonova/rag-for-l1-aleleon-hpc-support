@@ -277,6 +277,92 @@ Pertanyaan: {question}"""
     return response.choices[0].message.content
 
 
+def generate_source_justifications(question, answer, docs, api_url=None):
+    """Generate 'Why This Source' justification for each unique retrieved source."""
+    if api_url is None:
+        api_url = os.getenv("LLM_API_URL", "http://vllm-rocm:8000/v1")
+
+    # Deduplicate sources by (title, header)
+    unique_sources = []
+    seen_keys = []
+    for doc in docs:
+        title = doc.metadata.get("title", "Unknown")
+        header = doc.metadata.get("Header 2", doc.metadata.get("Header 3", ""))
+        key = (title, header)
+        if key not in seen_keys:
+            seen_keys.append(key)
+            snippet = doc.page_content[:200].replace("\n", " ")
+            unique_sources.append({"title": title, "header": header, "snippet": snippet})
+
+    if not unique_sources:
+        return []
+
+    # Build source list for prompt
+    source_list = ""
+    for i, src in enumerate(unique_sources, 1):
+        label = src["title"]
+        if src["header"]:
+            label += f" → {src['header']}"
+        source_list += f"{i}. [{label}]: {src['snippet']}\n"
+
+    client = OpenAI(
+        base_url=api_url,
+        api_key=os.getenv("LLM_API_KEY", "")
+    )
+
+    messages = [
+        {
+            "role": "system",
+            "content": "Kamu adalah asisten yang menjelaskan relevansi sumber dokumen. Berikan justifikasi singkat (1 kalimat) untuk setiap sumber. Jangan outputkan chain of thought."
+        },
+        {
+            "role": "user",
+            "content": f"""Untuk setiap sumber berikut, berikan 1 kalimat singkat mengapa sumber tersebut relevan untuk menjawab pertanyaan user.
+
+Pertanyaan: {question}
+Jawaban: {answer[:500]}
+
+Sumber:
+{source_list}
+Format output HARUS persis (hanya nomor dan alasan, tanpa label sumber):
+1. [alasan]
+2. [alasan]
+..."""
+        }
+    ]
+
+    try:
+        response = client.chat.completions.create(
+            model=os.getenv("LLM_MODEL_NAME", "Qwen/Qwen3.5-35B-A3B-GPTQ-Int4"),
+            messages=messages,
+            max_tokens=1024,
+            temperature=0.1,
+            top_p=0.9,
+            extra_body={
+                "chat_template_kwargs": {"enable_thinking": False},
+            }
+        )
+        raw = response.choices[0].message.content.strip()
+
+        # Parse numbered list → list of reason strings
+        justifications = []
+        for line in raw.split("\n"):
+            line = line.strip()
+            if line and line[0].isdigit():
+                # Remove leading "1. ", "2. ", etc.
+                parts = line.split(".", 1)
+                if len(parts) == 2:
+                    justifications.append(parts[1].strip())
+                else:
+                    justifications.append(line)
+
+        return justifications
+
+    except Exception as e:
+        print(f"    ⚠️  Gagal generate justifikasi sumber: {e}")
+        return []
+
+
 def create_rag_chain(vectorstore, llm_api_url=None):
     """Create RAG chain using embedding service and vLLM API."""
 
@@ -288,9 +374,15 @@ def create_rag_chain(vectorstore, llm_api_url=None):
         # Generate response using vLLM API
         answer = generate_response(question, context, llm_api_url)
 
+        # Generate "Why This Source" justifications
+        justifications = generate_source_justifications(
+            question, answer, docs, llm_api_url
+        )
+
         return {
             "answer": answer,
-            "context": docs
+            "context": docs,
+            "justifications": justifications
         }
 
     return retrieve_and_answer
@@ -432,7 +524,9 @@ def main():
             # Tampilkan sumber dokumen yang digunakan
             if result.get('context'):
                 print(f"\n    📚 Sumber ({len(result['context'])} chunks):")
+                justifications = result.get('justifications', [])
                 seen = []
+                justification_idx = 0
                 for doc in result['context']:
                     title = doc.metadata.get("title", "Unknown")
                     source = doc.metadata.get("source", "")
@@ -446,6 +540,10 @@ def main():
                         if source:
                             label += f"  ({source})"
                         print(label)
+                        # Print justification if available
+                        if justification_idx < len(justifications):
+                            print(f"      💡 Why: {justifications[justification_idx]}")
+                        justification_idx += 1
         except Exception as e:
             print(f"    → ERROR: {e}")
 
