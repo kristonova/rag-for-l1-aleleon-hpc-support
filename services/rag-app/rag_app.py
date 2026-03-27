@@ -10,6 +10,7 @@ calls and uses OpenAI-compatible API for vLLM inference.
 
 import os
 import requests
+import re
 from xml.etree import ElementTree
 from typing import List
 from langchain_text_splitters import HTMLSectionSplitter, RecursiveCharacterTextSplitter
@@ -347,14 +348,14 @@ Format output HARUS persis (hanya nomor dan alasan, tanpa label sumber):
         # Parse numbered list → list of reason strings
         justifications = []
         for line in raw.split("\n"):
-            line = line.strip()
-            if line and line[0].isdigit():
-                # Remove leading "1. ", "2. ", etc.
-                parts = line.split(".", 1)
+            # Hapus markdown bold/italic agar angka maju ke paling depan
+            line_clean = line.strip().replace("*", "") 
+            if line_clean and line_clean[0].isdigit():
+                parts = line_clean.split(".", 1)
                 if len(parts) == 2:
                     justifications.append(parts[1].strip())
                 else:
-                    justifications.append(line)
+                    justifications.append(line_clean)
 
         return justifications
 
