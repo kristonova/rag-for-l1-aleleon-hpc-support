@@ -92,6 +92,7 @@ services:
       - qdrant-data:/qdrant/storage
     environment:
       - QDRANT__SERVICE__API_KEY=your-secret-key
+      - QDRANT__SERVICE__MAX_REQUEST_SIZE_MB=100
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "bash -lc 'exec 3<>/dev/tcp/127.0.0.1/6333; printf \"GET /healthz HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n\" >&3; IFS= read -r line <&3; case \"$$line\" in *200*) exit 0;; *) exit 1;; esac'"]
@@ -121,6 +122,32 @@ services:
     #     condition: service_healthy
     #   qdrant:
     #     condition: service_healthy
+    stdin_open: true
+    tty: true
+
+  # ---- Benchmark Service ----
+  # Perbandingan performa Dense vs Sparse vs Multi-Vector vs Hybrid retrieval
+  # Usage:
+  #   podman-compose --profile benchmark run benchmark                          # Full benchmark
+  #   podman-compose --profile benchmark run benchmark --mode ingest            # Ingest only
+  #   podman-compose --profile benchmark run benchmark --mode query --no-llm    # Query only, no LLM
+  #   podman-compose --profile benchmark run benchmark --mode query --questions 5  # 5 questions only
+  #   podman-compose --profile benchmark run benchmark --mode cleanup           # Delete collections
+  benchmark:
+    build:
+      context: .
+      dockerfile: services/benchmark_retrieval/Dockerfile.benchmark
+    container_name: benchmark
+    profiles:
+      - benchmark
+    environment:
+      - EMBEDDING_API_URL=http://embedding-service:8001
+      - LLM_API_URL=http://vllm-rocm:8000/v1
+      - LLM_MODEL_NAME=Qwen/Qwen3.5-35B-A3B-GPTQ-Int4
+      - QDRANT_URL=http://qdrant:6333
+      - QDRANT_API_KEY=your-secret-key
+    volumes:
+      - ./output/benchmark:/app/output/benchmark
     stdin_open: true
     tty: true
 

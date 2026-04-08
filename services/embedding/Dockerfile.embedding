@@ -29,7 +29,8 @@ RUN --mount=type=cache,target=/root/.cache/pip,Z \
     fastapi \
     uvicorn \
     sentence-transformers \
-    chromadb \
+    FlagEmbedding \
+    peft \
     requests
 
 # Copy application code
