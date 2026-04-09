@@ -12,11 +12,20 @@ import os
 import requests
 import re
 from xml.etree import ElementTree
-from typing import List
+from typing import List, Dict, Any
 from langchain_text_splitters import HTMLSectionSplitter, RecursiveCharacterTextSplitter
 from langchain_core.embeddings import Embeddings
-from langchain_qdrant import QdrantVectorStore
 from qdrant_client import QdrantClient
+from qdrant_client.models import (
+    VectorParams,
+    SparseVectorParams,
+    Distance,
+    PointStruct,
+    SparseVector,
+    Prefetch,
+    FusionQuery,
+    Fusion,
+)
 from openai import OpenAI
 from langchain_core.documents import Document
 from bs4 import BeautifulSoup
@@ -26,13 +35,16 @@ import time
 # === KONFIGURASI ===
 QDRANT_URL = os.getenv("QDRANT_URL", "http://qdrant:6333")
 QDRANT_API_KEY = os.getenv("QDRANT_API_KEY", None)
-QDRANT_COLLECTION_NAME = "wiki_aleleon"
+QDRANT_COLLECTION_NAME = "wiki_aleleon_qdrant"
 EMBEDDING_API_URL = os.getenv("EMBEDDING_API_URL", "http://embedding-service:8001")
+DENSE_DIM = 1024
+TOP_K = 10
 
 
 class EmbeddingServiceClient(Embeddings):
     """
     LangChain-compatible wrapper yang memanggil embedding-service REST API.
+    Mendukung dense-only (/embed) dan multi-mode (/embed/multi) untuk hybrid retrieval.
     """
 
     def __init__(self, api_url: str = EMBEDDING_API_URL):
@@ -57,6 +69,58 @@ class EmbeddingServiceClient(Embeddings):
 
     def embed_query(self, text: str) -> List[float]:
         return self._call_api([text])[0]
+
+    def embed_multi(self, texts: List[str], batch_size: int = 16) -> Dict[str, Any]:
+        """
+        Panggil /embed/multi → return {'dense': [...], 'sparse': [...]}.
+        Digunakan saat ingestion untuk mendapatkan dense + sparse sekaligus.
+        """
+        all_dense, all_sparse = [], []
+        for i in range(0, len(texts), batch_size):
+            batch = texts[i : i + batch_size]
+            n_batches = (len(texts) + batch_size - 1) // batch_size
+            print(f"      Multi batch {i // batch_size + 1}/{n_batches} ({len(batch)} texts)")
+            resp = requests.post(
+                f"{self.api_url}/embed/multi",
+                json={
+                    "texts": batch,
+                    "return_dense": True,
+                    "return_sparse": True,
+                    "return_colbert": False,
+                },
+                timeout=600,
+            )
+            resp.raise_for_status()
+            data = resp.json()
+            if data.get("dense"):
+                all_dense.extend(data["dense"])
+            if data.get("sparse"):
+                all_sparse.extend(data["sparse"])
+        return {"dense": all_dense, "sparse": all_sparse}
+
+    def embed_query_multi(self, text: str) -> Dict[str, Any]:
+        """
+        Single query → return {'dense': [...], 'sparse': {...}}.
+        Digunakan saat retrieval (hybrid search).
+        """
+        resp = requests.post(
+            f"{self.api_url}/embed/multi",
+            json={
+                "texts": [text],
+                "return_dense": True,
+                "return_sparse": True,
+                "return_colbert": False,
+            },
+            timeout=600,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        result = {}
+        if data.get("dense"):
+            result["dense"] = data["dense"][0]
+        if data.get("sparse"):
+            result["sparse"] = data["sparse"][0]
+        return result
 
 
 def load_wiki_documents(sitemap_url, requests_per_second=2):
@@ -142,10 +206,11 @@ def qdrant_collection_exists() -> bool:
         return False
 
 
-def build_vectorstore(embeddings) -> QdrantVectorStore:
-    """
-    Scraping wiki → splitting → simpan ke Qdrant permanen.
+def build_vectorstore(embeddings: EmbeddingServiceClient) -> QdrantClient:
+    """ 
+    Scraping wiki → splitting → simpan ke Qdrant sebagai hybrid collection (dense + sparse).
     Hanya dijalankan SEKALI saat pertama kali.
+    Return QdrantClient untuk dipakai saat retrieval.
     """
     print("[1] Membaca & splitting halaman wiki berdasarkan struktur HTML...")
     splits = load_wiki_documents(
@@ -164,43 +229,67 @@ def build_vectorstore(embeddings) -> QdrantVectorStore:
 
     print(f"    → Total chunks: {len(splits)}")
 
-    # DEBUG: Tampilkan isi setiap chunk
-    for i, s in enumerate(splits):
-        print(f"\n    [Chunk {i}] ({len(s.page_content)} chars):")
-        print(f"    {s.page_content[:120]}...")
+    texts = [s.page_content for s in splits]
+    metadatas = [s.metadata for s in splits]
 
-    # Simpan ke Qdrant
-    print(f"[2] Menyimpan vektor ke database Qdrant di '{QDRANT_URL}'...")
-    vectorstore = QdrantVectorStore.from_documents(
-        documents=splits,
-        embedding=embeddings,
-        url=QDRANT_URL,
-        api_key=QDRANT_API_KEY,
-        collection_name=QDRANT_COLLECTION_NAME,
+    # Buat hybrid collection (dense + sparse)
+    print(f"[2] Membuat hybrid collection '{QDRANT_COLLECTION_NAME}' di Qdrant...")
+    client = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY, timeout=300)
+    client.create_collection(
+        QDRANT_COLLECTION_NAME,
+        vectors_config={"dense": VectorParams(size=DENSE_DIM, distance=Distance.COSINE)},
+        sparse_vectors_config={"text-sparse": SparseVectorParams()},
     )
-    print(f"    ✅ Qdrant tersimpan permanen di '{QDRANT_URL}'")
+    print(f"    ✅ Collection '{QDRANT_COLLECTION_NAME}' dibuat (dense + sparse)")
 
-    return vectorstore
+    # Embed semua chunk (dense + sparse sekaligus)
+    print("    Generating multi-mode embeddings (dense + sparse)...")
+    import time as _time
+    t0 = _time.time()
+    multi = embeddings.embed_multi(texts, batch_size=16)
+    print(f"    ⏱️  Embedding time: {_time.time() - t0:.1f}s")
+
+    # Upsert ke Qdrant (batch)
+    n = len(texts)
+    batch_size = 32
+    print(f"    Upserting {n} points ke Qdrant (batch={batch_size})...")
+    for i in range(0, n, batch_size):
+        points = []
+        for j in range(i, min(i + batch_size, n)):
+            sp = multi["sparse"][j]
+            points.append(
+                PointStruct(
+                    id=j,
+                    vector={
+                        "dense": multi["dense"][j],
+                        "text-sparse": SparseVector(
+                            indices=sp["indices"], values=sp["values"]
+                        ),
+                    },
+                    payload={"text": texts[j], **metadatas[j]},
+                )
+            )
+        client.upsert(QDRANT_COLLECTION_NAME, points)
+
+    count = client.get_collection(QDRANT_COLLECTION_NAME).points_count
+    print(f"    ✅ {count} points berhasil disimpan ke '{QDRANT_COLLECTION_NAME}'")
+
+    return client
 
 
 ## Jika ingin re-scrape (misal wiki berubah):
 ## Hapus collection di Qdrant lalu jalankan ulang rag_app.py
-def load_vectorstore(embeddings) -> QdrantVectorStore:
+def load_vectorstore(embeddings: EmbeddingServiceClient) -> QdrantClient:
     """
-    Load Qdrant collection yang sudah ada.
-    Tidak perlu scraping ulang.
+    Load Qdrant hybrid collection yang sudah ada.
+    Tidak perlu scraping ulang. Return QdrantClient.
     """
     print(f"[1] ⚡ Memuat Qdrant dari '{QDRANT_URL}' (tanpa scraping)...")
-    client = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY)
-    vectorstore = QdrantVectorStore(
-        client=client,
-        embedding=embeddings,
-        collection_name=QDRANT_COLLECTION_NAME,
-    )
+    client = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY, timeout=300)
     count = client.get_collection(QDRANT_COLLECTION_NAME).points_count
-    print(f"    ✅ Berhasil memuat {count} chunks dari Qdrant")
+    print(f"    ✅ Berhasil memuat collection '{QDRANT_COLLECTION_NAME}' ({count} points)")
 
-    return vectorstore
+    return client
 
 
 def wait_for_vllm(api_url, timeout=600, interval=10):
@@ -364,18 +453,53 @@ Format output HARUS persis (hanya nomor dan alasan, tanpa label sumber):
         return []
 
 
-def create_rag_chain(vectorstore, llm_api_url=None):
-    """Create RAG chain using embedding service and vLLM API."""
+def create_rag_chain(client: QdrantClient, embeddings: EmbeddingServiceClient, llm_api_url=None):
+    """Create RAG chain with hybrid retrieval (dense + sparse + RRF fusion)."""
 
     def retrieve_and_answer(question):
-        # Retrieve relevant documents from Qdrant
-        docs = vectorstore.similarity_search(question, k=10)
+        # 1. Embed query → dense + sparse
+        query_multi = embeddings.embed_query_multi(question)
+
+        # 2. Hybrid search: dense + sparse → RRF fusion
+        results = client.query_points(
+            QDRANT_COLLECTION_NAME,
+            prefetch=[
+                Prefetch(
+                    query=query_multi["dense"],
+                    using="dense",
+                    limit=TOP_K * 2,
+                ),
+                Prefetch(
+                    query=SparseVector(
+                        indices=query_multi["sparse"]["indices"],
+                        values=query_multi["sparse"]["values"],
+                    ),
+                    using="text-sparse",
+                    limit=TOP_K * 2,
+                ),
+            ],
+            query=FusionQuery(fusion=Fusion.RRF),
+            limit=TOP_K,
+        )
+
+        # 3. Convert results → Document objects (kompatibel dengan sisa kode)
+        docs = []
+        for point in results.points:
+            payload = point.payload or {}
+            doc = Document(
+                page_content=payload.get("text", ""),
+                metadata={
+                    k: v for k, v in payload.items() if k != "text"
+                },
+            )
+            docs.append(doc)
+
         context = "\n\n".join([doc.page_content for doc in docs])
 
-        # Generate response using vLLM API
+        # 4. Generate response using vLLM API
         answer = generate_response(question, context, llm_api_url)
 
-        # Generate "Why This Source" justifications
+        # 5. Generate "Why This Source" justifications
         justifications = generate_source_justifications(
             question, answer, docs, llm_api_url
         )
@@ -390,7 +514,7 @@ def create_rag_chain(vectorstore, llm_api_url=None):
 
 
 def main():
-    print("Memulai proses RAG dengan mesin vLLM...\n")
+    print("Memulai proses RAG (Hybrid: Dense + Sparse + RRF) dengan mesin vLLM...\n")
 
     # --- FASE 1: MEMASUKKAN DATA (INGESTION) ---
 
@@ -400,16 +524,16 @@ def main():
 
     # 2. Cek apakah Qdrant collection sudah ada → skip scraping jika sudah
     if qdrant_collection_exists():
-        vectorstore = load_vectorstore(embeddings)
+        qdrant_client = load_vectorstore(embeddings)
     else:
-        vectorstore = build_vectorstore(embeddings)
+        qdrant_client = build_vectorstore(embeddings)
 
     # --- FASE 2: SETUP RAG CHAIN ---
 
-    print("\n[3] Membuat RAG chain...")
+    print("\n[3] Membuat RAG chain (hybrid retrieval)...")
     llm_api_url = os.getenv("LLM_API_URL", "http://vllm-rocm:8000/v1")
     wait_for_vllm(llm_api_url)
-    rag_chain = create_rag_chain(vectorstore, llm_api_url=llm_api_url)
+    rag_chain = create_rag_chain(qdrant_client, embeddings, llm_api_url=llm_api_url)
 
     # --- FASE 3: TANYA JAWAB (RETRIEVAL & GENERATION) ---
 
