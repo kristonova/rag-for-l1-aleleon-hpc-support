@@ -151,6 +151,46 @@ services:
     stdin_open: true
     tty: true
 
+  # ---- RAG API Service ----
+  rag-api:
+    build:
+      context: .
+      dockerfile: services/rag-app/Dockerfile.rag-app
+    container_name: rag-api
+    profiles:
+      - api
+    ports:
+      - "8080:8080"
+    environment:
+      - EMBEDDING_API_URL=http://embedding-service:8001
+      - LLM_API_URL=http://vllm-rocm:8000/v1
+      - QDRANT_URL=http://qdrant:6333
+      - QDRANT_API_KEY=your-secret-key
+    depends_on:
+      embedding-service:
+        condition: service_healthy
+      vllm-rocm:
+        condition: service_healthy
+      qdrant:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ---- Telegram Bot ----
+  telegram-bot:
+    build:
+      context: .
+      dockerfile: services/telegram-bot/Dockerfile.telegram
+    container_name: telegram-bot
+    profiles:
+      - telegram
+    environment:
+      - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
+      - RAG_API_URL=http://rag-api:8080
+    depends_on:
+      rag-api:
+        condition: service_started
+    restart: unless-stopped
+
 networks:
   rag-network:
     driver: bridge
