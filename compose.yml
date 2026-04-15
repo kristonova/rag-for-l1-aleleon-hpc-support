@@ -151,6 +151,34 @@ services:
     stdin_open: true
     tty: true
 
+  # ---- RAG API Benchmark (TTFT / Latency) ----
+  # Benchmark concurrency & latency untuk endpoint POST /ask
+  # Usage:
+  #   podman-compose --profile benchmark-ttft run benchmark-ttft
+  #
+  # Environment variables (semua optional):
+  #   RAG_API_URL           - Target RAG API (default: http://rag-api:8080)
+  #   NUM_REQUESTS          - Jumlah request per concurrency level (default: 69)
+  #   CONCURRENCY_LEVELS    - Comma-separated concurrency levels (default: 1,2,4,8,16)
+  #   HEALTH_CHECK_RETRIES  - Max retry health check (default: 30)
+  #   HEALTH_CHECK_INTERVAL - Detik antar retry (default: 10)
+  benchmark-ttft:
+    build:
+      context: .
+      dockerfile: services/benchmark_ttft/Dockerfile.rag-bench
+    container_name: benchmark-ttft
+    profiles:
+      - benchmark-ttft
+    environment:
+      - RAG_API_URL=http://rag-api:8080
+      - NUM_REQUESTS=69
+      - CONCURRENCY_LEVELS=1,2,4,8,16
+      - HEALTH_CHECK_RETRIES=30
+      - HEALTH_CHECK_INTERVAL=10
+      - RESULT_DIR=/app/output/benchmark_ttft
+    volumes:
+      - ./output/benchmark_ttft:/app/output/benchmark_ttft
+
   # ---- RAG API Service ----
   rag-api:
     build:
