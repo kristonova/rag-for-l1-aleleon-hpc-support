@@ -68,6 +68,7 @@ services:
       --enable-auto-tool-choice
       --tool-call-parser qwen3_coder
       --reasoning-parser qwen3
+      --enable-prefix-caching
       --trust-remote-code
     restart: unless-stopped
     healthcheck:
