@@ -25,87 +25,76 @@ import time
 from datetime import datetime
 
 # ═══════════════════════════════════════════════════════════════
-# PERTANYAAN — diambil LANGSUNG dari rag_app.py pertanyaan_list
+# PERTANYAAN — diambil dari question.txt (49 pertanyaan, 4 level)
 # ═══════════════════════════════════════════════════════════════
 PERTANYAAN_LIST = [
-    # LEVEL 1: Fakta Langsung / Direct Facts (20 pertanyaan)
-    "Berapa kapasitas RAM efektif per node di partisi epyc-jumbo?",
-    "Berapa batas maksimal walltime (waktu komputasi) per job untuk golongan akun perseorangan?",
-    "Saya ingin pakai partisi GPU. GPU jenis apa yang terpasang di partisi ampere?",
-    "Apa alamat website portal EFIRO Web Service (EWS) untuk login?",
-    "Perintah apa yang harus saya ketik di terminal untuk melihat daftar environment python/pyload yang saya buat?",
-    "Berapa harga 1 GPU Hour (GH) untuk pengguna golongan perseorangan non-akademia?",
-    "Saya mau cek sisa kuota core hour saya. Perintah sausage apa yang harus diketik?",
-    "Apa itu PKSPIAS dalam pendaftaran akun ALELEON?",
-    "Jika saya pakai aplikasi SFTP seperti FileZilla, apakah ada limit ukuran file yang bisa diupload?",
-    "OS (Sistem Operasi) apa yang digunakan oleh ALELEON Mk.V?",
-    "Versi SLURM berapa yang terpasang di sistem ALELEON saat ini?",
-    "Bagaimana cara membatalkan/menghentikan job yang berstatus PENDING di terminal?",
-    "Berapa kapasitas limit storage HOME untuk akun perseorangan?",
-    "Apakah sistem ALELEON memiliki backup jika saya tidak sengaja menghapus data di HOME?",
-    "Email resmi apa yang harus saya hubungi jika ingin submit support ticket?",
-    "Saya mau menjalankan simulasi GROMACS, apa nama binary MPI yang dipakai? Apakah gmx atau yang lain?",
-    "Di EFIRO Account Manager, aplikasi authenticator apa saja yang didukung untuk fitur 2FA?",
-    "Apa perintah terminal untuk mengecek status antrian job saya di Slurm?",
-    "Apakah ALELEON mendukung instalasi package Python menggunakan pip?",
-    "Modul Lmod apa yang harus saya load jika ingin menggunakan compiler GCC versi 15.2.0?",
+    # =============================================================
+    # LEVEL 1: Fakta Langsung / Direct Facts (12 pertanyaan)
+    # Jawaban bisa ditemukan langsung di satu chunk/paragraf
+    # =============================================================
+    "Bagaimana perintah lengkap di terminal untuk menghapus sebuah conda environment beserta seluruh isinya di ALELEON?",
+    "Arsitektur prosesor AMD generasi apa yang secara spesifik digunakan pada seluruh compute node CPU di ALELEON Supercomputer?",
+    "Di direktori mana admin menyarankan pengguna untuk menyimpan folder file Slaster-Koster (SK) agar dapat diakses secara efisien oleh banyak job DFTB+?",
+    "Apa perintah spesifik pyload yang harus saya jalankan di terminal untuk mengaktifkan environment ACPYPE versi 2023.10.27?",
+    "Apa alamat tautan (URL) lengkap dari portal EFIRO Web Service (EWS) yang menjadi standar untuk mengakses fitur komputasi ALELEON?",
+    "Siapa target spesifik kewarganegaraan dan tujuan dari diselenggarakannya program sponsorship layanan komputasi gratis EUREKA! oleh EFISON?",
+    "Apa nama profil conda environment bawaan sistem atau perintah pyload yang harus diketikkan untuk memuat software BoltzTraP2 versi 25.3.1?",
+    "Berapa jumlah maksimal job komputasi yang diizinkan untuk berstatus berjalan atau mengantri secara bersamaan bagi pengguna akun Uji Coba (Trial)?",
+    "Sebutkan nama modul Lmod yang tepat untuk memuat NVIDIA HPC SDK Compilers versi 24.9!",
+    'Berapa megabyte (MB) batas maksimal ukuran file yang dizinkan untuk diunggah langsung melalui menu "Edit Files" di dalam aplikasi Job Composer?',
+    "Tombol menu apa yang harus saya klik secara presisi pada antarmuka aplikasi Job Composer di EFIRO Web Service jika saya ingin menghentikan job yang sedang berjalan?",
+    'Apa kepanjangan dan arti dari kode status "CG" ketika saya mengecek antrian job komputasi saya menggunakan perintah squeue?',
 
-    # LEVEL 2: Gabungan Info / Multi-Chunk (10 pertanyaan)
-    "Saya ingin buka sesi interaktif JupyterLab menggunakan GPU. Apa bedanya partisi torti dan tilla, dan mana yang harus saya pilih?",
-    "Saya punya file simulasi.ipynb. Bagaimana urutan langkah menjalankannya sebagai batch job di Job Composer EWS menggunakan conda environment saya sendiri?",
-    "Jelaskan perbedaan arti status job 'PD' dan 'CG' saat saya mengecek squeue. Lalu sebutkan satu contoh Reason kenapa job bisa berstatus PD!",
-    "Sebagai pengguna dari Akun Institusi, apakah job saya dibatasi maksimal 128 core CPU seperti akun perseorangan, dan apakah saya menggunakan sistem kuota (beli di awal)?",
-    "Saya mau ganti password akun ALELEON saya. Di portal web mana saya harus login, dan menu apa yang harus diklik?",
-    "File upload saya ukurannya 500 MB. Kenapa saya selalu gagal upload lewat menu Files di EWS, dan apa solusi spesifik serta alamat host yang harus saya gunakan?",
-    "Saya ingin mengkompilasi code C++ menggunakan compiler AMD target Zen 2 dan OpenMPI terbaru. Modul apa saja yang harus saya module load secara berurutan?",
-    "Saya mau pre-processing data GROMACS menggunakan binary gmx_mpi. Boleh tidak saya menjalankannya di Login Node? Jika boleh, apa syaratnya agar tidak di-kill admin?",
-    "Jika saya menjalankan batch job lalu tiba-tiba koneksi internet rumah saya mati dan laptop saya disconnect dari VPN ALELEON, apakah job saya di Slurm ikut berhenti?",
-    "Apa bedanya Effective Core Hour dengan Actual Core Hour di dalam sistem ALELEON?",
+    # =============================================================
+    # LEVEL 2: Gabungan Info / Multi-Chunk (13 pertanyaan)
+    # Butuh menggabungkan info dari beberapa bagian dokumen
+    # =============================================================
+    "Saya ingin menjalankan simulasi NAMD versi 2.14 khusus CPU murni menggunakan metode threading OpenMP. Modul Lmod apa yang harus saya muat, dan parameter SBATCH apa di dalam script yang harus saya set angkanya menjadi 1?",
+    "Saya ingin membuka sesi JupyterLab dengan container PyTorch 2.3.0 berbasis ROCm 6.2 di partisi GPU trial. File .sif apa yang harus saya pilih di formulir, dan pada jenis GPU apa sesi saya akan berjalan?",
+    "Jika saya ingin menggunakan modul cp2k/2025.2-gcc-13.4.0-cuda-12.9.0-k6i untuk komputasi, partisi apa yang WAJIB saya tuliskan di submit script, dan apakah modul tersebut mendukung eksekusi komputasi paralel multi-node?",
+    "Job saya PENDING dengan alasan QOSMaxMemoryPerUserLimit. Apa definisi dari error tersebut, dan aplikasi beserta menu apa di terminal yang bisa saya gunakan untuk mengecek alokasi memori saya?",
+    "Saya menggunakan template LAMMPS 22 July 2025 versi CPU dengan 150 proses MPI murni. Modul Lmod apa yang akan termuat di dalam script tersebut, dan secara default, ke berapa banyak node proses MPI saya tersebut akan disebar oleh Slurm jika berjalan di partisi epyc?",
+    "Saya perlu mengunggah file input sebesar 2GB ke dalam ruang job Quantum ESPRESSO saya di Job Composer. Mengapa saya tidak bisa menggunakan fitur unggah bawaan EWS, dan di kolom manakah pada web EWS saya bisa menemukan alamat direktori spesifik untuk dituju oleh aplikasi SFTP saya?",
+    "Saya ingin mengubah profil akun ALELEON Mk.V saya dan mengaktifkan 2FA menggunakan Google Authenticator. Di portal web beralamat apa saya harus login untuk melakukannya, dan menu apa yang harus saya tuju di dalamnya?",
+    'Jika saya menutup secara paksa tab browser web saya saat sesi JupyterLab saya sedang berstatus "Running", apakah perhitungan Core Hour saya akan otomatis berhenti? Bagaimana cara yang paling benar untuk menghentikannya?',
+    "Apa perbedaan mendasar cara kerja dan metode pencatatan antara 'Total Core Hour Usage' dengan 'Actual Core Hour Usage' yang ditampilkan di aplikasi sausage saat job komputasi saya sedang berlangsung?",
+    "Saya ingin melakukan kompilasi software mandiri menggunakan CMake versi 3.31.8 yang didasari oleh compiler C/C++ GCC versi 14.2.0. Tuliskan dua perintah module load secara berurutan untuk memuat environment tersebut!",
+    "Saya mensubmit job menggunakan modul openmpi/5.0.8-gcc-15.2.0-cuda-12.9.0-neq. Berapa kapasitas dan kecepatan maksimal interkoneksi jaringan (dalam Gbps) yang akan mendukung job saya jika ini dijalankan di partisi komputasi node GPU?",
+    "Saya adalah pengguna akun golongan Perseorangan. Apa yang akan terjadi secara teknis pada akun saya jika masa aktif 1 tahun saya telah habis, dan berapa lama masa tenggang yang akan diberikan sistem sebelum akun saya sepenuhnya dinonaktifkan?",
 
-    # LEVEL 3: Reasoning / Deduksi & Troubleshooting (10 pertanyaan)
-    "Saya menjalankan simulasi FLACS-CFD dengan 192 proses MPI murni. Di partisi epyc, otomatis job ini butuh lebih dari 1 node. Berapa angka yang harus saya tulis persisnya di #SBATCH --mem= jika total RAM yang saya butuhkan untuk seluruh job adalah 400GB?",
-    "(Troubleshooting) Saya submit job GROMACS tapi selalu gagal dengan pesan error Invalid syntax. Di script saya menulis #SBATCH --mem= 64 GB. Apa yang salah dari tulisan saya?",
-    "Saya submit 3 batch job berturut-turut. Job 1 pakai 64 CPU. Job 2 pakai 32 CPU. Kenapa saat saya submit Job 3 yang butuh 64 CPU, statusnya malah PENDING dengan tulisan QOSMaxCpuPerUserLimit, padahal node epyc masih banyak yang kosong?",
-    "(Troubleshooting) Job saya berstatus PD dengan alasan AssocMaxWallDurationPerJobLimit. Di script saya menulis #SBATCH --time=4-00:00:00. Akun saya adalah akun perseorangan biasa. Mengapa tertahan?",
-    "Saya mau menjalankan 10 simulasi FLACS-CFD sekaligus menggunakan fitur Slurm Array. Setiap simulasi butuh 4 core CPU dan 8GB RAM. Di script, apakah saya harus menulis --cpus-per-task=40 atau --cpus-per-task=4?",
-    "Saya menjalankan script dengan #SBATCH --ntasks=4 dan #SBATCH --cpus-per-task=8 untuk OpenMX hibrida. Berapa total core thread CPU yang saya konsumsi, dan berapa Actual Core Hour yang terpotong jika job ini jalan 2 jam?",
-    "Saya butuh komputasi memori raksasa sebesar 350 GB untuk satu aplikasi yang non-MPI (tidak bisa dibagi ke banyak node). Partisi apa yang WAJIB saya gunakan agar tidak error kehabisan memori?",
-    "Saya mencoba mengisi form Sesi JupyterLab di EFIRO. Saya set waktu 3 hari (72 jam) dan minta 1 GPU. Namun tombol Launch ditolak karena saldo kurang. Jika sisa kuota GPU Hour (GH) saya tinggal 50 GH, berapa maksimal hari/jam yang bisa saya ajukan?",
-    "Kenapa saat saya meminta alokasi #SBATCH --ntasks=7, sistem Slurm ALELEON akan membulatkannya menjadi 8 dan saya ditagih biaya untuk 8 core?",
-    "Apakah ada gunanya saya upload file Slaster-Koster (SK) ke setiap ruang Job Composer DFTB+? Ataukah ada cara yang lebih hemat storage?",
+    # =============================================================
+    # LEVEL 3: Reasoning / Deduksi & Troubleshooting (12 pertanyaan)
+    # Butuh menyimpulkan dari informasi yang tersedia
+    # =============================================================
+    "Saya memiliki saldo 100 CCH. Saya mensubmit job dengan alokasi 16 core CPU dan menulis parameter #SBATCH --time=10:00:00. Mengapa Slurm langsung menahan job saya dengan alasan AssocGrpCPUMinutesLimit padahal kondisi server (node) sedang kosong sama sekali dan jobnya belum berjalan satu detik pun?",
+    "Saya mensubmit script simulasi dengan alokasi #SBATCH --nodes=2, #SBATCH --ntasks-per-node=4, dan #SBATCH --cpus-per-task=8. Jika job hibrida ini berhasil berjalan selama persis 2 jam, berapa total tagihan Actual Core Hour (CCH) yang secara matematis akan ditarik dari saldo saya?",
+    "Saya ingin menjalankan simulasi dinamika molekuler NAMD berat yang dikonfigurasi untuk mendistribusikan proses ke 6 buah GPU NVIDIA RTX 3090 secara paralel. Berapa jumlah minimal node fisik di partisi ampere yang akan dikunci dan diokupasi oleh Slurm untuk memenuhi seluruh permintaan perangkat keras (GPU) job saya ini?",
+    "Di dalam dokumen rujukan disebutkan bahwa GROMACS versi CUDA merupakan salah satu software yang dapat menyebarkan proses MPI secara langsung ke tingkatan perangkat keras GPU. Jika saya mensubmit GROMACS CUDA dan meminta 2 GPU, variabel environment internal apa dari Slurm yang bertugas menangkap jumlah alokasi proses MPI tersebut?",
+    "Saya menjalankan simulasi CP2K dengan murni MPI dan secara spesifik mengatur nilai #SBATCH --ntasks=13. Jika job ini sukses berjalan selama 1 jam, apakah tagihan CCH akhir saya bernilai 13 CCH? Jelaskan analisis matematis Anda berdasarkan fitur SMT pada arsitektur perangkat keras prosesor AMD ALELEON!",
+    "Saya mempunyai program Python custom (non-MPI) yang didesain untuk memuat dan mengolah sebuah dataset matriks raksasa berukuran 600 GB di dalam RAM. Saya merencanakan untuk mensubmit program ini ke partisi komputasi epyc-jumbo. Apakah job ini secara logis dan fisik bisa dieksekusi di ALELEON? Berikan alasan berbasis batasan maksimum memori efektif per node!",
+    "Saya bermaksud mengeksekusi perintah gmx_mpi untuk melakukan pre-processing sistem molekul yang amat masif (yang memakan RAM 100GB dan komputasi 16 core CPU penuh) secara langsung di antarmuka terminal interaktif Aleleon Shell Access tanpa membuat submit script sbatch. Berdasarkan Standard Operating Procedure (SOP), apa risiko terbesar dan sanksi sistem yang akan dijatuhkan pada proses saya tersebut?",
+    "Saya mencoba mengisi formulir sesi JupyterLab di EWS untuk partisi tilla dengan spesifikasi permintaan: 8 CPU thread, 1 GPU, dan durasi reservasi waktu selama 10 jam. Jika saldo yang saya miliki saat ini adalah 100 CCH dan 5 GH, mengapa tombol 'Launch' otomatis akan menggagalkan/menolak peluncuran sesi saya?",
+    "Saya membuka aplikasi squeue dan melihat dua riwayat job historis saya. Job X tercatat berakhir dengan status 'CA' sedangkan Job Y berakhir dengan status 'PR'. Berdasarkan definisi status Slurm, siapa pihak yang secara teknis menjadi subjek/pelaku penghentian pada masing-masing job tersebut?",
+    "Grup riset saya baru saja memborong pembelian kuota GPU Hour (GH) dalam jumlah besar khusus untuk mendongkrak performa dan kecepatan kecepatan simulasi ab-initio menggunakan software OpenMX 3.9. Mengapa investasi finansial (pembelian kuota GPU) ini justru berujung sama sekali tidak bisa dimanfaatkan secara teknis pada software tersebut?",
+    "Sebagai pengguna akun golongan Perseorangan standar, saya mensubmit tiga batch job berskala berat di waktu yang bersamaan. Job A dialokasikan 64 core, Job B dialokasikan 64 core, dan Job C dialokasikan 16 core. Asumsikan klaster CPU epyc saat ini sedang tidak dipakai oleh siapa pun. Jika diproses oleh Slurm, manakah job yang akan langsung beralih ke status RUNNING dan manakah yang akan tertahan di status PENDING? Berikan analisis Anda!",
+    "Dokumen menjelaskan bahwa Slurm ALELEON secara otomatis mendistribusikan proses MPI agar terkelompok ketat (tightly coupled) di dalam susunan grup CCX/CCD prosesor demi mengejar performa terbaik. Jika sebuah job dieksekusi dengan murni MPI yang meminta alokasi 32 proses, berapa banyak core fisik (physical cores) dan thread komputasi logis (v-cores) aktual yang akan dihidupkan/dialokasikan oleh sistem untuk melayani job tersebut?",
 
-    # LEVEL 4: Anti-Hallucination / Out-of-Context (15 pertanyaan)
-    "Berapa kapasitas ukuran penyimpanan (storage) SSD untuk satu node Login di ALELEON?",
-    "Bagaimana langkah-langkah submit job menggunakan aplikasi MATLAB di ALELEON?",
-    "Berapa biaya denda yang harus dibayar jika file di HOME saya melebihi kuota 150GB?",
-    "Apakah saya bisa menginstal package R menggunakan perintah conda install r-seurat di ALELEON?",
-    "Berapa kecepatan internet/bandwidth VPN jika saya akses dari luar pulau Jawa?",
-    "Bagaimana cara mereset environment Python bawaan sistem (python 3.9) ke kondisi pabrik jika saya merusaknya?",
-    "Apakah tersedia modul aplikasi ANSYS Fluent di ALELEON?",
-    "Bagaimana cara menyambungkan ekstensi Remote-SSH dari aplikasi Visual Studio Code (VSCode) ke compute node ALELEON?",
-    "Saya adalah user dari Singapura (WNA). Berapa tarif konversi Core Hour ke dalam US Dollar (USD)?",
-    "Apa password standar/bawaan dari admin sebelum saya menggantinya di awal?",
-    "Siapa nama Chief Technology Officer (CTO) dari EFISON yang membangun ALELEON ini?",
-    "Bagaimana cara menghapus halaman Wiki ALELEON jika saya menemukan typo?",
-    "Bagaimana cara membatalkan/mengakhiri perjanjian PKSPIAS untuk akun Institusi sebelum waktunya habis?",
-    "Jika server ALELEON mati lampu, berapa jam daya tahan baterai UPS yang dimiliki EFISON?",
-    "Bagaimana cara menggunakan AutoGluon untuk machine learning di sistem ini?",
-
-    # LEVEL 5: Pertanyaan Tambahan
-    "Bagaimana cara membuat conda environment di aleleon?",
-    "bagaimana cara menjalankan jupyter dengan conda environment sendiri?",
-    "Versi Python default dari Anaconda3 2025.06-1 apa?",
-    "Perintah apa untuk mengaktifkan Mamba 23.11.0-0?",
-    "Bagaimana cara membuat modul pyload setelah conda env aktif?",
-    "Perintah apa untuk melihat daftar modul pyload yang tersedia?",
-    "Di partisi GPU mana batch job conda berjalan?",
-    "Apa email support admin ALELEON?",
-    "Jam kerja support EFISON kapan?",
-    "Apa saja pilihan cara menjalankan komputasi Python dengan conda env di ALELEON?",
-    "Apa perbedaan antara menjalankan batch job via Job Composer EWS dan via terminal Slurm?",
-    "Bagaimana langkah lengkap membuat conda env baru dan modul pyload dari awal?",
-    "Apa saja status job di squeue dan artinya masing-masing?",
-    "Bagaimana cara mengisi formulir Jupyter di EWS untuk conda env user?",
+    # =============================================================
+    # LEVEL 4: Anti-Hallucination / Strict Grounding (12 pertanyaan)
+    # Jawaban TIDAK ada di dokumen, model harus jujur
+    # =============================================================
+    "Bagaimana contoh format pembuatan submit script lengkap beserta argumen module load untuk menjalankan simulasi pemodelan cuaca iklim resolusi tinggi menggunakan software WRF (Weather Research and Forecasting) di partisi komputasi epyc?",
+    "Jika saya berstatus sebagai mahasiswa peneliti pascasarjana internasional yang berasal dan berafiliasi dengan universitas negeri di Malaysia, apakah saya secara sah berhak mendapatkan penerapan tarif diskon Golongan Perseorangan Akademia (sebesar Rp555/CCH)?",
+    "Tolong sebutkan merk pabrikan komersial (vendor brand) spesifik dari kartu memori RAM dan papan induk (Motherboard) yang dipasang secara fisik di dalam kerangka sasis server pada compute node berpartisi ampere!",
+    "Apa kombinasi syntax atau perintah bypass administrator khusus di dalam manajemen Slurm yang dapat saya ketikkan dari terminal pengguna (user) untuk melakukan restart (reboot) paksa dari jarak jauh pada salah satu compute node yang sedang mengalami hang atau tidak responsif?",
+    "Berdasarkan catatan arsip historis di dokumen EUREKA! Periode 1 dan Periode 2, pada tanggal berapakah persisnya proses pengumuman pemenang untuk EUREKA! Periode 3 direncanakan akan dipublikasikan ke publik oleh EFISON?",
+    "Saya memiliki skrip Python yang secara otomatis mengunduh dataset CIFAR-100 sebesar 16GB dari repositori cloud eksternal. Apakah compute node komputasi di partisi epyc dikonfigurasi untuk memiliki koneksi outbound internet publik secara langsung agar skrip saya ini tidak gagal saat dijalankan via sbatch?",
+    "Berikan saya step-by-step tutorial mengenai bagaimana cara merutekan (forwarding) dan membuka antarmuka grafis (Graphical User Interface / GUI) visualizer bawaan dari software Quantum ESPRESSO langsung ke layar laptop Windows saya melalui koneksi terenkripsi SSH X11!",
+    "Organisasi saya adalah pemegang Akun Institusi berbayar. Apakah kami secara perjanjian diizinkan untuk secara fisik membawa, menitipkan, dan menghubungkan rak perangkat penyimpanan eksternal pribadi (seperti SAN/NAS) milik institusi kami langsung ke dalam jaringan tertutup ALELEON?",
+    "Berapa besar persentase nilai pengembalian dana (refund) tunai atau kompensasi kuota Core Hour yang secara resmi dijamin akan saya terima dari EFISON apabila seluruh infrastruktur sistem ALELEON mengalami kendala downtime (mati total) lebih dari 3x24 jam berturut-turut di tengah simulasi saya?",
+    "Saya memiliki image kontainer Docker kustom yang mengharuskan eksekusi skrip entrypoint sebagai root. Apa kredensial kata sandi (password) sudo atau argumen sudo spesifik yang perlu saya tambahkan saat memanggil image tersebut dengan Apptainer di lingkungan komputasi ALELEON?",
+    "Sesuai spesifikasi arsitektur kelas atas ALELEON, berapa nilai estimasi performa ukuran latensi jaringan (dalam satuan nanosecond / ns) yang diukur dari pengiriman message passing murni antar dua inti prosesor pada dua compute node epyc berbeda melewati switch Mellanox RoCE 100Gbps?",
+    "Jika file proyek penelitian skripsi saya terhapus tanpa sengaja akibat salah ketik instruksi rm -rf, berapa lama sisa retention period maksimum (dalam hitungan batas hari) di mana file cadangan (backup snapshot) data saya tersebut masih aman disimpan oleh admin di sistem sebelum akhirnya tertimpa/terhapus permanen?",
 ]
 
 

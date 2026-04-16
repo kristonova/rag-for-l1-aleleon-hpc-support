@@ -172,7 +172,7 @@ services:
       - benchmark-ttft
     environment:
       - RAG_API_URL=http://rag-api:8080
-      - NUM_REQUESTS=69
+      - NUM_REQUESTS=49
       - CONCURRENCY_LEVELS=1,2,4,8,16
       - HEALTH_CHECK_RETRIES=30
       - HEALTH_CHECK_INTERVAL=10
