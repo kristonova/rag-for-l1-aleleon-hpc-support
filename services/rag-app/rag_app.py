@@ -404,11 +404,11 @@ def generate_source_justifications(question, answer, docs, api_url=None):
     messages = [
         {
             "role": "system",
-            "content": "Kamu adalah asisten yang menjelaskan relevansi sumber dokumen. Berikan justifikasi singkat (1 kalimat) untuk setiap sumber. Jangan outputkan chain of thought."
+            "content": "Kamu adalah asisten yang menjelaskan relevansi sumber dokumen. Berikan justifikasi singkat (1 kalimat) untuk setiap sumber. Jika sumber TIDAK digunakan atau TIDAK relevan untuk menjawab pertanyaan, jawab HANYA dengan kata 'TIDAK RELEVAN'. Jangan outputkan chain of thought."
         },
         {
             "role": "user",
-            "content": f"""Untuk setiap sumber berikut, berikan 1 kalimat singkat mengapa sumber tersebut relevan untuk menjawab pertanyaan user.
+            "content": f"""Untuk setiap sumber berikut, berikan 1 kalimat singkat mengapa sumber tersebut relevan untuk menjawab pertanyaan user. Jika tidak relevan, tulis "TIDAK RELEVAN".
 
 Pertanyaan: {question}
 Jawaban: {answer[:500]}
@@ -454,10 +454,60 @@ Format output HARUS persis (hanya nomor dan alasan, tanpa label sumber):
         return []
 
 
+def is_question_relevant(question, api_url=None) -> bool:
+    """Cek apakah pertanyaan relevan dengan HPC/Aleleon sebelum proses embedding."""
+    if api_url is None:
+        api_url = os.getenv("LLM_API_URL", "http://vllm-rocm:8000/v1")
+
+    client = OpenAI(
+        base_url=api_url,
+        api_key=os.getenv("LLM_API_KEY", "")
+    )
+
+    messages = [
+        {
+            "role": "system",
+            "content": "Kamu adalah filter pertanyaan. Tugasmu hanya menentukan apakah pertanyaan user berkaitan dengan High Performance Computing (HPC), Supercomputer, Slurm, Linux, layanan Aleleon, EFIRO, Server, Komputasi, atau IT Support. Jawab HANYA dengan kata 'YA' jika relevan, atau 'TIDAK' jika sama sekali tidak relevan. Jangan berikan alasan atau kalimat lain."
+        },
+        {
+            "role": "user",
+            "content": f"Pertanyaan: {question}"
+        }
+    ]
+
+    try:
+        response = client.chat.completions.create(
+            model=os.getenv("LLM_MODEL_NAME", "Qwen/Qwen3.5-35B-A3B-GPTQ-Int4"),
+            messages=messages,
+            max_tokens=10,
+            temperature=0.0,
+            extra_body={
+                "chat_template_kwargs": {"enable_thinking": False},
+            }
+        )
+        answer = response.choices[0].message.content.strip().upper()
+        # Jika model membalas dengan TIDAK (atau mengandung kata TIDAK), maka tidak relevan
+        if "TIDAK" in answer and "YA" not in answer:
+            return False
+        return True
+    except Exception as e:
+        print(f"    ⚠️  Gagal mengecek relevansi (fallback ke True): {e}")
+        return True  # Fallback: anggap relevan jika LLM error
+
+
+
 def create_rag_chain(client: QdrantClient, embeddings: EmbeddingServiceClient, llm_api_url=None):
     """Create RAG chain with hybrid retrieval (dense + sparse + RRF fusion)."""
 
     def retrieve_and_answer(question):
+        # 0. Cek relevansi pertanyaan dengan LLM (tanpa embedding)
+        if not is_question_relevant(question, llm_api_url):
+            return {
+                "answer": "Pertanyaan anda tidak relevan, silahkan coba dengan pertanyaan lain yang berkaitan dengan layanan ALELEON HPC.",
+                "context": [],
+                "justifications": []
+            }
+
         # 1. Embed query → dense + sparse
         query_multi = embeddings.embed_query_multi(question)
 
@@ -505,10 +555,58 @@ def create_rag_chain(client: QdrantClient, embeddings: EmbeddingServiceClient, l
             question, answer, docs, llm_api_url
         )
 
+        # 6. Filter out irrelevant sources
+        filtered_docs = []
+        filtered_justifications = []
+        seen_keys = []
+        j_idx = 0
+        
+        for doc in docs:
+            title = doc.metadata.get("title", "Unknown")
+            header = doc.metadata.get("Header 2", doc.metadata.get("Header 3", ""))
+            key = (title, header)
+            
+            if key not in seen_keys:
+                seen_keys.append(key)
+                if j_idx < len(justifications):
+                    just = justifications[j_idx]
+                else:
+                    just = ""
+                j_idx += 1
+            else:
+                # Same key as a previously processed doc, reuse the last seen justification index logic.
+                # Actually, since `seen_keys` appends keys in order, we can find its index.
+                idx = seen_keys.index(key)
+                if idx < len(justifications):
+                    just = justifications[idx]
+                else:
+                    just = ""
+
+            if "TIDAK RELEVAN" not in just.upper():
+                filtered_docs.append(doc)
+                # We only want one justification per unique key in the output, but wait:
+                # The CLI and API expect `justifications` to be parallel to unique keys of `context`.
+                # If we filter `context`, `unique(context)` will also be filtered.
+                # Let's just build a new list of justifications for the unique keys we KEPT.
+                pass
+
+        # Re-build parallel justifications for the unique kept docs
+        final_unique_keys = []
+        for doc in filtered_docs:
+            title = doc.metadata.get("title", "Unknown")
+            header = doc.metadata.get("Header 2", doc.metadata.get("Header 3", ""))
+            key = (title, header)
+            if key not in final_unique_keys:
+                final_unique_keys.append(key)
+                # Find the original justification for this key
+                orig_idx = seen_keys.index(key)
+                if orig_idx < len(justifications):
+                    filtered_justifications.append(justifications[orig_idx])
+
         return {
             "answer": answer,
-            "context": docs,
-            "justifications": justifications
+            "context": filtered_docs,
+            "justifications": filtered_justifications
         }
 
     return retrieve_and_answer
