@@ -433,7 +433,18 @@ Format output HARUS persis (hanya nomor dan alasan, tanpa label sumber):
                 "chat_template_kwargs": {"enable_thinking": False},
             }
         )
-        raw = response.choices[0].message.content.strip()
+        raw = response.choices[0].message.content
+        if raw is None:
+            print("    ⚠️  LLM returned None content for justifications")
+            return []
+        raw = raw.strip()
+        
+        # Strip <think>...</think> blocks jika model menyisipkannya meski non-thinking
+        import re as _re
+        raw = _re.sub(r"<think>.*?</think>", "", raw, flags=_re.DOTALL).strip()
+        
+        print(f"    🔍 Raw justification response ({len(raw)} chars):")
+        print(f"    {repr(raw[:500])}")
 
         # Parse numbered list → list of reason strings
         justifications = []
@@ -447,11 +458,108 @@ Format output HARUS persis (hanya nomor dan alasan, tanpa label sumber):
                 else:
                     justifications.append(line_clean)
 
+        print(f"    🔍 Parsed {len(justifications)} justifications from {len(unique_sources)} sources")
+        if len(justifications) < len(unique_sources):
+            print(f"    ⚠️  Mismatch! {len(unique_sources)} sources but only {len(justifications)} justifications parsed")
+            print(f"    ⚠️  Full raw response: {repr(raw)}")
+
         return justifications
 
     except Exception as e:
         print(f"    ⚠️  Gagal generate justifikasi sumber: {e}")
         return []
+
+
+def review_script(script_content, api_url=None):
+    """
+    Review skrip Bash/Slurm langsung pakai LLM, TANPA retrieval dokumen.
+    Digunakan saat user mengirim file .sh atau paste skrip di chat.
+    Return: dict {"review": str, "issues_found": int}
+    """
+    if api_url is None:
+        api_url = os.getenv("LLM_API_URL", "http://vllm-rocm:8000/v1")
+
+    # Batas ukuran skrip (10.000 karakter) agar tidak habiskan context window
+    MAX_SCRIPT_LEN = 10000
+    if len(script_content) > MAX_SCRIPT_LEN:
+        return {
+            "review": f"⚠️ Skrip terlalu panjang ({len(script_content)} karakter). "
+                      f"Maksimal {MAX_SCRIPT_LEN} karakter. "
+                      "Silakan potong atau kirim bagian yang ingin di-review saja.",
+            "issues_found": 0
+        }
+
+    client = OpenAI(
+        base_url=api_url,
+        api_key=os.getenv("LLM_API_KEY", "")
+    )
+
+    messages = [
+        {
+            "role": "system",
+            "content": """Kamu adalah ahli HPC Slurm scripting dan Bash scripting. Tugasmu mereview skrip yang diberikan user.
+
+Periksa hal-hal berikut:
+1. **Syntax Bash**: Shebang (#!/bin/bash), quoting, variable expansion, typo perintah.
+2. **Parameter #SBATCH**: Format yang salah (misal spasi setelah `=`, satuan tidak menyatu seperti `--mem= 64 GB` seharusnya `--mem=64G`), parameter yang tidak ada/tidak valid.
+3. **Best Practice Slurm**:
+   - Apakah --mem menggunakan format yang benar (contoh: 64G, bukan "64 GB").
+   - Apakah --time dalam format yang benar (D-HH:MM:SS atau HH:MM:SS).
+   - Apakah --ntasks dan --cpus-per-task digunakan dengan benar.
+   - Apakah ada potensi pemborosan resource.
+4. **Potensi Error**: Variabel yang tidak didefinisikan, path yang salah, perintah yang kemungkinan gagal tanpa error handling.
+5. **Keamanan**: Penggunaan `rm -rf` tanpa konfirmasi, hardcoded password, dll.
+
+Format output:
+- Mulai dengan ringkasan singkat (1 kalimat) tentang apa yang skrip ini lakukan.
+- Kemudian list masalah yang ditemukan dengan format:
+  [NOMOR]. [❌ ERROR / ⚠️ WARNING / 💡 SARAN] Deskripsi masalah
+     Baris: [kutip baris yang bermasalah]
+     Perbaikan: [contoh kode yang benar]
+- Akhiri dengan ringkasan: "Ditemukan X masalah (Y error, Z warning)."
+- Jika tidak ada masalah, katakan "✅ Skrip terlihat baik! Tidak ditemukan masalah."
+
+Gunakan Bahasa Indonesia. Jangan outputkan chain of thought."""
+        },
+        {
+            "role": "user",
+            "content": f"Tolong review skrip berikut:\n```\n{script_content}\n```"
+        }
+    ]
+
+    try:
+        print(f"    🔍 review_script: Reviewing script ({len(script_content)} chars)...")
+        response = client.chat.completions.create(
+            model=os.getenv("LLM_MODEL_NAME", "Qwen/Qwen3.5-35B-A3B-GPTQ-Int4"),
+            messages=messages,
+            max_tokens=4096,
+            temperature=0.2,
+            top_p=0.9,
+            extra_body={
+                "chat_template_kwargs": {"enable_thinking": False},
+            }
+        )
+
+        raw = response.choices[0].message.content
+        if raw is None:
+            print("    ⚠️  review_script: LLM returned None")
+            return {"review": "Maaf, gagal mereview skrip. Silakan coba lagi.", "issues_found": 0}
+
+        # Strip <think> blocks
+        raw = re.sub(r"<think>.*?</think>", "", raw, flags=re.DOTALL).strip()
+        print(f"    ✅ review_script: Got review ({len(raw)} chars)")
+
+        # Hitung jumlah issues (❌ + ⚠️ + 💡)
+        issues = raw.count("❌") + raw.count("⚠️") + raw.count("💡")
+
+        return {"review": raw, "issues_found": issues}
+
+    except Exception as e:
+        print(f"    ⚠️  review_script error: {e}")
+        return {
+            "review": f"Maaf, terjadi error saat mereview skrip: {str(e)[:200]}",
+            "issues_found": 0
+        }
 
 
 def is_question_relevant(question, api_url=None) -> bool:
@@ -467,7 +575,19 @@ def is_question_relevant(question, api_url=None) -> bool:
     messages = [
         {
             "role": "system",
-            "content": "Kamu adalah filter pertanyaan. Tugasmu hanya menentukan apakah pertanyaan user berkaitan dengan High Performance Computing (HPC), Supercomputer, Slurm, Linux, layanan Aleleon, EFIRO, Server, Komputasi, atau IT Support. Jawab HANYA dengan kata 'YA' jika relevan, atau 'TIDAK' jika sama sekali tidak relevan. Jangan berikan alasan atau kalimat lain."
+            "content": """Kamu adalah filter pertanyaan untuk layanan support ALELEON HPC.
+Tugasmu menentukan apakah pertanyaan user MUNGKIN berkaitan dengan topik-topik berikut:
+- High Performance Computing (HPC), Supercomputer, Cluster, Komputasi
+- Slurm, batch job, partisi, node, CPU, GPU, RAM, storage
+- Linux, terminal, command line, module, environment
+- Layanan ALELEON, EFIRO, EWS, akun (perseorangan/institusi), kuota, billing, Core Hour, GPU Hour
+- Server, VPN, SSH, SFTP, file transfer
+- Software ilmiah (GROMACS, FLACS, VASP, Conda, Python, dll)
+- IT Support, troubleshooting, error
+
+Jika pertanyaan MUNGKIN relevan (bahkan sedikit), jawab 'YA'.
+Jawab 'TIDAK' HANYA jika pertanyaan jelas-jelas tidak ada hubungannya sama sekali (contoh: resep masak, gosip artis, cuaca).
+Jawab HANYA dengan kata 'YA' atau 'TIDAK'. Jangan berikan alasan."""
         },
         {
             "role": "user",
@@ -485,10 +605,23 @@ def is_question_relevant(question, api_url=None) -> bool:
                 "chat_template_kwargs": {"enable_thinking": False},
             }
         )
-        answer = response.choices[0].message.content.strip().upper()
+        raw = response.choices[0].message.content
+        if raw is None:
+            print(f"    ⚠️  is_question_relevant: LLM returned None (fallback ke True)")
+            return True
+
+        # Strip <think> blocks jika ada
+        import re as _re
+        raw = _re.sub(r"<think>.*?</think>", "", raw, flags=_re.DOTALL).strip()
+
+        answer = raw.upper()
+        print(f"    🔍 is_question_relevant: raw={repr(raw)} → answer={repr(answer)}")
+
         # Jika model membalas dengan TIDAK (atau mengandung kata TIDAK), maka tidak relevan
         if "TIDAK" in answer and "YA" not in answer:
+            print(f"    ❌ Pertanyaan ditolak sebagai tidak relevan: {question[:80]}")
             return False
+        print(f"    ✅ Pertanyaan dianggap relevan")
         return True
     except Exception as e:
         print(f"    ⚠️  Gagal mengecek relevansi (fallback ke True): {e}")

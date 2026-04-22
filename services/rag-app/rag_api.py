@@ -2,6 +2,7 @@
 """
 rag_api.py — FastAPI wrapper untuk RAG Application
 Endpoint: POST /ask  →  { "question": "..." }  →  { "answer": "...", "sources": [...] }
+Endpoint: POST /review-script  →  { "script": "..." }  →  { "review": "...", "issues_found": N }
 """
 
 import os
@@ -17,17 +18,19 @@ from rag_app import (
     build_vectorstore,
     wait_for_vllm,
     create_rag_chain,
+    review_script,
 )
 
 # ── FastAPI App ──────────────────────────────────────────────
 app = FastAPI(
     title="ALELEON HPC RAG API",
     description="REST API untuk RAG L1 Support ALELEON HPC",
-    version="1.0.0",
+    version="1.1.0",
 )
 
 # ── Global variables (diisi saat startup) ────────────────────
 rag_chain = None
+llm_api_url = None
 
 
 # ── Pydantic Models ──────────────────────────────────────────
@@ -47,6 +50,15 @@ class AskResponse(BaseModel):
     sources: List[SourceInfo]
 
 
+class ReviewScriptRequest(BaseModel):
+    script: str
+
+
+class ReviewScriptResponse(BaseModel):
+    review: str
+    issues_found: int
+
+
 # ── Startup Event ────────────────────────────────────────────
 @app.on_event("startup")
 async def startup():
@@ -57,7 +69,7 @@ async def startup():
     3. Tunggu vLLM ready
     4. Buat RAG chain
     """
-    global rag_chain
+    global rag_chain, llm_api_url
 
     print("[API] Memulai inisialisasi RAG...")
 
@@ -124,6 +136,27 @@ async def ask(req: AskRequest):
     return AskResponse(answer=result["answer"], sources=sources)
 
 
+@app.post("/review-script", response_model=ReviewScriptResponse)
+async def review_script_endpoint(req: ReviewScriptRequest):
+    """
+    Review skrip Bash/Slurm langsung pakai LLM (tanpa retrieval dokumen).
+
+    Contoh request:
+        curl -X POST http://localhost:8080/review-script \
+          -H "Content-Type: application/json" \
+          -d '{"script": "#!/bin/bash\\n#SBATCH --mem= 64 GB\\nsrun gmx_mpi mdrun"}'
+    """
+    if llm_api_url is None:
+        raise HTTPException(status_code=503, detail="LLM belum siap, coba lagi nanti.")
+
+    try:
+        result = review_script(req.script, api_url=llm_api_url)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error saat review skrip: {str(e)}")
+
+    return ReviewScriptResponse(review=result["review"], issues_found=result["issues_found"])
+
+
 @app.get("/health")
 async def health():
     return {
@@ -136,9 +169,10 @@ async def health():
 async def root():
     return {
         "service": "ALELEON HPC RAG API",
-        "version": "1.0.0",
+        "version": "1.1.0",
         "endpoints": {
-            "POST /ask": "Kirim pertanyaan ke RAG",
+            "POST /ask": "Kirim pertanyaan ke RAG (retrieval + LLM)",
+            "POST /review-script": "Review skrip Bash/Slurm (LLM langsung, tanpa retrieval)",
             "GET /health": "Health check",
         },
     }
