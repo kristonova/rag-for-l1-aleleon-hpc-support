@@ -18,19 +18,21 @@ from rag_app import (
     build_vectorstore,
     wait_for_vllm,
     create_rag_chain,
-    review_script,
+    review_script_hybrid,
 )
 
 # ── FastAPI App ──────────────────────────────────────────────
 app = FastAPI(
     title="ALELEON HPC RAG API",
     description="REST API untuk RAG L1 Support ALELEON HPC",
-    version="1.1.0",
+    version="1.2.0",
 )
 
 # ── Global variables (diisi saat startup) ────────────────────
 rag_chain = None
 llm_api_url = None
+qdrant_client_global = None
+embeddings_global = None
 
 
 # ── Pydantic Models ──────────────────────────────────────────
@@ -57,6 +59,7 @@ class ReviewScriptRequest(BaseModel):
 class ReviewScriptResponse(BaseModel):
     review: str
     issues_found: int
+    policy_sources: Optional[List[SourceInfo]] = None
 
 
 # ── Startup Event ────────────────────────────────────────────
@@ -69,18 +72,20 @@ async def startup():
     3. Tunggu vLLM ready
     4. Buat RAG chain
     """
-    global rag_chain, llm_api_url
+    global rag_chain, llm_api_url, qdrant_client_global, embeddings_global
 
     print("[API] Memulai inisialisasi RAG...")
 
     # 1. Embedding client
     embeddings = EmbeddingServiceClient()
+    embeddings_global = embeddings  # Simpan untuk hybrid script review
 
     # 2. Vector store
     if qdrant_collection_exists():
         vectorstore = load_vectorstore(embeddings)
     else:
         vectorstore = build_vectorstore(embeddings)
+    qdrant_client_global = vectorstore  # Simpan untuk hybrid script review
 
     # 3. Tunggu LLM ready
     llm_api_url = os.getenv("LLM_API_URL", "http://vllm-rocm:8000/v1")
@@ -139,7 +144,9 @@ async def ask(req: AskRequest):
 @app.post("/review-script", response_model=ReviewScriptResponse)
 async def review_script_endpoint(req: ReviewScriptRequest):
     """
-    Review skrip Bash/Slurm langsung pakai LLM (tanpa retrieval dokumen).
+    Review skrip Bash/Slurm dengan pendekatan HYBRID:
+    - LLM analisis teknis skrip
+    - Jika ada resource params → retrieval kebijakan HPC untuk validasi
 
     Contoh request:
         curl -X POST http://localhost:8080/review-script \
@@ -150,11 +157,32 @@ async def review_script_endpoint(req: ReviewScriptRequest):
         raise HTTPException(status_code=503, detail="LLM belum siap, coba lagi nanti.")
 
     try:
-        result = review_script(req.script, api_url=llm_api_url)
+        result = review_script_hybrid(
+            req.script,
+            api_url=llm_api_url,
+            qdrant_client=qdrant_client_global,
+            embeddings=embeddings_global,
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error saat review skrip: {str(e)}")
 
-    return ReviewScriptResponse(review=result["review"], issues_found=result["issues_found"])
+    # Build policy_sources for response
+    policy_sources = None
+    if result.get("policy_sources"):
+        policy_sources = [
+            SourceInfo(
+                title=s["title"],
+                source_url=s["source_url"],
+                section=s.get("section"),
+            )
+            for s in result["policy_sources"]
+        ]
+
+    return ReviewScriptResponse(
+        review=result["review"],
+        issues_found=result["issues_found"],
+        policy_sources=policy_sources,
+    )
 
 
 @app.get("/health")
@@ -169,10 +197,10 @@ async def health():
 async def root():
     return {
         "service": "ALELEON HPC RAG API",
-        "version": "1.1.0",
+        "version": "1.2.0",
         "endpoints": {
             "POST /ask": "Kirim pertanyaan ke RAG (retrieval + LLM)",
-            "POST /review-script": "Review skrip Bash/Slurm (LLM langsung, tanpa retrieval)",
+            "POST /review-script": "Review skrip Bash/Slurm (hybrid: LLM teknis + RAG kebijakan HPC)",
             "GET /health": "Health check",
         },
     }

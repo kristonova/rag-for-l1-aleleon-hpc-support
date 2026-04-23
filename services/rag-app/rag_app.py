@@ -470,11 +470,189 @@ Format output HARUS persis (hanya nomor dan alasan, tanpa label sumber):
         return []
 
 
-def review_script(script_content, api_url=None):
+def extract_resource_params(script_content, api_url=None):
     """
-    Review skrip Bash/Slurm langsung pakai LLM, TANPA retrieval dokumen.
-    Digunakan saat user mengirim file .sh atau paste skrip di chat.
-    Return: dict {"review": str, "issues_found": int}
+    Step 1 Hybrid: LLM mengekstrak resource parameters dari skrip Slurm.
+    Return: dict dengan parameter yang ditemukan, atau {"params_found": False}.
+    """
+    if api_url is None:
+        api_url = os.getenv("LLM_API_URL", "http://vllm-rocm:8000/v1")
+
+    client = OpenAI(
+        base_url=api_url,
+        api_key=os.getenv("LLM_API_KEY", "")
+    )
+
+    messages = [
+        {
+            "role": "system",
+            "content": """Kamu adalah parser skrip Slurm. Tugasmu HANYA mengekstrak parameter resource dari direktif #SBATCH.
+
+Ekstrak parameter berikut jika ada:
+- partition: nama partisi (--partition atau -p)
+- time: batas waktu (--time atau -t)
+- mem: memori (--mem atau --mem-per-cpu)
+- ntasks: jumlah tasks (--ntasks atau -n)
+- cpus_per_task: CPU per task (--cpus-per-task atau -c)
+- nodes: jumlah nodes (--nodes atau -N)
+- gres: GPU atau resource lain (--gres)
+- account: nama akun (--account atau -A)
+- qos: quality of service (--qos)
+- array: job array (--array)
+
+Output HARUS berupa skrip valid, tanpa teks lain. Contoh:
+{"params_found": true, "partition": "ampere", "time": "1-00:00:00", "mem": "64G", "ntasks": 4, "cpus_per_task": 8, "gres": "gpu:1"}
+
+Jika TIDAK ada direktif #SBATCH sama sekali, output:
+{"params_found": false}
+
+Untuk parameter yang tidak ada di skrip, JANGAN sertakan key-nya di JSON.
+Jangan outputkan chain of thought atau penjelasan."""
+        },
+        {
+            "role": "user",
+            "content": f"Ekstrak parameter resource dari skrip berikut:\n```\n{script_content}\n```"
+        }
+    ]
+
+    try:
+        print(f"    🔍 extract_resource_params: Parsing script...")
+        response = client.chat.completions.create(
+            model=os.getenv("LLM_MODEL_NAME", "Qwen/Qwen3.5-35B-A3B-GPTQ-Int4"),
+            messages=messages,
+            max_tokens=512,
+            temperature=0.0,
+            extra_body={
+                "chat_template_kwargs": {"enable_thinking": False},
+            }
+        )
+
+        raw = response.choices[0].message.content
+        if raw is None:
+            print("    ⚠️  extract_resource_params: LLM returned None")
+            return {"params_found": False}
+
+        # Strip <think> blocks
+        raw = re.sub(r"<think>.*?</think>", "", raw, flags=re.DOTALL).strip()
+
+        # Ekstrak JSON dari response (kadang LLM wrap dalam ```json ... ```)
+        json_match = re.search(r'\{[^{}]*\}', raw, flags=re.DOTALL)
+        if not json_match:
+            print(f"    ⚠️  extract_resource_params: No JSON found in: {repr(raw[:200])}")
+            return {"params_found": False}
+
+        import json
+        params = json.loads(json_match.group())
+        print(f"    ✅ extract_resource_params: {params}")
+        return params
+
+    except Exception as e:
+        print(f"    ⚠️  extract_resource_params error: {e}")
+        return {"params_found": False}
+
+
+def retrieve_policy_context(params, qdrant_client, embeddings):
+    """
+    Step 2 Hybrid: Berdasarkan resource params, lakukan retrieval spesifik
+    ke Qdrant untuk mendapatkan dokumen kebijakan HPC yang relevan.
+    Return: (context_str, policy_docs_list)
+    """
+    # Bangun query berdasarkan parameter yang ditemukan
+    queries = []
+
+    if params.get("partition"):
+        queries.append(f"partisi {params['partition']} spesifikasi kapasitas RAM CPU GPU")
+
+    if params.get("time"):
+        queries.append("batas waktu walltime limit maksimal per golongan akun perseorangan institusi")
+
+    if params.get("mem"):
+        queries.append("kapasitas RAM memori efektif per node partisi")
+
+    if params.get("ntasks") or params.get("cpus_per_task"):
+        queries.append("batas limit CPU core per user per job QOS maksimal")
+
+    if params.get("gres"):
+        queries.append("GPU partisi kuota GPU Hour batas alokasi")
+
+    if params.get("nodes"):
+        queries.append("jumlah node maksimal alokasi multi-node MPI")
+
+    if params.get("qos"):
+        queries.append("quality of service QOS limit batasan akun")
+
+    if params.get("array"):
+        queries.append("job array Slurm batas maksimal array task")
+
+    if not queries:
+        print("    ℹ️  retrieve_policy_context: No specific queries to run")
+        return "", []
+
+    print(f"    🔍 retrieve_policy_context: Running {len(queries)} targeted queries...")
+
+    # Retrieve untuk setiap query, kumpulkan hasil unik
+    all_docs = []
+    seen_texts = set()
+    POLICY_TOP_K = 5  # Lebih kecil dari RAG normal, karena targeted
+
+    for q in queries:
+        try:
+            query_multi = embeddings.embed_query_multi(q)
+
+            results = qdrant_client.query_points(
+                QDRANT_COLLECTION_NAME,
+                prefetch=[
+                    Prefetch(
+                        query=query_multi["dense"],
+                        using="dense",
+                        limit=POLICY_TOP_K * 2,
+                    ),
+                    Prefetch(
+                        query=SparseVector(
+                            indices=query_multi["sparse"]["indices"],
+                            values=query_multi["sparse"]["values"],
+                        ),
+                        using="text-sparse",
+                        limit=POLICY_TOP_K * 2,
+                    ),
+                ],
+                query=FusionQuery(fusion=Fusion.RRF),
+                limit=POLICY_TOP_K,
+            )
+
+            for point in results.points:
+                payload = point.payload or {}
+                text = payload.get("text", "")
+                # Deduplicate berdasarkan konten
+                text_key = text[:200]
+                if text_key not in seen_texts:
+                    seen_texts.add(text_key)
+                    doc = Document(
+                        page_content=text,
+                        metadata={k: v for k, v in payload.items() if k != "text"},
+                    )
+                    all_docs.append(doc)
+
+        except Exception as e:
+            print(f"    ⚠️  retrieve_policy_context query error for '{q[:50]}': {e}")
+            continue
+
+    print(f"    ✅ retrieve_policy_context: Retrieved {len(all_docs)} unique policy docs")
+
+    # Gabungkan jadi context string
+    context = "\n\n".join([doc.page_content for doc in all_docs])
+    return context, all_docs
+
+
+def review_script_hybrid(script_content, api_url=None, qdrant_client=None, embeddings=None):
+    """
+    Review skrip Bash/Slurm dengan pendekatan HYBRID:
+    1. LLM ekstrak resource parameters dari skrip
+    2. Jika ada resource params → retrieval kebijakan HPC dari Qdrant
+    3. LLM review teknis + validasi kebijakan berdasarkan dokumen
+
+    Jika qdrant_client/embeddings None → fallback ke review tanpa policy context.
+    Return: dict {"review": str, "issues_found": int, "policy_sources": [...]}
     """
     if api_url is None:
         api_url = os.getenv("LLM_API_URL", "http://vllm-rocm:8000/v1")
@@ -486,18 +664,39 @@ def review_script(script_content, api_url=None):
             "review": f"⚠️ Skrip terlalu panjang ({len(script_content)} karakter). "
                       f"Maksimal {MAX_SCRIPT_LEN} karakter. "
                       "Silakan potong atau kirim bagian yang ingin di-review saja.",
-            "issues_found": 0
+            "issues_found": 0,
+            "policy_sources": []
         }
 
+    # === STEP 1: Ekstrak resource parameters ===
+    policy_context = ""
+    policy_docs = []
+
+    if qdrant_client is not None and embeddings is not None:
+        params = extract_resource_params(script_content, api_url)
+
+        if params.get("params_found", False):
+            # === STEP 2: Retrieval kebijakan HPC ===
+            policy_context, policy_docs = retrieve_policy_context(
+                params, qdrant_client, embeddings
+            )
+            if policy_context:
+                print(f"    📋 Policy context retrieved ({len(policy_context)} chars, {len(policy_docs)} docs)")
+            else:
+                print(f"    ℹ️  No policy context retrieved")
+        else:
+            print(f"    ℹ️  No resource params found, skipping policy retrieval")
+    else:
+        print(f"    ℹ️  No Qdrant client, running pure LLM review (legacy mode)")
+
+    # === STEP 3: LLM Review (teknis + policy) ===
     client = OpenAI(
         base_url=api_url,
         api_key=os.getenv("LLM_API_KEY", "")
     )
 
-    messages = [
-        {
-            "role": "system",
-            "content": """Kamu adalah ahli HPC Slurm scripting dan Bash scripting. Tugasmu mereview skrip yang diberikan user.
+    # System prompt — diperluas dengan section kebijakan jika ada
+    system_prompt = """Kamu adalah ahli HPC Slurm scripting dan Bash scripting. Tugasmu mereview skrip yang diberikan user.
 
 Periksa hal-hal berikut:
 1. **Syntax Bash**: Shebang (#!/bin/bash), quoting, variable expansion, typo perintah.
@@ -508,7 +707,20 @@ Periksa hal-hal berikut:
    - Apakah --ntasks dan --cpus-per-task digunakan dengan benar.
    - Apakah ada potensi pemborosan resource.
 4. **Potensi Error**: Variabel yang tidak didefinisikan, path yang salah, perintah yang kemungkinan gagal tanpa error handling.
-5. **Keamanan**: Penggunaan `rm -rf` tanpa konfirmasi, hardcoded password, dll.
+5. **Keamanan**: Penggunaan `rm -rf` tanpa konfirmasi, hardcoded password, dll."""
+
+    if policy_context:
+        system_prompt += """
+6. **Validasi Kebijakan HPC ALELEON**: Periksa apakah parameter resource di skrip sesuai dengan kebijakan HPC berikut.
+   - Jika ada parameter yang MELANGGAR kebijakan (misal time limit melebihi batas akun, partisi tidak tersedia, mem melebihi kapasitas node), tandai sebagai ❌ ERROR.
+   - Jika ada parameter yang MENDEKATI batas, tandai sebagai ⚠️ WARNING.
+   - Kutip aturan dari dokumen kebijakan secara spesifik.
+
+Dokumen Kebijakan HPC ALELEON (gunakan untuk validasi resource parameters):
+---
+""" + policy_context + "\n---"
+
+    system_prompt += """
 
 Format output:
 - Mulai dengan ringkasan singkat (1 kalimat) tentang apa yang skrip ini lakukan.
@@ -516,19 +728,20 @@ Format output:
   [NOMOR]. [❌ ERROR / ⚠️ WARNING / 💡 SARAN] Deskripsi masalah
      Baris: [kutip baris yang bermasalah]
      Perbaikan: [contoh kode yang benar]
-- Akhiri dengan ringkasan: "Ditemukan X masalah (Y error, Z warning)."
+- Lanjutkan dengan memberikan ringkasan: "Ditemukan X masalah (Y error, Z warning)."
+- Akhiri dengan semua kode yang benar.
 - Jika tidak ada masalah, katakan "✅ Skrip terlihat baik! Tidak ditemukan masalah."
 
 Gunakan Bahasa Indonesia. Jangan outputkan chain of thought."""
-        },
-        {
-            "role": "user",
-            "content": f"Tolong review skrip berikut:\n```\n{script_content}\n```"
-        }
+
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": f"Tolong review skrip berikut:\n```\n{script_content}\n```"}
     ]
 
     try:
-        print(f"    🔍 review_script: Reviewing script ({len(script_content)} chars)...")
+        mode = "hybrid (teknis + policy)" if policy_context else "teknis saja"
+        print(f"    🔍 review_script_hybrid: Reviewing script ({len(script_content)} chars, mode={mode})...")
         response = client.chat.completions.create(
             model=os.getenv("LLM_MODEL_NAME", "Qwen/Qwen3.5-35B-A3B-GPTQ-Int4"),
             messages=messages,
@@ -542,23 +755,40 @@ Gunakan Bahasa Indonesia. Jangan outputkan chain of thought."""
 
         raw = response.choices[0].message.content
         if raw is None:
-            print("    ⚠️  review_script: LLM returned None")
-            return {"review": "Maaf, gagal mereview skrip. Silakan coba lagi.", "issues_found": 0}
+            print("    ⚠️  review_script_hybrid: LLM returned None")
+            return {"review": "Maaf, gagal mereview skrip. Silakan coba lagi.", "issues_found": 0, "policy_sources": []}
 
         # Strip <think> blocks
         raw = re.sub(r"<think>.*?</think>", "", raw, flags=re.DOTALL).strip()
-        print(f"    ✅ review_script: Got review ({len(raw)} chars)")
+        print(f"    ✅ review_script_hybrid: Got review ({len(raw)} chars)")
 
         # Hitung jumlah issues (❌ + ⚠️ + 💡)
         issues = raw.count("❌") + raw.count("⚠️") + raw.count("💡")
 
-        return {"review": raw, "issues_found": issues}
+        # Build policy_sources list (unique sources dari policy docs)
+        policy_sources = []
+        seen_keys = []
+        for doc in policy_docs:
+            title = doc.metadata.get("title", "Unknown")
+            header = doc.metadata.get("Header 2", doc.metadata.get("Header 3", ""))
+            source_url = doc.metadata.get("source", "")
+            key = (title, header)
+            if key not in seen_keys:
+                seen_keys.append(key)
+                policy_sources.append({
+                    "title": title,
+                    "source_url": source_url,
+                    "section": header or None,
+                })
+
+        return {"review": raw, "issues_found": issues, "policy_sources": policy_sources}
 
     except Exception as e:
-        print(f"    ⚠️  review_script error: {e}")
+        print(f"    ⚠️  review_script_hybrid error: {e}")
         return {
             "review": f"Maaf, terjadi error saat mereview skrip: {str(e)[:200]}",
-            "issues_found": 0
+            "issues_found": 0,
+            "policy_sources": []
         }
 
 

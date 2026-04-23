@@ -54,6 +54,42 @@ def escape_html(text: str) -> str:
     return html.escape(text, quote=False)
 
 
+def markdown_to_html(text: str) -> str:
+    """
+    Konversi Markdown yang dihasilkan LLM ke HTML untuk Telegram.
+    Urutan: escape HTML chars → konversi code blocks → inline code →
+            bold → italic → headers → list markers.
+    """
+    import re
+
+    # 1. Escape HTML chars dulu agar <, >, & aman
+    text = html.escape(text, quote=False)
+
+    # 2. Fenced code blocks: ```lang\ncode\n``` → <pre>code</pre>
+    text = re.sub(
+        r'```(?:\w*)\n(.*?)```',
+        r'<pre>\1</pre>',
+        text, flags=re.DOTALL,
+    )
+
+    # 3. Inline code: `code` → <code>code</code>
+    text = re.sub(r'`([^`]+)`', r'<code>\1</code>', text)
+
+    # 4. Bold: **text** → <b>text</b>
+    text = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', text)
+
+    # 5. Italic: *text* → <i>text</i>  (hati-hati agar tidak bentrok dg list marker)
+    text = re.sub(r'(?<!\w)\*([^\*\n]+?)\*(?!\w)', r'<i>\1</i>', text)
+
+    # 6. Headers: ### / ## / # di awal baris → <b>text</b>
+    text = re.sub(r'^#{1,3}\s+(.+)$', r'<b>\1</b>', text, flags=re.MULTILINE)
+
+    # 7. List markers: "- item" di awal baris → "• item"
+    text = re.sub(r'^- ', '• ', text, flags=re.MULTILINE)
+
+    return text
+
+
 def is_shell_script(text: str) -> bool:
     """Deteksi apakah teks yang di-paste adalah skrip Bash/Slurm."""
     indicators = [
@@ -77,7 +113,7 @@ def format_reply_html(answer: str, sources: list) -> str:
     Telegram HTML parse mode jauh lebih stabil daripada Markdown v1
     karena hanya perlu escape <, >, & di konten teks.
     """
-    reply = escape_html(answer) + "\n"
+    reply = markdown_to_html(answer) + "\n"
 
     if sources:
         reply += "\n📚 <b>Sumber:</b>\n"
@@ -128,14 +164,33 @@ def format_sources_html(sources: list) -> str:
     return source_text
 
 
-def format_review_html(review: str, issues_found: int, filename: str = None) -> str:
-    """Format review skrip sebagai HTML untuk Telegram."""
+def format_review_html(review: str, issues_found: int, filename: str = None, policy_sources: list = None) -> str:
+    """Format review skrip sebagai HTML untuk Telegram, termasuk sumber kebijakan jika ada."""
     header = "🔍 <b>Review Skrip"
     if filename:
         header += f": {escape_html(filename)}"
     header += "</b>\n\n"
 
-    return header + escape_html(review)
+    result = header + markdown_to_html(review)
+
+    # Tampilkan sumber kebijakan HPC jika ada
+    if policy_sources:
+        result += "\n\n📋 <b>Kebijakan HPC yang dirujuk:</b>\n"
+        for i, src in enumerate(policy_sources, 1):
+            title = escape_html(src.get("title", "Unknown"))
+            section = src.get("section", "")
+            url = src.get("source_url", "")
+
+            label = title
+            if section:
+                label += f" → {escape_html(section)}"
+
+            if url:
+                result += f'{i}. <a href="{escape_html(url)}">{label}</a>\n'
+            else:
+                result += f"{i}. {label}\n"
+
+    return result
 
 
 # ── Handler: /start ──────────────────────────────────────────
@@ -344,8 +399,9 @@ async def _handle_script_review(update, chat, script_content, filename=None):
 
         review = data.get("review", "Maaf, gagal mereview skrip.")
         issues_found = data.get("issues_found", 0)
+        policy_sources = data.get("policy_sources", None)
 
-        reply = format_review_html(review, issues_found, filename=filename)
+        reply = format_review_html(review, issues_found, filename=filename, policy_sources=policy_sources)
         await _send_html_reply(placeholder_msg, update, reply)
 
     except requests.Timeout:
