@@ -723,14 +723,78 @@ Dokumen Kebijakan HPC ALELEON (gunakan untuk validasi resource parameters):
     system_prompt += """
 
 Format output:
-- Mulai dengan ringkasan singkat (1 kalimat) tentang apa yang skrip ini lakukan.
-- Kemudian list masalah yang ditemukan dengan format:
-  [NOMOR]. [❌ ERROR / ⚠️ WARNING / 💡 SARAN] Deskripsi masalah
-     Baris: [kutip baris yang bermasalah]
-     Perbaikan: [contoh kode yang benar]
-- Lanjutkan dengan memberikan ringkasan: "Ditemukan X masalah (Y error, Z warning)."
-- Akhiri dengan semua kode yang benar.
-- Jika tidak ada masalah, katakan "✅ Skrip terlihat baik! Tidak ditemukan masalah."
+1. Berikan penjelasan singkat mengenai perbaikan atau kesalahan yang dibuat.
+2. Jika tidak ada masalah, katakan "✅ Skrip terlihat baik! Tidak ditemukan masalah."
+3. WAJIB berikan skrip akhir (koreksi) dengan format template standar ALELEON berikut. Gunakan "////" untuk nilai yang tidak diketahui atau perlu diisi user. Sesuaikan isinya dengan konteks program user.
+
+```bash
+#!/bin/bash
+
+# --------------------------------------------------
+# [NAMA SOFTWARE/PROGRAM]
+# rev.[TANGGAL]
+#
+# NOTES:
+# (1) Isi bagian yang ditandai 4 garing (////).
+# (2) Ikuti petunjuk script. 
+# (3) Template ini bersifat referensi.
+#     User dapat mengubah bagian yang perlu diubah.
+# --------------------------------------------------
+
+# ------ Spesifikasi reservasi job (SBATCH) --------
+# Terdapat rentang nilai di SBATCH alokasi komputasi
+# berdasarkan ketentuan metrik (SLA) ALELEON. 
+#
+# Mengetahui rentang nilai:
+# (1) Jalankan perintah:
+#     $ sausage
+# (2) Pilih menu slimit -> job type: Batch job
+# --------------------------------------------------
+
+# > Partisi
+#SBATCH --partition=////
+
+# > Jumlah core thread CPU, minimal 2
+#SBATCH --cpus-per-task=////
+
+# > Jumlah GPU (biarkan jika partisi GPU, hapus jika CPU)
+#SBATCH --gpus=////
+
+# > Jumlah task MPI per GPU (hapus jika bukan MPI)
+#SBATCH --ntasks-per-gpu=1
+
+# > Jumlah memori RAM (satuan GB)
+#SBATCH --mem=////GB
+
+# > Total reservasi waktu job 
+# > Format HH:MM:SS atau D-HH:MM:SS
+# > ex, 1 hari: 24:00:00 atau 1-00:00:00
+#SBATCH --time=////
+
+# > File output terminal, %j -> ID job
+#SBATCH --output=result-[nama_software]-%j.txt
+
+# > File output log, status, dan error 
+#SBATCH --error=error-[nama_software]-%j.txt
+
+# -------------------------------------------------
+# Script jalannya program
+# -------------------------------------------------
+
+# Set unlimited stack size dan pre-cleanup
+ulimit -s unlimited
+ulimit -l unlimited 
+ml purge
+
+# Memuat modul (sesuaikan dengan nama program)
+ml load ////
+
+# Input file (jika ada)
+INPUT_FILE="////"
+
+# Perintah menjalankan program
+////
+```
 
 Gunakan Bahasa Indonesia. Jangan outputkan chain of thought."""
 

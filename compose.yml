@@ -63,7 +63,7 @@ services:
       --dtype float16
       --enforce-eager
       --gpu-memory-utilization 0.99
-      --max-model-len 50000
+      --max-model-len 262144
       --max-num-seqs 16
       --tensor-parallel-size 1
       --enable-auto-tool-choice
