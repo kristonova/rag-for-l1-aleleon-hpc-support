@@ -69,7 +69,7 @@ COLLECTION_HYBRID = "bench_hybrid"
 
 TOP_K = 10
 
-SITEMAP_URL = "https://wiki.efisonlt.com/sitemap/sitemap-wiki.efisonlt.com-NS_0-0.xml"
+SITEMAP_URL = "https://wiki.efisonlt.com/sitemap/sitemap-wiki.efisonlt.com-0.xml"
 
 # Output directory (fixed path inside container, bind-mounted to host)
 OUTPUT_DIR = os.getenv("BENCHMARK_OUTPUT_DIR", "/app/output/benchmark")

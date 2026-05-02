@@ -1,12 +1,12 @@
 {
-  "num_documents": 417,
-  "embedding_time_s": 329.6,
-  "dense_ingest_s": 0.2,
-  "sparse_ingest_s": 0.0,
-  "multivec_ingest_s": 13.5,
-  "hybrid_ingest_s": 0.2,
-  "bench_dense_points": 417,
-  "bench_sparse_points": 417,
-  "bench_multivec_points": 417,
-  "bench_hybrid_points": 417
+  "num_documents": 1771,
+  "embedding_time_s": 1088.1,
+  "dense_ingest_s": 0.7,
+  "sparse_ingest_s": 0.2,
+  "multivec_ingest_s": 52.7,
+  "hybrid_ingest_s": 0.9,
+  "bench_dense_points": 1771,
+  "bench_sparse_points": 1771,
+  "bench_multivec_points": 1771,
+  "bench_hybrid_points": 1771
 }
