@@ -8,6 +8,7 @@ Mendukung review skrip Bash/Slurm via paste teks atau file upload.
 import os
 import asyncio
 import logging
+import re
 import html
 import requests
 from telegram import Update
@@ -49,8 +50,6 @@ PROGRESS_FRAMES_REVIEW = [
 ]
 
 
-
-
 def is_shell_script(text: str) -> bool:
     """Deteksi apakah teks yang di-paste adalah skrip Bash/Slurm."""
     indicators = [
@@ -68,86 +67,198 @@ def is_shell_script(text: str) -> bool:
     return False
 
 
-def format_reply_markdown(answer: str, sources: list) -> str:
-    """Format jawaban + sumber + justifikasi sebagai Markdown."""
-    reply = answer + "\n"
+# ── Helper: convert Markdown ke HTML aman untuk Telegram ─────────
+def markdown_to_telegram_html(text: str) -> str:
+    """Mengubah sintaks Markdown dari LLM menjadi HTML yang valid untuk Telegram.
+    
+    Escape semua karakter khusus HTML (<, >, &) lebih dulu, lalu
+    mengubah blok kode, bold, dan italic ke tag HTML yang diizinkan.
+    """
+    if not text:
+        return ""
+
+    # Escape HTML entities dasar (seperti <, >, &) agar tidak merusak parser Telegram
+    text = html.escape(text, quote=False)
+
+    # Fenced code blocks: ```lang\ncode\n```
+    def replace_code_block(m):
+        lang = m.group(1).strip()
+        code = m.group(2)
+        if lang:
+            return f'<pre><code class="language-{lang}">{code}</code></pre>'
+        return f'<pre><code>{code}</code></pre>'
+    
+    text = re.sub(r'```(\w*)\n?(.*?)```', replace_code_block, text, flags=re.DOTALL)
+
+    # Inline code: `code`
+    text = re.sub(r'`([^`\n]+)`', r'<code>\1</code>', text)
+
+    # Bold: **bold** or __bold__
+    text = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', text, flags=re.DOTALL)
+    text = re.sub(r'__(.+?)__', r'<b>\1</b>', text, flags=re.DOTALL)
+
+    # Italic: *italic* or _italic_
+    text = re.sub(r'(?<!\w)\*(.+?)\*(?!\w)', r'<i>\1</i>', text, flags=re.DOTALL)
+    text = re.sub(r'(?<!\w)_(.+?)_(?!\w)', r'<i>\1</i>', text, flags=re.DOTALL)
+
+    # Headings: ### Title → <b>Title</b>
+    text = re.sub(r'^#{1,6}\s+(.+)$', r'<b>\1</b>', text, flags=re.MULTILINE)
+
+    # Strikethrough: ~~text~~ → <s>text</s>
+    text = re.sub(r'~~(.+?)~~', r'<s>\1</s>', text, flags=re.DOTALL)
+
+    # Links: [text](url) → <a href="url">text</a>
+    text = re.sub(r'\[([^\]]+)\]\(([^)]+)\)', r'<a href="\2">\1</a>', text)
+
+    return text
+
+
+def format_reply(answer: str, sources: list) -> str:
+    """Format jawaban + sumber sebagai HTML."""
+    reply = markdown_to_telegram_html(answer or "") + "\n"
 
     if sources:
-        reply += "\n📚 *Sumber:*\n"
+        reply += "\n📚 <b>Sumber:</b>\n"
         for i, src in enumerate(sources, 1):
-            title = src.get("title", "Unknown")
-            section = src.get("section", "")
-            url = src.get("source_url", "")
+            title = html.escape(str(src.get("title") or "Unknown"), quote=False)
+            section = html.escape(str(src.get("section") or ""), quote=False)
+            url = src.get("source_url") or ""
 
             label = title
             if section:
                 label += f" → {section}"
 
             if url:
-                reply += f'{i}. [{label}]({url})\n'
+                reply += f'{i}. <a href="{url}">{label}</a>\n'
             else:
                 reply += f"{i}. {label}\n"
 
-            # Tambahkan justifikasi jika ada
-            justification = src.get("justification", "")
+            justification = src.get("justification") or ""
             if justification:
-                reply += f"   _💡 {justification}_\n"
+                reply += f"   💡 <i>{html.escape(justification, quote=False)}</i>\n"
 
     return reply
 
 
-def format_sources_markdown(sources: list) -> str:
-    """Format hanya bagian sumber + justifikasi sebagai Markdown (untuk pesan terpisah)."""
-    source_text = "📚 *Sumber:*\n"
+def format_sources(sources: list) -> str:
+    """Format hanya bagian sumber (untuk pesan terpisah)."""
+    source_text = "📚 <b>Sumber:</b>\n"
     for i, src in enumerate(sources, 1):
-        title = src.get("title", "Unknown")
-        section = src.get("section", "")
-        url = src.get("source_url", "")
+        title = html.escape(str(src.get("title") or "Unknown"), quote=False)
+        section = html.escape(str(src.get("section") or ""), quote=False)
+        url = src.get("source_url") or ""
 
         label = title
         if section:
             label += f" → {section}"
 
         if url:
-            source_text += f'{i}. [{label}]({url})\n'
+            source_text += f'{i}. <a href="{url}">{label}</a>\n'
         else:
             source_text += f"{i}. {label}\n"
 
-        # Tambahkan justifikasi jika ada
-        justification = src.get("justification", "")
+        justification = src.get("justification") or ""
         if justification:
-            source_text += f"   _💡 {justification}_\n"
+            source_text += f"   💡 <i>{html.escape(justification, quote=False)}</i>\n"
 
     return source_text
 
 
-def format_review_markdown(review: str, issues_found: int, filename: str = None, policy_sources: list = None) -> str:
-    """Format review skrip sebagai Markdown untuk Telegram."""
-    header = "🔍 *Review Skrip"
+def format_review(review: str, issues_found: int, filename: str = None, policy_sources: list = None) -> str:
+    """Format review skrip sebagai HTML yang aman."""
+    header = "🔍 <b>Review Skrip"
     if filename:
-        header += f": {filename}"
-    header += "*\n\n"
+        header += f": {html.escape(filename, quote=False)}"
+    header += "</b>\n\n"
 
-    result = header + review
+    result = header + markdown_to_telegram_html(review or "")
 
-    # Tampilkan sumber kebijakan HPC jika ada
     if policy_sources:
-        result += "\n\n📋 *Kebijakan HPC yang dirujuk:*\n"
+        result += "\n\n📋 <b>Kebijakan HPC yang dirujuk:</b>\n"
         for i, src in enumerate(policy_sources, 1):
-            title = src.get("title", "Unknown")
-            section = src.get("section", "")
-            url = src.get("source_url", "")
+            title = html.escape(str(src.get("title") or "Unknown"), quote=False)
+            section = html.escape(str(src.get("section") or ""), quote=False)
+            url = src.get("source_url") or ""
 
             label = title
             if section:
                 label += f" → {section}"
 
             if url:
-                result += f'{i}. [{label}]({url})\n'
+                result += f'{i}. <a href="{url}">{label}</a>\n'
             else:
                 result += f"{i}. {label}\n"
 
     return result
+
+
+# ── Shared: Send reply ──────────────────────────────────────────
+def split_html_for_telegram(text: str, max_len=4000) -> list:
+    """Membagi teks HTML panjang menjadi potongan-potongan aman untuk Telegram.
+    
+    Menjaga agar tag HTML tidak terpotong di tengah dan otomatis
+    menutup tag yang terbuka di akhir potongan, lalu membukanya 
+    kembali di awal potongan berikutnya.
+    """
+    chunks = []
+    while len(text) > max_len:
+        # Cari titik pisah terbaik (paragraf atau baris baru)
+        split_idx = text.rfind('\n\n', 0, max_len)
+        if split_idx == -1:
+            split_idx = text.rfind('\n', 0, max_len)
+        if split_idx == -1:
+            split_idx = max_len
+            
+        chunk = text[:split_idx]
+        
+        # Track tag HTML yang sedang terbuka
+        open_tags = []
+        for match in re.finditer(r'<(/)?([a-zA-Z0-9]+)([^>]*)>', chunk):
+            is_close = match.group(1) == '/'
+            tag_name = match.group(2)
+            full_tag = match.group(0)
+            
+            if not is_close:
+                open_tags.append((tag_name, full_tag))
+            else:
+                if open_tags and open_tags[-1][0] == tag_name:
+                    open_tags.pop()
+                    
+        # Tutup tag yang masih terbuka di akhir chunk
+        closing_tags = ''.join(f'</{tag_name}>' for tag_name, _ in reversed(open_tags))
+        chunks.append(chunk + closing_tags)
+        
+        # Buka kembali tag tersebut di awal chunk berikutnya
+        opening_tags = ''.join(full_tag for _, full_tag in open_tags)
+        text = opening_tags + text[split_idx:].lstrip()
+        
+    if text.strip():
+        chunks.append(text.strip())
+        
+    return chunks
+
+async def _send_reply(placeholder_msg, update, reply_text: str):
+    """Send message with HTML parse mode, fallback to plain text gracefully."""
+    try:
+        chunks = split_html_for_telegram(reply_text)
+        
+        # Kirim chunk pertama untuk me-replace placeholder
+        await placeholder_msg.edit_text(chunks[0], parse_mode="HTML")
+        
+        # Kirim sisa chunk sebagai pesan baru
+        for chunk in chunks[1:]:
+            await update.message.reply_text(chunk, parse_mode="HTML")
+            
+    except Exception as e:
+        logger.warning(f"Gagal kirim HTML ({e}), fallback ke teks murni tanpa tag.")
+        # Hapus tag HTML jika parse gagal
+        clean = re.sub(r'<[^>]+>', '', reply_text)
+        clean = html.unescape(clean)
+        
+        clean_chunks = [clean[i:i+4000] for i in range(0, len(clean), 4000)]
+        await placeholder_msg.edit_text(clean_chunks[0])
+        for chunk in clean_chunks[1:]:
+            await update.message.reply_text(chunk)
 
 
 # ── Handler: /start ──────────────────────────────────────────
@@ -156,36 +267,36 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     welcome = (
         "👋 Halo! Saya bot asisten HPC ALELEON.\n\n"
         "Saya bisa membantu dengan:\n"
-        "📖 *Pertanyaan* — Kirim pertanyaan tentang ALELEON/Slurm/HPC\n"
-        "📝 *Review Skrip* — Kirim/paste skrip .sh untuk saya review\n\n"
-        "*Contoh pertanyaan:*\n"
+        "📖 Pertanyaan — Kirim pertanyaan tentang ALELEON/Slurm/HPC\n"
+        "📝 Review Skrip — Kirim/paste skrip .sh untuk saya review\n\n"
+        "Contoh pertanyaan:\n"
         "• Bagaimana cara membuat conda environment?\n"
         "• Berapa kuota storage HOME untuk akun perseorangan?\n\n"
-        "*Review skrip:*\n"
+        "Review skrip:\n"
         "• Paste langsung skrip yang mengandung #!/bin/bash atau #SBATCH\n"
         "• Upload file .sh / .slurm / .sbatch\n\n"
         "Ketik pertanyaan atau kirim skrip! 🚀"
     )
-    await update.message.reply_text(welcome, parse_mode="Markdown")
+    await update.message.reply_text(welcome)
 
 
 # ── Handler: /help ───────────────────────────────────────────
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Tampilkan bantuan."""
     help_text = (
-        "📖 *Cara pakai bot ini:*\n\n"
-        "*1. Pertanyaan:*\n"
+        "📖 Cara pakai bot ini:\n\n"
+        "1. Pertanyaan:\n"
         "Ketik pertanyaan langsung di chat. Bot akan mencari jawaban dari wiki ALELEON.\n\n"
-        "*2. Review Skrip:*\n"
-        "• *Paste* skrip Bash/Slurm langsung di chat (harus mengandung #!/bin/bash atau #SBATCH)\n"
-        "• *Upload file* .sh, .slurm, .sbatch, atau .bash\n"
+        "2. Review Skrip:\n"
+        "• Paste skrip Bash/Slurm langsung di chat (harus mengandung #!/bin/bash atau #SBATCH)\n"
+        "• Upload file .sh, .slurm, .sbatch, atau .bash\n"
         "Bot akan mengecek syntax, parameter SBATCH, dan best practice.\n\n"
-        "*Perintah:*\n"
+        "Perintah:\n"
         "/start — Pesan selamat datang\n"
         "/help — Bantuan ini\n"
         "/status — Cek status RAG API"
     )
-    await update.message.reply_text(help_text, parse_mode="Markdown")
+    await update.message.reply_text(help_text)
 
 
 # ── Handler: /status ─────────────────────────────────────────
@@ -228,34 +339,6 @@ async def _keep_alive_indicator(chat, placeholder_msg, stop_event: asyncio.Event
         except asyncio.TimeoutError:
             continue
 
-
-# ── Shared: Send reply with Markdown formatting ────────────────
-async def _send_markdown_reply(placeholder_msg, update, reply_text: str):
-    """Send formatted Markdown reply, with fallback to plain text if parse fails."""
-    try:
-        if len(reply_text) > 4000:
-            # Split: first 4000 chars in placeholder, rest in new message
-            await placeholder_msg.edit_text(
-                reply_text[:4000], parse_mode="Markdown",
-                disable_web_page_preview=True,
-            )
-            remaining = reply_text[4000:]
-            if remaining.strip():
-                await update.message.reply_text(
-                    remaining, parse_mode="Markdown",
-                    disable_web_page_preview=True,
-                )
-        else:
-            await placeholder_msg.edit_text(
-                reply_text, parse_mode="Markdown",
-                disable_web_page_preview=True,
-            )
-    except Exception as parse_err:
-        logger.warning(f"Gagal parse Markdown, fallback ke plain text: {parse_err}")
-        if len(reply_text) > 4000:
-            await placeholder_msg.edit_text(reply_text[:4000])
-        else:
-            await placeholder_msg.edit_text(reply_text)
 
 
 # ── Handler: Pesan teks biasa (pertanyaan atau skrip) ────────
@@ -307,8 +390,8 @@ async def _handle_rag_question(update, chat, question):
             j = src.get("justification")
             logger.info(f"  Source: {src.get('title')} | justification: {repr(j)}")
 
-        reply = format_reply_markdown(answer, sources)
-        await _send_markdown_reply(placeholder_msg, update, reply)
+        reply = format_reply(answer, sources)
+        await _send_reply(placeholder_msg, update, reply)
 
     except requests.Timeout:
         stop_event.set()
@@ -321,7 +404,7 @@ async def _handle_rag_question(update, chat, question):
     except Exception as e:
         stop_event.set()
         await indicator_task
-        logger.error(f"Error: {e}")
+        logger.exception("Error detail:")
         await placeholder_msg.edit_text(f"⚠️ Terjadi error: {str(e)[:200]}")
 
 
@@ -355,8 +438,8 @@ async def _handle_script_review(update, chat, script_content, filename=None):
         issues_found = data.get("issues_found", 0)
         policy_sources = data.get("policy_sources", None)
 
-        reply = format_review_markdown(review, issues_found, filename=filename, policy_sources=policy_sources)
-        await _send_markdown_reply(placeholder_msg, update, reply)
+        reply = format_review(review, issues_found, filename=filename, policy_sources=policy_sources)
+        await _send_reply(placeholder_msg, update, reply)
 
     except requests.Timeout:
         stop_event.set()
@@ -369,7 +452,7 @@ async def _handle_script_review(update, chat, script_content, filename=None):
     except Exception as e:
         stop_event.set()
         await indicator_task
-        logger.error(f"Error review skrip: {e}")
+        logger.exception("Error review skrip:")
         await placeholder_msg.edit_text(f"⚠️ Terjadi error: {str(e)[:200]}")
 
 

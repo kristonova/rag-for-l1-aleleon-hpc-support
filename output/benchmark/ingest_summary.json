@@ -1,12 +1,12 @@
 {
-  "num_documents": 1771,
-  "embedding_time_s": 1088.1,
-  "dense_ingest_s": 0.7,
+  "num_documents": 1773,
+  "embedding_time_s": 1040.9,
+  "dense_ingest_s": 0.8,
   "sparse_ingest_s": 0.2,
-  "multivec_ingest_s": 52.7,
+  "multivec_ingest_s": 54.6,
   "hybrid_ingest_s": 0.9,
-  "bench_dense_points": 1771,
-  "bench_sparse_points": 1771,
-  "bench_multivec_points": 1771,
-  "bench_hybrid_points": 1771
+  "bench_dense_points": 1773,
+  "bench_sparse_points": 1773,
+  "bench_multivec_points": 1773,
+  "bench_hybrid_points": 1773
 }
