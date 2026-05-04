@@ -51,19 +51,25 @@ PROGRESS_FRAMES_REVIEW = [
 
 
 def is_shell_script(text: str) -> bool:
-    """Deteksi apakah teks yang di-paste adalah skrip Bash/Slurm."""
-    indicators = [
-        "#!/bin/bash",
-        "#!/bin/sh",
-        "#!/usr/bin/env bash",
-        "#!/usr/bin/env sh",
-        "#SBATCH",
-    ]
-    # Cek minimal 1 indikator di awal atau dalam teks
-    text_upper = text.strip()
-    for indicator in indicators:
-        if indicator in text_upper:
-            return True
+    """Deteksi apakah teks yang di-paste adalah skrip Bash/Slurm.
+    
+    Hanya menganggap teks sebagai skrip jika:
+    1. Dimulai dengan shebang bash/sh
+    2. ATAU terdapat baris yang diawali dengan #SBATCH
+    Ini mencegah salah deteksi jika user hanya menyebut '#SBATCH' di tengah kalimat.
+    """
+    text_stripped = text.strip()
+    
+    if text_stripped.startswith("#!/bin/bash") or \
+       text_stripped.startswith("#!/bin/sh") or \
+       text_stripped.startswith("#!/usr/bin/env bash") or \
+       text_stripped.startswith("#!/usr/bin/env sh"):
+        return True
+        
+    # Cek apakah ada baris yang diawali dengan #SBATCH (mengabaikan spasi di awal)
+    if re.search(r'^\s*#SBATCH', text_stripped, flags=re.MULTILINE):
+        return True
+        
     return False
 
 
