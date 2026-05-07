@@ -5,47 +5,45 @@ A Retrieval-Augmented Generation (RAG) system that serves as an AI assistant for
 ## Architecture
 
 ```
-┌──────────────────────────────────────────────────────────────────────┐
-│                          RAG Pipeline                                │
-│                                                                      │
-│  ┌───────────────────┐  ┌──────────────────┐  ┌───────────────────┐  │
-│  │  Wiki Sitemap     │─▶│ HTMLSectionSplit │─▶│  Embedding Model. │  │
-│  │  Loader (XML→HTML)│  │ (h1/h2/h3)       │  │  (multilingual-   │  │
-│  │  + BeautifulSoup  │  │ fallback: 4500ch │  │   e5-large)       │  │
-│  └───────────────────┘  └──────────────────┘  └────────┬──────────┘  │
-│                                                         │            │
-│                                               ┌─────────▼────────┐   │
-│                                               │  ChromaDB        │   │
-│                                               │  (Vector Store)  │   │
-│                                               └─────────┬────────┘   │
-│                                                         │            │
-│  ┌──────────────────┐    ┌────────────────┐    ┌────────▼────────┐   │
-│  │  vLLM Engine     │◀───│  LangChain     │◀───│  Retriever      │   │
-│  │  (Qwen2.5-7B     │    │  RAG Chain     │    │  (Top-15 chunks)│   │
-│  │   Instruct)      │    │  (ChatML)      │    └─────────────────┘   │
-│  │  ROCm / HIP      │    └────────────────┘                         │
-│  └──────────────────┘                                                │
-└──────────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────┐
+│                    Pipeline RAG (Podman Container)                       │
+│                                                                          │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────┐  ┌─────────────┐       │
+│  │   INGESTION  │→ │  EMBEDDING   │→ │ RETRIEVAL│→ │  GENERASI   │       │
+│  │  (HTML Wiki) │  │ + Penyimpanan│  (Pencarian)│  │   (LLM)     │       │
+│  └──────────────┘  └──────────────┘  └──────────┘  └─────────────┘       │
+│                                                                          │
+│  Fase 1: Ambil & Split   Fase 2: Vektorisasi   Fase 3: Menjawab          │
+│                                                                          │
+│  Layanan:                                                                │
+│  ┌─────────────────┐ ┌─────────────┐ ┌──────────┐ ┌──────────────┐       │
+│  │embedding-service│ │  vllm-rocm  │ │  qdrant  │ │   rag-app    │       │
+│  │ (BAAI/bge-m3)   │ │ (Qwen3.5)   │ │ (Vektor) │ │ (Orkestrator)│       │
+│  │ Port 8001       │ │ Port 8000   │ │ Port 6333│ │              │       │
+│  └─────────────────┘ └─────────────┘ └──────────┘ └──────────────┘       │
+└──────────────────────────────────────────────────────────────────────────┘
 ```
 
 ## Project Structure
 
 ```
 rag-for-l1-aleleon-hpc-support/
-├── rag_slurm_vllm.py            # Main RAG application script
-├── Dockerfile.rocm              # Container image for AMD ROCm GPUs
-├── compose.yml           # Multi-container orchestration (optional)
-├── pyproject.toml               # Python project metadata & dependencies
-├── poetry.lock                  # Locked dependency versions
+├── services/
+│   ├── embedding/
+│   │   ├── Dockerfile.embedding
+│   │   └── embedding_api.py
+│   └── rag-app/
+│       ├── Dockerfile.rag-app
+│       └── rag_app.py
+├── compose.yml                  # Podman multi-container orchestration
+├── Dockerfile.rocm              # Container image for AMD ROCm GPUs (legacy)
+├── rag_slurm_vllm.py            # Standalone script (legacy)
 ├── HOW IT WORKS.md              # Detailed explanation document
-├── afo_tune_device_0_full.csv   # GPU tuning data
-├── wiki/                        # Local copies of wiki pages (reference)
-│   ├── Komputasi_Python_dengan_Conda_Environment_User.txt
-│   ├── komputasi_python_venv_user.txt
-│   ├── metode_komputasi_efison.txt
-│   ├── mpi_aleleon_superkomputer.txt
-│   ├── spesifikasi_aleleon.txt
-│   └── tutorial_akun_trial_a6.txt
+├── inspect_chroma.py            # Inspect Qdrant vector store contents
+├── debug_parse_sitemap.py       # Debug sitemap parsing
+├── pyproject.toml               # Python project metadata & dependencies
+├── tests/
+│   └── test_services.py
 └── README.md                    # This file
 ```
 
@@ -60,8 +58,8 @@ The application runs in three phases:
 3. **Structure-Based Splitting** — Uses `HTMLSectionSplitter` to split content by heading tags (`h1`, `h2`, `h3`), preserving document structure.
 4. **Fallback Splitting** — Chunks larger than 4500 characters are further split using `RecursiveCharacterTextSplitter` (chunk size: 4500, overlap: 900).
 5. **Metadata Enrichment** — Each chunk gets labeled with `[Sumber: <page_title>] [Section: <heading>]` prefix for source attribution.
-6. **Embedding** — Converts each chunk into a vector using `intfloat/multilingual-e5-large` (~1.2GB multilingual model, runs on CPU/GPU).
-7. **Vector Storage** — Stores embeddings in an in-memory ChromaDB instance for fast similarity search.
+6. **Embedding via API** — Converts each chunk into a vector using `BAAI/bge-m3` served by `embedding-service` (batched, 32 texts per request).
+7. **Vector Storage** — Stores embeddings in a persistent Qdrant collection, backed by a Podman named volume (`qdrant-data:/qdrant/storage`).
 
 ### Phase 2 — LLM Setup (vLLM on ROCm)
 
@@ -69,25 +67,27 @@ The application runs in three phases:
 
    | Parameter | Value | Reason |
    |---|---|---|
-   | `gpu_memory_utilization` | 0.80 | Use 80% of available VRAM |
+   | `gpu_memory_utilization` | 0.99 | Use 99% of available VRAM |
    | `enforce_eager` | True | Avoids CUDAGraph issues on ROCm/RDNA4 |
-   | `max_model_len` | 32768 | Full 32K context window for large prompts |
-   | `temperature` | 0.6 | Balanced factual/creative answers |
-   | `top_p` | 0.95 | Nucleus sampling |
-   | `top_k` | 20 | "INSERT_REASON" |
-   | `max_new_tokens` | 32768 | Max response length |
+    | `max_model_len` | 131072 | Full 128K context window for large prompts |
+    | `temperature` | 0.3 | Lower randomness for RAG |
+    | `top_p` | 0.9 | Nucleus sampling |
+    | `top_k` | 20 | Top-k sampling constraint |
+    | `max_tokens` | 32768 | Max response length |
 
 ### Phase 3 — Question Answering (RAG Chain)
 
-9. **Retrieval** — For each user question, the retriever finds the **top-15** most semantically similar chunks from ChromaDB.
-10. **Prompt Construction** — Builds a ChatML-formatted prompt (`<|im_start|>` / `<|im_end|>`) with system instructions (in Bahasa Indonesia), retrieved context, and the user question.
-11. **Generation** — vLLM generates an answer grounded in the retrieved documents.
-12. **Anti-Hallucination** — The system prompt enforces 7 strict rules:
+9. **Retrieval** — For each user question, the retriever finds the **top-10** most semantically similar chunks from Qdrant via cosine similarity.
+10. **Prompt Construction** — Builds OpenAI messages with system instructions (Bahasa Indonesia), retrieved context, and the user question.
+11. **Generation** — vLLM generates an answer grounded in the retrieved documents using the OpenAI-compatible API.
+12. **Anti-Hallucination** — The system prompt enforces 11 strict rules (0-10):
     - Answer ONLY from documents; quote commands exactly
     - Preserve exact numbers, versions, and specs
     - Never substitute commands (e.g., don't replace `source activate` with `conda activate`)
     - Distinguish "minimal" vs "maksimal"
-    - Respond "Saya tidak menemukan informasi tersebut di sistem" when info is not in docs
+    - Respond "Saya tidak menemukan informasi tersebut di sistem." when info is not in docs
+    - Watch for LEGACY labels — do not apply Mk.III info to Mk.V
+    - Always answer with at least 2 sentences; never return an empty response
 
 ### Multiprocessing Guard
 
@@ -111,70 +111,56 @@ The `if __name__ == '__main__'` guard is **required** because vLLM v1 uses `spaw
 - ~15GB disk for the container image
 - ~25GB disk for the Qwen3.5-35B-A3B-GPTQ-Int4 model weights (auto-downloaded)
 
-## Quick Start
+## Quick Start (Podman Compose)
 
-### 1. Build the Container
-
-```bash
-podman build -t rag-kristo-rocm -f Dockerfile.rocm .
-```
-
-### 2. Run
+### 1. Start Services
 
 ```bash
-podman run -it --rm \
-    --cap-add=SYS_PTRACE \
-    --device=/dev/kfd \
-    --device=/dev/dri \
-    -v $(pwd):/app:Z \
-    -v ~/.cache/huggingface:/root/.cache/huggingface:Z \
-    --group-add keep-groups \
-    rag-kristo-rocm \
-    bash
+podman-compose --profile backend up -d embedding-service qdrant vllm-rocm
 ```
 
-### 3. Run Interactively (mount local files)
+### 2. Run the RAG App
 
 ```bash
-podman run \
-  --cap-add=SYS_PTRACE \
-  --device=/dev/kfd \
-  --device=/dev/dri \
-  --group-add keep-groups \
-  -v $(pwd):/app:Z \
-  -v ~/.cache/huggingface:/root/.cache/huggingface:Z \
-  -it rag-kristo-rocm bash
+podman-compose --profile rag-app run --rm rag-app
 ```
 
-Then inside the container:
+### 3. Optional: Start All in One
 
 ```bash
-python rag_slurm_vllm.py
+podman-compose --profile test up
 ```
 
-## Dockerfile.rocm — Build Details
+or
+
+```bash
+podman-compose --profile embedding-service --profile vllm-rocm --profile qdrant --profile rag-app up
+```
+
+## Dockerfile.rocm — Build Details (Legacy)
 
 The Dockerfile uses `rocm/vllm-dev:nightly` as the base image (includes PyTorch ROCm + vLLM). Key design decisions:
 
 | Challenge | Solution |
 |---|---|
-| `pip install chromadb` pulls CUDA torch | Install chromadb with `--no-deps`, then add safe dependencies manually |
+| Qdrant vector store | Install `qdrant-client` and `langchain-qdrant` for vector store integration |
 | `pip install sentence-transformers` pulls CUDA torch | Install with `--no-deps`, add sub-dependencies separately |
 | `pip install onnxruntime` pulls CUDA torch | Install with `--no-deps` |
-| LangChain 1.x API changes | Uses `langchain-classic` for `create_retrieval_chain` / `create_stuff_documents_chain` |
+| LangChain 1.x API changes | Uses direct Python functions instead of chain helpers |
 | Wiki HTML parsing | Installs `lxml` and `beautifulsoup4` for `HTMLSectionSplitter` |
 | Build-time verification | `assert torch.version.hip is not None` ensures PyTorch ROCm survives all pip installs |
 
 ## Test Questions & Expected Results
 
-The script includes **23 test questions** across 4 difficulty levels:
+The script includes **69 test questions** across 5 difficulty levels:
 
-| Level | Count | Tests |
+| Level | Count | Description |
 |---|---|---|
-| **Level 1** — Direct Facts | 9 | Conda env creation, Jupyter setup, Anaconda version, Mamba activation, pyload module, GPU partition, support email, office hours |
-| **Level 2** — Multi-Chunk | 5 | Computation methods overview, Job Composer vs terminal Slurm, full conda+pyload setup, squeue statuses, EWS Jupyter form |
-| **Level 3** — Reasoning / Deduction | 6 | TensorFlow CUDA version, Anaconda version recommendation, .ipynb batch prep, bash -l header reasoning, multi-GPU packages, storage cleanup |
-| **Level 4** — Anti-Hallucination | 3 | Pricing (not in docs), Docker in conda (not in docs), max GPU limit (not in docs) |
+| **Level 1** — Direct Facts | 20 | RAM capacity, walltime limits, GPU types, portal URLs, conda commands, pricing, quotas, PKSPIAS, SFTP limits, OS version, Slurm version, job cancellation, storage limits, backup policy, support email, GROMACS binary, 2FA authenticators, squeue, pip support, GCC module |
+| **Level 2** — Multi-Chunk | 10 | GPU partition comparison, JupyterLab batch job, squeue status meanings, institutional account limits, password change portal, file upload troubleshooting, AMD compiler modules, login node restrictions, VPN disconnect behavior, Core Hour types |
+| **Level 3** — Reasoning / Deduction & Troubleshooting | 10 | Memory allocation calculation, Slurm syntax error diagnosis, QOS CPU limits, walltime limits, Slurm Array configuration, hybrid MPI+OpenMP core counting, high-memory partition selection, GPU Hour quota estimation, core rounding behavior, storage optimization |
+| **Level 4** — Anti-Hallucination | 15 | SSD storage (not in docs), MATLAB (not in docs), storage fines, R packages, VPN bandwidth, Python reset, ANSYS Fluent, VSCode SSH, foreign currency, default password, CTO name, wiki editing, PKSPIAS cancellation, UPS battery, AutoGluon |
+| **Level 5** — Additional Questions | 14 | Conda env creation, Jupyter with custom env, Python version, Mamba activation, pyload module, module listing, GPU partition, support email, office hours, computation methods, Job Composer vs terminal, full setup procedure, squeue statuses, EWS Jupyter form |
 
 ## Configuration
 
@@ -191,22 +177,11 @@ splits = load_wiki_documents(
 
 ### Changing the LLM Model
 
-Edit the `model` parameter in the script:
-
-```python
-llm = VLLM(
-    model="Qwen/Qwen2.5-Coder-7B-Instruct",  # Change this
-    ...
-)
-```
+Edit the `--model` argument in [compose.yml](compose.yml#L33) (service `vllm-rocm`).
 
 ### Changing the Embedding Model
 
-Edit the `model_name` parameter:
-
-```python
-embeddings = HuggingFaceEmbeddings(model_name="intfloat/multilingual-e5-large")  # Change this
-```
+Edit `MODEL_NAME` in [compose.yml](compose.yml#L28) (service `embedding-service`).
 
 ### Adjusting for Different GPUs
 
@@ -231,21 +206,21 @@ rocminfo | grep "Name:" | grep "gfx"
 |---|---|---|
 | `chunk_size` | 4500 | Max chars per chunk before fallback splitting |
 | `chunk_overlap` | 900 | Overlap between fallback chunks to preserve context |
-| `search_kwargs["k"]` | 15 | Number of chunks retrieved per question (more = richer context, larger prompt) |
+| `k` (similarity_search) | 10 | Number of chunks retrieved per question (more = richer context, larger prompt) |
 | `requests_per_second` | 2 | Rate limit for fetching wiki pages |
 
 ## Dependencies
 
 Managed via Poetry (`pyproject.toml`):
 
-- **langchain** / **langchain-core** / **langchain-community** — RAG chain orchestration
-- **langchain-classic** — Provides `create_retrieval_chain` and `create_stuff_documents_chain` (LangChain 1.x API)
+- **langchain-core** / **langchain-community** — Document loading and retriever utilities
 - **langchain-text-splitters** — `HTMLSectionSplitter` and `RecursiveCharacterTextSplitter`
-- **langchain-huggingface** — HuggingFace embedding integration
-- **langchain-chroma** — ChromaDB vector store integration
-- **sentence-transformers** — Embedding model runtime (`intfloat/multilingual-e5-large`)
+- **langchain-qdrant** — Qdrant vector store integration via LangChain
+- **qdrant-client** — Qdrant Python client for collection management
+- **openai** — OpenAI-compatible client for vLLM
+- **requests** — HTTP calls to embedding-service and health checks
 - **beautifulsoup4** / **lxml** — HTML parsing for wiki page extraction
-- **vLLM** — High-performance LLM inference engine (included in base Docker image)
+- **vLLM** — High-performance LLM inference engine (inside the vllm-rocm container)
 
 ## License
 

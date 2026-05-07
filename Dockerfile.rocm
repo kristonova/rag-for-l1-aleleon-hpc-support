@@ -17,15 +17,19 @@ FROM docker.io/rocm/vllm-dev:nightly
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONUNBUFFERED=1
-ENV FLASH_ATTENTION_TRITON_AMD_ENABLE=TRUE
-ENV TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL=1
+ENV ROCM_HOME=/opt/rocm
+ENV PATH="${ROCM_HOME}/bin:${PATH}"
+ENV LD_LIBRARY_PATH="${ROCM_HOME}/lib:${LD_LIBRARY_PATH}"
+ENV HSA_OVERRIDE_GFX_VERSION=12.0.1
+#ENV FLASH_ATTENTION_TRITON_AMD_ENABLE=TRUE
+#ENV TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL=1
 
 # =============================================================================
 # Pip cache directory configuration
 # =============================================================================
 ENV PIP_CACHE_DIR=/root/.cache/pip
 
-RUN --mount=type=cache,target=/root/.cache/pip pip install --upgrade pip
+RUN pip install --upgrade pip
 
 # Log initial state of PyTorch ROCm
 RUN python -c "\
@@ -35,43 +39,37 @@ print('HIP:', torch.version.hip); \
 print('GPU available:', torch.cuda.is_available())"
 
 # ============================================================
-# Install langchain (WITHOUT chromadb for now)
+# Install langchain
 # ============================================================
-RUN --mount=type=cache,target=/root/.cache/pip pip install \
+RUN pip install \
     langchain \
     langchain-core \
     langchain-community \
     langchain-text-splitters
 
 # ============================================================
-# Chromadb: install WITHOUT dependencies (avoid onnxruntime pulling torch)
+# Qdrant: install vector store client
 # ============================================================
-RUN --mount=type=cache,target=/root/.cache/pip pip install --no-deps chromadb
-RUN --mount=type=cache,target=/root/.cache/pip pip install --no-deps langchain-chroma
-
-# Safe chromadb dependencies (not torch)
-RUN --mount=type=cache,target=/root/.cache/pip pip install \
-    pypika overrides mmh3 bcrypt posthog \
-    build importlib-resources kubernetes
+RUN pip install qdrant-client langchain-qdrant
 
 # ============================================================
 # SitemapLoader dependencies
 # ============================================================
-RUN --mount=type=cache,target=/root/.cache/pip pip install lxml beautifulsoup4
+RUN pip install lxml beautifulsoup4
 
 # onnxruntime WITHOUT dependencies (so it doesn't pull torch CUDA)
-RUN --mount=type=cache,target=/root/.cache/pip pip install --no-deps onnxruntime
-RUN --mount=type=cache,target=/root/.cache/pip pip install flatbuffers
+RUN pip install --no-deps onnxruntime
+RUN pip install flatbuffers
 
 # ============================================================
 # Sentence-transformers & langchain-huggingface WITHOUT torch dep
 # ============================================================
-RUN --mount=type=cache,target=/root/.cache/pip pip install --no-deps \
+RUN pip install --no-deps \
     sentence-transformers \
     langchain-huggingface
 
 # Safe sub-dependencies
-RUN --mount=type=cache,target=/root/.cache/pip pip install \
+RUN pip install \
     scikit-learn scipy Pillow
 
 # ============================================================
@@ -94,7 +92,7 @@ RUN python -c "from langchain_classic.chains import create_retrieval_chain; prin
 RUN python -c "from langchain_classic.chains.combine_documents import create_stuff_documents_chain; print('✓ langchain stuff chain OK')"
 RUN python -c "from langchain_community.llms import VLLM; print('✓ langchain VLLM OK')"
 RUN python -c "from langchain_huggingface import HuggingFaceEmbeddings; print('✓ HuggingFace OK')"
-RUN python -c "from langchain_chroma import Chroma; print('✓ Chroma OK')"
+RUN python -c "from langchain_qdrant import QdrantVectorStore; print('✓ Qdrant OK')"
 RUN python -c "from sentence_transformers import SentenceTransformer; print('✓ SentenceTransformers OK')"
 
 WORKDIR /app

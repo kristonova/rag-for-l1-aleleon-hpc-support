@@ -1,0 +1,471 @@
+{
+  "summary": {
+    "concurrency": 4,
+    "total_requests": 49,
+    "successful": 37,
+    "failed": 12,
+    "avg_latency_s": 72.7082,
+    "min_latency_s": 19.4616,
+    "max_latency_s": 135.1217,
+    "p50_latency_s": 70.0613,
+    "p99_latency_s": 132.5027,
+    "stdev_latency_s": 27.3324,
+    "throughput_rps": 0.0478,
+    "wall_clock_s": 773.6725
+  },
+  "requests": [
+    {
+      "request_id": 1,
+      "question": "Bagaimana perintah lengkap di terminal untuk menghapus sebuah conda environment ",
+      "status": 200,
+      "latency_s": 70.0616,
+      "answer_length": 847,
+      "num_sources": 9,
+      "success": true
+    },
+    {
+      "request_id": 2,
+      "question": "Arsitektur prosesor AMD generasi apa yang secara spesifik digunakan pada seluruh",
+      "status": 200,
+      "latency_s": 70.0613,
+      "answer_length": 930,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 3,
+      "question": "Di direktori mana admin menyarankan pengguna untuk menyimpan folder file Slaster",
+      "status": 200,
+      "latency_s": 70.0615,
+      "answer_length": 759,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 4,
+      "question": "Apa perintah spesifik pyload yang harus saya jalankan di terminal untuk mengakti",
+      "status": 200,
+      "latency_s": 19.4616,
+      "answer_length": 772,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 5,
+      "question": "Apa alamat tautan (URL) lengkap dari portal EFIRO Web Service (EWS) yang menjadi",
+      "status": 200,
+      "latency_s": 65.1748,
+      "answer_length": 524,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 6,
+      "question": "Siapa target spesifik kewarganegaraan dan tujuan dari diselenggarakannya program",
+      "status": -1,
+      "latency_s": 14.575,
+      "answer_length": 0,
+      "num_sources": 0,
+      "success": false,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "request_id": 7,
+      "question": "Apa nama profil conda environment bawaan sistem atau perintah pyload yang harus ",
+      "status": 200,
+      "latency_s": 39.5931,
+      "answer_length": 1448,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 8,
+      "question": "Berapa jumlah maksimal job komputasi yang diizinkan untuk berstatus berjalan ata",
+      "status": -1,
+      "latency_s": 14.5751,
+      "answer_length": 0,
+      "num_sources": 0,
+      "success": false,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "request_id": 9,
+      "question": "Sebutkan nama modul Lmod yang tepat untuk memuat NVIDIA HPC SDK Compilers versi ",
+      "status": 200,
+      "latency_s": 41.9712,
+      "answer_length": 625,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 10,
+      "question": "Berapa megabyte (MB) batas maksimal ukuran file yang dizinkan untuk diunggah lan",
+      "status": 200,
+      "latency_s": 109.6144,
+      "answer_length": 519,
+      "num_sources": 8,
+      "success": true
+    },
+    {
+      "request_id": 11,
+      "question": "Tombol menu apa yang harus saya klik secara presisi pada antarmuka aplikasi Job ",
+      "status": 200,
+      "latency_s": 76.0014,
+      "answer_length": 736,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 12,
+      "question": "Apa kepanjangan dan arti dari kode status \"CG\" ketika saya mengecek antrian job ",
+      "status": 200,
+      "latency_s": 50.9834,
+      "answer_length": 652,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 13,
+      "question": "Saya ingin menjalankan simulasi NAMD versi 2.14 khusus CPU murni menggunakan met",
+      "status": 200,
+      "latency_s": 67.6434,
+      "answer_length": 1047,
+      "num_sources": 9,
+      "success": true
+    },
+    {
+      "request_id": 14,
+      "question": "Saya ingin membuka sesi JupyterLab dengan container PyTorch 2.3.0 berbasis ROCm ",
+      "status": -1,
+      "latency_s": 33.6129,
+      "answer_length": 0,
+      "num_sources": 0,
+      "success": false,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "request_id": 15,
+      "question": "Jika saya ingin menggunakan modul cp2k/2025.2-gcc-13.4.0-cuda-12.9.0-k6i untuk k",
+      "status": 200,
+      "latency_s": 54.5443,
+      "answer_length": 1029,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 16,
+      "question": "Job saya PENDING dengan alasan QOSMaxMemoryPerUserLimit. Apa definisi dari error",
+      "status": 200,
+      "latency_s": 42.9294,
+      "answer_length": 1214,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 17,
+      "question": "Saya menggunakan template LAMMPS 22 July 2025 versi CPU dengan 150 proses MPI mu",
+      "status": -1,
+      "latency_s": 20.9312,
+      "answer_length": 0,
+      "num_sources": 0,
+      "success": false,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "request_id": 18,
+      "question": "Saya perlu mengunggah file input sebesar 2GB ke dalam ruang job Quantum ESPRESSO",
+      "status": 200,
+      "latency_s": 84.4885,
+      "answer_length": 962,
+      "num_sources": 9,
+      "success": true
+    },
+    {
+      "request_id": 19,
+      "question": "Saya ingin mengubah profil akun ALELEON Mk.V saya dan mengaktifkan 2FA menggunak",
+      "status": 200,
+      "latency_s": 63.5572,
+      "answer_length": 1650,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 20,
+      "question": "Jika saya menutup secara paksa tab browser web saya saat sesi JupyterLab saya se",
+      "status": 200,
+      "latency_s": 112.8558,
+      "answer_length": 1141,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 21,
+      "question": "Apa perbedaan mendasar cara kerja dan metode pencatatan antara 'Total Core Hour ",
+      "status": 200,
+      "latency_s": 90.8579,
+      "answer_length": 2172,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 22,
+      "question": "Saya ingin melakukan kompilasi software mandiri menggunakan CMake versi 3.31.8 y",
+      "status": 200,
+      "latency_s": 65.7949,
+      "answer_length": 536,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 23,
+      "question": "Saya mensubmit job menggunakan modul openmpi/5.0.8-gcc-15.2.0-cuda-12.9.0-neq. B",
+      "status": -1,
+      "latency_s": 49.2984,
+      "answer_length": 0,
+      "num_sources": 0,
+      "success": false,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "request_id": 24,
+      "question": "Saya adalah pengguna akun golongan Perseorangan. Apa yang akan terjadi secara te",
+      "status": -1,
+      "latency_s": 16.4963,
+      "answer_length": 0,
+      "num_sources": 0,
+      "success": false,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "request_id": 25,
+      "question": "Saya memiliki saldo 100 CCH. Saya mensubmit job dengan alokasi 16 core CPU dan m",
+      "status": 200,
+      "latency_s": 48.7994,
+      "answer_length": 2201,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 26,
+      "question": "Saya mensubmit script simulasi dengan alokasi #SBATCH --nodes=2, #SBATCH --ntask",
+      "status": 200,
+      "latency_s": 102.0448,
+      "answer_length": 1755,
+      "num_sources": 9,
+      "success": true
+    },
+    {
+      "request_id": 27,
+      "question": "Saya ingin menjalankan simulasi dinamika molekuler NAMD berat yang dikonfigurasi",
+      "status": 200,
+      "latency_s": 85.5486,
+      "answer_length": 1394,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 28,
+      "question": "Di dalam dokumen rujukan disebutkan bahwa GROMACS versi CUDA merupakan salah sat",
+      "status": 200,
+      "latency_s": 135.1217,
+      "answer_length": 1379,
+      "num_sources": 9,
+      "success": true
+    },
+    {
+      "request_id": 29,
+      "question": "Saya menjalankan simulasi CP2K dengan murni MPI dan secara spesifik mengatur nil",
+      "status": 200,
+      "latency_s": 102.8189,
+      "answer_length": 1356,
+      "num_sources": 9,
+      "success": true
+    },
+    {
+      "request_id": 30,
+      "question": "Saya mempunyai program Python custom (non-MPI) yang didesain untuk memuat dan me",
+      "status": -1,
+      "latency_s": 49.5733,
+      "answer_length": 0,
+      "num_sources": 0,
+      "success": false,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "request_id": 31,
+      "question": "Saya bermaksud mengeksekusi perintah gmx_mpi untuk melakukan pre-processing sist",
+      "status": 200,
+      "latency_s": 79.4221,
+      "answer_length": 2162,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 32,
+      "question": "Saya mencoba mengisi formulir sesi JupyterLab di EWS untuk partisi tilla dengan ",
+      "status": 200,
+      "latency_s": 64.4751,
+      "answer_length": 2586,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 33,
+      "question": "Saya membuka aplikasi squeue dan melihat dua riwayat job historis saya. Job X te",
+      "status": -1,
+      "latency_s": 29.8486,
+      "answer_length": 0,
+      "num_sources": 0,
+      "success": false,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "request_id": 34,
+      "question": "Grup riset saya baru saja memborong pembelian kuota GPU Hour (GH) dalam jumlah b",
+      "status": 200,
+      "latency_s": 117.9283,
+      "answer_length": 1368,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 35,
+      "question": "Sebagai pengguna akun golongan Perseorangan standar, saya mensubmit tiga batch j",
+      "status": 200,
+      "latency_s": 88.0798,
+      "answer_length": 2276,
+      "num_sources": 9,
+      "success": true
+    },
+    {
+      "request_id": 36,
+      "question": "Dokumen menjelaskan bahwa Slurm ALELEON secara otomatis mendistribusikan proses ",
+      "status": 200,
+      "latency_s": 127.8466,
+      "answer_length": 909,
+      "num_sources": 9,
+      "success": true
+    },
+    {
+      "request_id": 37,
+      "question": "Bagaimana contoh format pembuatan submit script lengkap beserta argumen module l",
+      "status": 200,
+      "latency_s": 93.2205,
+      "answer_length": 802,
+      "num_sources": 9,
+      "success": true
+    },
+    {
+      "request_id": 38,
+      "question": "Jika saya berstatus sebagai mahasiswa peneliti pascasarjana internasional yang b",
+      "status": 200,
+      "latency_s": 58.8104,
+      "answer_length": 1134,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 39,
+      "question": "Tolong sebutkan merk pabrikan komersial (vendor brand) spesifik dari kartu memor",
+      "status": -1,
+      "latency_s": 39.7669,
+      "answer_length": 0,
+      "num_sources": 0,
+      "success": false,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "request_id": 40,
+      "question": "Apa kombinasi syntax atau perintah bypass administrator khusus di dalam manajeme",
+      "status": -1,
+      "latency_s": 19.0432,
+      "answer_length": 0,
+      "num_sources": 0,
+      "success": false,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "request_id": 41,
+      "question": "Berdasarkan catatan arsip historis di dokumen EUREKA! Periode 1 dan Periode 2, p",
+      "status": 200,
+      "latency_s": 33.1199,
+      "answer_length": 567,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 42,
+      "question": "Saya memiliki skrip Python yang secara otomatis mengunduh dataset CIFAR-100 sebe",
+      "status": 200,
+      "latency_s": 71.0532,
+      "answer_length": 719,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 43,
+      "question": "Berikan saya step-by-step tutorial mengenai bagaimana cara merutekan (forwarding",
+      "status": 200,
+      "latency_s": 52.0099,
+      "answer_length": 1649,
+      "num_sources": 7,
+      "success": true
+    },
+    {
+      "request_id": 44,
+      "question": "Organisasi saya adalah pemegang Akun Institusi berbayar. Apakah kami secara perj",
+      "status": 200,
+      "latency_s": 82.9269,
+      "answer_length": 899,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 45,
+      "question": "Berapa besar persentase nilai pengembalian dana (refund) tunai atau kompensasi k",
+      "status": 200,
+      "latency_s": 68.8502,
+      "answer_length": 677,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 46,
+      "question": "Saya memiliki image kontainer Docker kustom yang mengharuskan eksekusi skrip ent",
+      "status": -1,
+      "latency_s": 30.9169,
+      "answer_length": 0,
+      "num_sources": 0,
+      "success": false,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "request_id": 47,
+      "question": "Sesuai spesifikasi arsitektur kelas atas ALELEON, berapa nilai estimasi performa",
+      "status": 200,
+      "latency_s": 48.1228,
+      "answer_length": 636,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 48,
+      "question": "Jika file proyek penelitian skripsi saya terhapus tanpa sengaja akibat salah ket",
+      "status": -1,
+      "latency_s": 17.2058,
+      "answer_length": 0,
+      "num_sources": 0,
+      "success": false,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "request_id": 49,
+      "question": "Bagaimana perintah lengkap di terminal untuk menghapus sebuah conda environment ",
+      "status": 200,
+      "latency_s": 34.3492,
+      "answer_length": 961,
+      "num_sources": 9,
+      "success": true
+    }
+  ]
+}

@@ -1,0 +1,4143 @@
+Loading ChromaDB...
+Failed to send telemetry event ClientStartEvent: capture() takes 1 positional argument but 3 were given
+Failed to send telemetry event ClientCreateCollectionEvent: capture() takes 1 positional argument but 3 were given
+
+📊 Total chunks tersimpan: 247
+Failed to send telemetry event CollectionGetEvent: capture() takes 1 positional argument but 3 were given
+
+======================================================================
+
+[Chunk 0] ID: ad9c3ddf-e1e5-4eab-a367-60f726c796f4
+  📄 Title : ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/ALELEON_Supercomputer
+  📏 Length: 771 chars
+  📝 Preview: Selamat datang di wiki ALELEON Supercomputer! ALELEON Supercomputer adalah layanan superkomputer publik pertama dari EFISON untuk komputasi saintifik (scientific computing), machine learning, dan big ...
+----------------------------------------------------------------------
+
+[Chunk 1] ID: 17f549dc-23ba-4368-9981-a9c51eae4c27
+  📄 Title : Submit Script ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Submit_Script_ALELEON_Supercomputer
+  📏 Length: 1996 chars
+  📝 Preview: Halaman ini menjelaskan pemahaman
+Submit Script
+yang merupakan 'formulir' untuk menjalankan komputasi batch job melalui
+sistem manajemen
+Slurm
+.
+Merupakan
+suplemen info
+untuk:
+Setiap panduan di
+[
+Daft...
+----------------------------------------------------------------------
+
+[Chunk 2] ID: 8142e174-ab45-4b46-bfeb-1d16e5a71c32
+  📄 Title : Submit Script ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Submit_Script_ALELEON_Supercomputer
+  📏 Length: 1973 chars
+  📝 Preview: . SLURM punya ratusan opsi parameter SBATCH dimana panduan ini memberikan daftar esensial dan pemahaman mendalam pada penggunaan ALELEON Supercomputer:
+`
+#SBATCH
+--partition
+Menentukan jenis partisi (...
+----------------------------------------------------------------------
+
+[Chunk 3] ID: 1f8ae294-cd86-4e92-ab1f-9f1e41a3c3d4
+  📄 Title : Submit Script ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Submit_Script_ALELEON_Supercomputer
+  📏 Length: 1923 chars
+  📝 Preview: SBATCH
+cpus-per-task
+berpasangan dengan SBATCH
+ntasks
+, contoh:
+# ntasks mewakili jumlah core CPU atau proses MPI
+#SBATCH --ntasks=2
+# cpus-per-task mewakili jumlah thread OMP
+# per core CPU atau pros...
+----------------------------------------------------------------------
+
+[Chunk 4] ID: c8513c94-ca10-4c80-b5f6-e1e0c463bb42
+  📄 Title : Submit Script ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Submit_Script_ALELEON_Supercomputer
+  📏 Length: 1630 chars
+  📝 Preview: #SBATCH --error=error-%j.txt
+`
+#SBATCH
+--mail
+untuk Notifikasi Email
+Slurm ALELEON Supercomputer dapat mengirim notifikasi email kepada user dengan nama
+Jojo
+untuk mengabarkan status jalannya job. SBA...
+----------------------------------------------------------------------
+
+[Chunk 5] ID: 77712f6e-4aee-42e2-9ac6-3dff09fd41f0
+  📄 Title : Submit Script ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Submit_Script_ALELEON_Supercomputer
+  📏 Length: 641 chars
+  📝 Preview: module load
+nama-modul-software
+# Alur jalannya program ...
+Daftar modul software yang lengkap dirangkum pada:
+Halaman
+[
+Katalog Softwar
+e ALELEON Supercomputer
+]
+Setiap panduan software d
+i
+[
+Daftar ...
+----------------------------------------------------------------------
+
+[Chunk 6] ID: 0219bb95-d77c-49f7-a947-8acb88b49b93
+  📄 Title : Core Hour
+  🔗 Source: https://wiki.efisonlt.com/wiki/Core_Hour
+  📏 Length: 1996 chars
+  📝 Preview: Core Hour adalah metrik yang digunakan oleh ALELEON Supercomputer untuk menghitung biaya penggunaan bagi penggunanya. Halaman ini menjelaskan teknis core hour ALELEON.
+Halaman ini bagian dari:
+[
+Penda...
+----------------------------------------------------------------------
+
+[Chunk 7] ID: e42a30e0-fc67-469d-b302-e4f7eba4cf28
+  📄 Title : Core Hour
+  🔗 Source: https://wiki.efisonlt.com/wiki/Core_Hour
+  📏 Length: 1793 chars
+  📝 Preview: Slurm GPU minutes
+= jumlah alokasi GPU
+*
+waktu job berjalan (satuan menit)
+Kemudian ALELEON menkonversinya ke core hour:
+ALELEON CPU Core Hour (CCH)
+= Slurm Core Minutes
+/
+60
+ALELEON GPU Hour (GH)
+= S...
+----------------------------------------------------------------------
+
+[Chunk 8] ID: 9aaa12a7-e7d6-4059-b345-745a9896bdef
+  📄 Title : Katalog Software ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Katalog_Software_ALELEON_Supercomputer
+  📏 Length: 1994 chars
+  📝 Preview: Halaman ini memuat info daftar software terinstal di ALELEON Supercomputer.
+- Daftar isi -
+Layanan Gratis Instalasi Software
+Daftar Software Komputasi
+Mengakses Modul Software dengan Lmod
+Daftar Modul...
+----------------------------------------------------------------------
+
+[Chunk 9] ID: 31f3cf9e-9593-48c4-a4c5-2466d12703cf
+  📄 Title : Katalog Software ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Katalog_Software_ALELEON_Supercomputer
+  📏 Length: 1932 chars
+  📝 Preview: $
+ml av
+keyword
+Mengaktifkan modul software
+$
+ml
+nama-modul
+Abaikan pesan berikut
+apabila muncul setelah memuat modul:
+Lmod Warning:
+The following dependent module(s) are not currently loaded: ...
+Mel...
+----------------------------------------------------------------------
+
+[Chunk 10] ID: 5b6725e3-f51a-468e-a84e-812647782427
+  📄 Title : Katalog Software ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Katalog_Software_ALELEON_Supercomputer
+  📏 Length: 1983 chars
+  📝 Preview: Open MPI 5.0.8
+(GCC 15.2.0)
+openmpi/5.0.8-gcc-15.2.0-bip
+Open MPI 5.0.8
+(GCC 15.2.0 + CUDA 12.9.0)
+openmpi/5.0.8-gcc-15.2.0-cuda-12.9.0-neq
+`
+4.3. Library Matematika
+Library matematika mencakup BLAS, ...
+----------------------------------------------------------------------
+
+[Chunk 11] ID: af3a89af-4f8a-44cd-92c8-0440e7f2e823
+  📄 Title : Katalog Software ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Katalog_Software_ALELEON_Supercomputer
+  📏 Length: 1581 chars
+  📝 Preview: Compute node GPU (Partisi ampere) terpasang 2x RTX 3090 NVLink sehingga rekomendasi gunakan
+multi-GPU NVIDIA library
+seperti NVIDIA NCCL.
+- Modul library NVIDIA -
+Kategori
+Nama dan Versi
+Nama Modul
+Co...
+----------------------------------------------------------------------
+
+[Chunk 12] ID: 209f95b0-6aea-4abb-8cbe-5783f40c4c65
+  📄 Title : Pendaftaran dan Biaya ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Pendaftaran_dan_Biaya_ALELEON_Supercomputer
+  📏 Length: 1942 chars
+  📝 Preview: Halaman ini memuat informasi pendaftaran akun untuk menggunakan ALELEON Supercomputer beserta biayanya.
+- Daftar Isi -
+Kontak EFISON
+Spesifikasi dan Alokasi Penggunaan ALELEON
+Core Hour: Metrik Penggu...
+----------------------------------------------------------------------
+
+[Chunk 13] ID: cc1efd2a-9a9d-4179-a2e2-ff075b68caa5
+  📄 Title : Pendaftaran dan Biaya ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Pendaftaran_dan_Biaya_ALELEON_Supercomputer
+  📏 Length: 1920 chars
+  📝 Preview: Ketentuan akun golongan perseorangan:
+Pengguna perseorangan adalah Warga Negara Indonesia (WNI).
+Setuju dengan
+[
+Syarat dan Ketentuan Pengguna HPC ALELEON
+]
+Setiap pengguna mendapatkan satu akun yang ...
+----------------------------------------------------------------------
+
+[Chunk 14] ID: 8a4b18a2-2624-49fe-bedd-16a9b3a30305
+  📄 Title : Pendaftaran dan Biaya ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Pendaftaran_dan_Biaya_ALELEON_Supercomputer
+  📏 Length: 1827 chars
+  📝 Preview: yang menjadi acuan penggunaan baik secara bisnis dan teknis.
+PKSPIAS ditandatangani atas nama institusi dengan kredensial institusi seperti cap resmi.
+5. Biaya Layanan Core Hour ALELEON
+Berikut adalah...
+----------------------------------------------------------------------
+
+[Chunk 15] ID: f14ee87e-ada7-49d3-bbb8-17fd1f7bf685
+  📄 Title : R
+  🔗 Source: https://wiki.efisonlt.com/wiki/R
+  📏 Length: 1965 chars
+  📝 Preview: R adalah bahasa interpreter yang didesain untuk mengerjakan komputasi statistika. Pada perkembangannya, bahasa R digunakan untuk pengolahan data di bidang
+data science
+. Software R didukung oleh
+The R...
+----------------------------------------------------------------------
+
+[Chunk 16] ID: 6b1da1ae-a7fd-4a65-be12-353d9acf83a2
+  📄 Title : R
+  🔗 Source: https://wiki.efisonlt.com/wiki/R
+  📏 Length: 1982 chars
+  📝 Preview: ')
+Package akan terinstal di direktori
+HOME user
+.
+Bagi user yang pertama kali melakukan instalasi package R:
+Akan ada prompt untuk mengarahkan instalasi ke personal library, jawab
+yes
+.
+Warning in in...
+----------------------------------------------------------------------
+
+[Chunk 17] ID: fa398f54-5963-435b-b468-f4fd7fcf9381
+  📄 Title : R
+  🔗 Source: https://wiki.efisonlt.com/wiki/R
+  📏 Length: 1987 chars
+  📝 Preview: # -----------------------------------------------------
+# Alokasi komputasi SBATCH, input, dan module
+# -----------------------------------------------------
+# Alokasi jumlah core thread CPU
+#SBATCH -...
+----------------------------------------------------------------------
+
+[Chunk 18] ID: a86aa635-e78c-4c29-b78b-a0d7ce979a05
+  📄 Title : R
+  🔗 Source: https://wiki.efisonlt.com/wiki/R
+  📏 Length: 1997 chars
+  📝 Preview: INPUT_FILE
+=
+"////.R"
+# Memuat modul software R
+# Daftar modul lihat subbab "Modul R" di atas
+module load R////
+# ----------------------------------------------------
+# Script jalannya program
+# -----...
+----------------------------------------------------------------------
+
+[Chunk 19] ID: 0b6157f3-0215-4d5d-8c6d-f4c7562de107
+  📄 Title : R
+  🔗 Source: https://wiki.efisonlt.com/wiki/R
+  📏 Length: 1962 chars
+  📝 Preview: ->
+From Template
+3
+Pilih template R yang diinginkan:
+Nama Template
+Penjelasan
+R 4.3.0 "Already Tomorrow"
+Menjalankan R versi 4.3.0
+RMPI 4.3.0 "Already Tomorrow"
+Menjalankan R versi 4.3.0 dengan MPI
+Ke...
+----------------------------------------------------------------------
+
+[Chunk 20] ID: 678d0c03-da42-4f59-8683-98312a022e30
+  📄 Title : R
+  🔗 Source: https://wiki.efisonlt.com/wiki/R
+  📏 Length: 1969 chars
+  📝 Preview: Kolom
+Folder Contents
+.
+8
+Untuk menghapus ruang job dan datanya:
+Pilih ruang job yang akan dihapus.
+Klik menu
+Delete
+Tips
+Apabila program R gagal selesai karena package R yang belum terinstal:
+File ou...
+----------------------------------------------------------------------
+
+[Chunk 21] ID: 1ff16b80-4983-44b8-a47c-a8ec7d8d39a8
+  📄 Title : R
+  🔗 Source: https://wiki.efisonlt.com/wiki/R
+  📏 Length: 1429 chars
+  📝 Preview: Conda environment directory
+->
+Kosongkan
+Software modules
+->
+Masukkan nama modul R yang digunakan
+Environment setup
+->
+Kosongkan
+Additional Jupyter arguments
+->
+Kosongkan
+Email address
+Notifikasi emai...
+----------------------------------------------------------------------
+
+[Chunk 22] ID: 6f02c1da-8d34-44b8-a84a-59fae11085e6
+  📄 Title : Spesifikasi ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Spesifikasi_ALELEON_Supercomputer
+  📏 Length: 1974 chars
+  📝 Preview: ALELEON Supercomputer saat ini menggunakan
+ALELEON Mk.V
+- superkomputer
+custom
+EFISON generasi kelima dengan platform EFIRO v2 yang sepenuhnya operasional Oktober 2025..
+Spesifikasi Compute Node
+Compu...
+----------------------------------------------------------------------
+
+[Chunk 23] ID: 1b364c6d-a860-43d1-98a4-1bb841b319ca
+  📄 Title : Spesifikasi ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Spesifikasi_ALELEON_Supercomputer
+  📏 Length: 1528 chars
+  📝 Preview: 1.1
+Partisi epyc
+1.2
+Partisi epyc-jumbo
+1.3
+Partisi ampere
+2
+Spesifikasi Interactive Node
+2.1
+Partisi torti
+2.2
+Partisi tilla
+3
+Spesifikasi Storage
+4
+Spesifikasi Software Sistem
+Spesifikasi Software S...
+----------------------------------------------------------------------
+
+[Chunk 24] ID: 4e8b31d4-4e5d-4060-a119-65f6463c535b
+  📄 Title : GROMACS
+  🔗 Source: https://wiki.efisonlt.com/wiki/GROMACS
+  📏 Length: 1969 chars
+  📝 Preview: [
+GROMACS
+]
+adalah package berkecepatan tinggi untuk komputasi dinamika molekular baik untuk biokimia (seperti protein, lipids) maupun non-biokimia (seperti polimer).
+Panduan ini urutan
+3
+dari:
+[
+Tuto...
+----------------------------------------------------------------------
+
+[Chunk 25] ID: 1d157d12-a5b1-4e69-9770-96e8a24be3d8
+  📄 Title : GROMACS
+  🔗 Source: https://wiki.efisonlt.com/wiki/GROMACS
+  📏 Length: 1990 chars
+  📝 Preview: Pre-processing berat gunakan batch job.
+- Pre-processing di Login Node -
+Ketentuan:
+Berjalan di login node dengan
+alokasi komputasi kecil.
+Sistem tidak menghitung Core Hour.
+Hanya untuk pre-processing...
+----------------------------------------------------------------------
+
+[Chunk 26] ID: 6ebc50a6-7222-425c-91f5-2c93f3ba71a2
+  📄 Title : GROMACS
+  🔗 Source: https://wiki.efisonlt.com/wiki/GROMACS
+  📏 Length: 1970 chars
+  📝 Preview: Aktifkan environment ACPYPE:
+$
+ml Anaconda3/2024.06-1
+$
+source activate $CENV1/ACPYPE_2023.10.27
+Kemudian user dapat menggunakan
+acpype
+- / 3 / -
+Bila sudah selesai, matikan environment ACPYPE
+$
+conda...
+----------------------------------------------------------------------
+
+[Chunk 27] ID: de82834b-4475-4186-bd15-64bcfd94d82e
+  📄 Title : GROMACS
+  🔗 Source: https://wiki.efisonlt.com/wiki/GROMACS
+  📏 Length: 1980 chars
+  📝 Preview: $
+sausage
+Pilih menu
+slimit
+, job type
+Batch Job
+menghitung rentang SBATCH
+CPU, memori, GPU, dan time
+Info SBATCH lainnya:
+SBATCH untuk notifikasi email status job lihat
+[
+Slurm Jojo
+]
+Info lengkap su...
+----------------------------------------------------------------------
+
+[Chunk 28] ID: da05bcb8-3700-4b9a-aafe-8a112416ce52
+  📄 Title : GROMACS
+  🔗 Source: https://wiki.efisonlt.com/wiki/GROMACS
+  📏 Length: 1969 chars
+  📝 Preview: Pilih ruang job yang akan dihapus lalu klik
+[Delete]
+Perhatikan opsi ini
+menghapus data
+di ruang job tersebut.
+---
+Di Terminal / Shell
+Tutorial ini mengasumsikan user dapat menggunakan CLI.
+1
+Akses / ...
+----------------------------------------------------------------------
+
+[Chunk 29] ID: 1be51b4e-2c4a-4af7-88b3-cefccc1266d7
+  📄 Title : GROMACS
+  🔗 Source: https://wiki.efisonlt.com/wiki/GROMACS
+  📏 Length: 1998 chars
+  📝 Preview: #SBATCH --time=////
+# File output terminal, %j merekap no ID job
+#SBATCH --output=result-%j.txt
+# File output log status dan error (bila ada)
+#SBATCH --error=error-%j.txt
+# ---------------------------...
+----------------------------------------------------------------------
+
+[Chunk 30] ID: 6ac5abc4-3010-426b-a36f-0039edd8fd89
+  📄 Title : GROMACS
+  🔗 Source: https://wiki.efisonlt.com/wiki/GROMACS
+  📏 Length: 1998 chars
+  📝 Preview: # Limit waktu job (HH:MM:SS atau D-HH:MM:SS)
+# ex: 1 hari -> 24:00:00 atau 1-00:00:00
+#SBATCH --time=////
+# File output terminal, %j merekap no ID job
+#SBATCH --output=result-%j.txt
+# File output log ...
+----------------------------------------------------------------------
+
+[Chunk 31] ID: 3412d933-268a-4ecd-9532-249897b33848
+  📄 Title : GROMACS
+  🔗 Source: https://wiki.efisonlt.com/wiki/GROMACS
+  📏 Length: 1566 chars
+  📝 Preview: Buka menu
+Jobs > Active Jobs
+Bila belum, ganti mode
+All Jobs
+ke
+Your Jobs
+Klik tombol
+>
+pada job user yang akan dipantau
+Pembacaan utilisasi CPU dan memori ada dibawah.
+Membaca cgroup usage, mean, las...
+----------------------------------------------------------------------
+
+[Chunk 32] ID: e1e9309d-ff8c-4eee-8e2a-993416bf5641
+  📄 Title : NWChem
+  🔗 Source: https://wiki.efisonlt.com/wiki/NWChem
+  📏 Length: 1989 chars
+  📝 Preview: NWChem
+adalah software komputasi kimia untuk biomolekul, kimia kuantum, kimia klasik,
+Gaussian, nanostructures, solid-state, ground-state, excite-state
+, dan sebagainya.
+Daftar isi
+1
+Modul NWChem
+2
+Pi...
+----------------------------------------------------------------------
+
+[Chunk 33] ID: 5f77105b-02d9-45fd-8acf-71f9ffa6f224
+  📄 Title : NWChem
+  🔗 Source: https://wiki.efisonlt.com/wiki/NWChem
+  📏 Length: 1990 chars
+  📝 Preview: # Alokasi jumlah core thread CPU
+#SBATCH --ntasks=////
+# Alokasi jumlah memori RAM (satuan GB)
+#SBATCH --mem=////GB
+# Alokasi limit waktu menjalankan job
+# Format HH:MM:SS atau D-HH:MM:SS
+#SBATCH --ti...
+----------------------------------------------------------------------
+
+[Chunk 34] ID: e8ceb740-d1e0-4a3b-9a13-6842560738bd
+  📄 Title : NWChem
+  🔗 Source: https://wiki.efisonlt.com/wiki/NWChem
+  📏 Length: 1955 chars
+  📝 Preview: $ scancel 231
+Job Submission Web EFIRO
+Langkah Job Submission Web EFIRO
+1
+Login ke web EFIRO
+ALELEON Supercomputer.
+2
+Buka pinned apps
+Job Composer
+di homepage EFIRO.
+Pilih menu
+New Job
+->
+From Templa...
+----------------------------------------------------------------------
+
+[Chunk 35] ID: 9c693b97-f62d-4104-a111-d73f6fb1506b
+  📄 Title : NWChem
+  🔗 Source: https://wiki.efisonlt.com/wiki/NWChem
+  📏 Length: 411 chars
+  📝 Preview: Folder Contents
+Atau dengan membuka menu
+Edit Files
+Kolom
+Folder Contents
+.
+8
+Untuk menghapus ruang job dan datanya:
+Pilih ruang job yang akan dihapus.
+Klik menu
+Delete
+Pelaporan Kendala dan Support
+A...
+----------------------------------------------------------------------
+
+[Chunk 36] ID: 720da7f5-dfc7-4551-a13e-5867136ac6bc
+  📄 Title : Quantum ESPRESSO
+  🔗 Source: https://wiki.efisonlt.com/wiki/Quantum_ESPRESSO
+  📏 Length: 1990 chars
+  📝 Preview: [
+Quantum ESPRESSO
+]
+adalah framework suite untuk kalkulasi
+electronic-structure
+dan modeling material berdasarkan
+density-functional theory
+(DFT)
+, plane waves
+, dan
+pseudopotentials
+.
+Halaman ini ba...
+----------------------------------------------------------------------
+
+[Chunk 37] ID: 29316e9c-db16-4009-9fde-549e45d78fa8
+  📄 Title : Quantum ESPRESSO
+  🔗 Source: https://wiki.efisonlt.com/wiki/Quantum_ESPRESSO
+  📏 Length: 1997 chars
+  📝 Preview: a.
+Klik
+[Open Editor]
+b.
+Ikuti petunjuk
+NOTES
+dan alur script di dalamnya.
+c.
+Klik
+[Save]
+untuk menyimpan script.
+Info lengkap submit script lihat
+[
+Submit Script ALELEON
+]
+.
+(5)
+Jalankan job dengan k...
+----------------------------------------------------------------------
+
+[Chunk 38] ID: 675f0251-9a09-4abf-8efc-0cf0f7dfaafa
+  📄 Title : Quantum ESPRESSO
+  🔗 Source: https://wiki.efisonlt.com/wiki/Quantum_ESPRESSO
+  📏 Length: 1969 chars
+  📝 Preview: Pilih ruang job yang akan dihapus.
+Klik
+[Delete]
+*
+2B. Batch Job dengan Slurm di Terminal
+.
+Batch job berjalan di
+[
+compute node
+]
+Panduan ini mengasumsikan user dapat menggunakan terminal Linux.
+(1)
+...
+----------------------------------------------------------------------
+
+[Chunk 39] ID: 562b7a46-bfe3-48d0-8823-a7a6d132deac
+  📄 Title : Quantum ESPRESSO
+  🔗 Source: https://wiki.efisonlt.com/wiki/Quantum_ESPRESSO
+  📏 Length: 1956 chars
+  📝 Preview: # > File output status dan error
+#SBATCH --error=error-%j.txt
+# --------------------------------------------------
+# Script jalannya program
+# --------------------------------------------------
+# Memu...
+----------------------------------------------------------------------
+
+[Chunk 40] ID: e18c569f-ce9f-4204-8aa5-4c289b902e82
+  📄 Title : Quantum ESPRESSO
+  🔗 Source: https://wiki.efisonlt.com/wiki/Quantum_ESPRESSO
+  📏 Length: 1559 chars
+  📝 Preview: - contoh membatalkan job ID 231:
+$
+scancel
+231
+CG (COMPLETING)
+- job selesai dan proses
+clean-up
+.
+CA (CANCELED)
+- job dibatalkan user.
+PR (PREEMPETED)
+- job dibatalkan oleh tim admin.
+Notifikasi dan ...
+----------------------------------------------------------------------
+
+[Chunk 41] ID: 7d791cff-1f25-41a0-9a07-691e51b4d31a
+  📄 Title : GAMESS
+  🔗 Source: https://wiki.efisonlt.com/wiki/GAMESS
+  📏 Length: 1990 chars
+  📝 Preview: GAMESS
+(General Atomic and Molecular Electronic Structure System) adalah package
+ab-inito
+kimia kuantum untuk komputasi SCF Wavefunctions.
+Daftar isi
+1
+Modul GAMESS
+2
+Pilihan Menjalankan Komputasi
+2.1...
+----------------------------------------------------------------------
+
+[Chunk 42] ID: ba8170d9-ef58-4938-9dd6-a2454b49d931
+  📄 Title : GAMESS
+  🔗 Source: https://wiki.efisonlt.com/wiki/GAMESS
+  📏 Length: 1999 chars
+  📝 Preview: # Alokasi jumlah core thread CPU
+#SBATCH --ntasks=////
+# Alokasi jumlah memori RAM (satuan GB)
+#SBATCH --mem=////GB
+# Alokasi limit waktu menjalankan job
+# Format HH:MM:SS atau D-HH:MM:SS
+#SBATCH --ti...
+----------------------------------------------------------------------
+
+[Chunk 43] ID: d3ed24d3-821b-48e0-840b-62d21c904cdd
+  📄 Title : GAMESS
+  🔗 Source: https://wiki.efisonlt.com/wiki/GAMESS
+  📏 Length: 1937 chars
+  📝 Preview: Job Submission Web EFIRO
+Langkah Job Submission Web EFIRO
+1
+Login ke web EFIRO
+ALELEON Supercomputer.
+2
+Buka pinned apps
+Job Composer
+di homepage EFIRO.
+Pilih menu
+New Job
+->
+From Template
+3
+Pilih tem...
+----------------------------------------------------------------------
+
+[Chunk 44] ID: 8d0e84ba-2211-40bb-aac7-df715cb99fae
+  📄 Title : GAMESS
+  🔗 Source: https://wiki.efisonlt.com/wiki/GAMESS
+  📏 Length: 411 chars
+  📝 Preview: Folder Contents
+Atau dengan membuka menu
+Edit Files
+Kolom
+Folder Contents
+.
+8
+Untuk menghapus ruang job dan datanya:
+Pilih ruang job yang akan dihapus.
+Klik menu
+Delete
+Pelaporan Kendala dan Support
+A...
+----------------------------------------------------------------------
+
+[Chunk 45] ID: 1e927557-1127-490e-b0a7-26b092842f14
+  📄 Title : NAMD
+  🔗 Source: https://wiki.efisonlt.com/wiki/NAMD
+  📏 Length: 1981 chars
+  📝 Preview: NAMD
+adalah framework dinamika molekular yang digunakan untuk komputasi biomolekuler skala besar di HPC. NAMD mendukung komputasi paralel.
+Daftar isi
+1
+Modul NAMD
+2
+Pilihan Menjalankan Komputasi
+2.1
+J...
+----------------------------------------------------------------------
+
+[Chunk 46] ID: 08d0ac2c-e686-4a1b-8af5-738a548283c1
+  📄 Title : NAMD
+  🔗 Source: https://wiki.efisonlt.com/wiki/NAMD
+  📏 Length: 1992 chars
+  📝 Preview: # -----------------------------------------------------
+# Alokasi komputasi SBATCH, input, dan module
+# -----------------------------------------------------
+# Alokasi jumlah core thread CPU
+#SBATCH -...
+----------------------------------------------------------------------
+
+[Chunk 47] ID: fece7aee-3658-4c4e-8385-8d555762ff4a
+  📄 Title : NAMD
+  🔗 Source: https://wiki.efisonlt.com/wiki/NAMD
+  📏 Length: 1971 chars
+  📝 Preview: #SBATCH --output=result-%j.txt
+# Definisi file untuk menampung output error log
+#SBATCH --error=error-%j.txt
+# Nama input file NAMD yang dijalankan
+INPUT_FILE
+=
+"////.conf"
+# Memuat modul software NAM...
+----------------------------------------------------------------------
+
+[Chunk 48] ID: 75ebe03d-2067-490e-88ac-559925feed18
+  📄 Title : NAMD
+  🔗 Source: https://wiki.efisonlt.com/wiki/NAMD
+  📏 Length: 1995 chars
+  📝 Preview: Nama Template
+Penjelasan
+NAMD 2.14 (CPU)
+Menjalankan NAMD 2.14 pada CPU
+NAMD 2.14 (GPU)
+Menjalankan NAMD 2.14 dengan akselerasi GPU.
+Kemudian Isi
+Job Name
+dan klik
+Create New Job
+4
+Siapkan file komput...
+----------------------------------------------------------------------
+
+[Chunk 49] ID: 85819607-4234-4053-9df0-5f1b69437517
+  📄 Title : ORCA
+  🔗 Source: https://wiki.efisonlt.com/wiki/ORCA
+  📏 Length: 1987 chars
+  📝 Preview: [
+ORCA
+]
+adalah package ab-inito kimia kuantum yang menyediakan semua metode
+electronic structure
+seperti
+density functional theory, many-body perturbation and coupled cluster theories
+, dll.
+Halaman ...
+----------------------------------------------------------------------
+
+[Chunk 50] ID: d4e7924a-909f-4922-ab13-b0479bba25ea
+  📄 Title : ORCA
+  🔗 Source: https://wiki.efisonlt.com/wiki/ORCA
+  📏 Length: 1985 chars
+  📝 Preview: %PAL NPROCS 64 END
+*
+3. Pilihan Menjalankan Komputasi
+Pilih sesuai preferensi user:
+[ 3A ]
+- Batch job
+tampilan web
+dengan
+Job Composer EFIRO Web Service.
+[ 3B ]
+- Batch job
+terminal
+dengan
+Slurm.
+Pen...
+----------------------------------------------------------------------
+
+[Chunk 51] ID: 2d9d58a5-3be3-40d0-9a1f-f94ead312122
+  📄 Title : ORCA
+  🔗 Source: https://wiki.efisonlt.com/wiki/ORCA
+  📏 Length: 1983 chars
+  📝 Preview: dan tutup.
+Untuk mengaktifkan pembacaan utilisasi cgroup.
+3.
+Buka menu
+Jobs > Active Jobs
+4.
+Bila belum, ganti mode
+All Jobs
+ke
+Your Jobs
+5.
+Klik tombol
+pada job user yang akan dipantau.
+6.
+Lihat moni...
+----------------------------------------------------------------------
+
+[Chunk 52] ID: 8e4b4f2d-dbff-4fb8-b978-159988589e6c
+  📄 Title : ORCA
+  🔗 Source: https://wiki.efisonlt.com/wiki/ORCA
+  📏 Length: 1983 chars
+  📝 Preview: # --------------------------------------------------
+# ------ Spesifikasi reservasi job (SBATCH) --------
+# Terdapat rentang nilai di SBATCH alokasi komputasi
+# berdasarkan ketentuan metrik (SLA) ALEL...
+----------------------------------------------------------------------
+
+[Chunk 53] ID: 99d47222-c574-4a6e-a2fd-1900083652a8
+  📄 Title : ORCA
+  🔗 Source: https://wiki.efisonlt.com/wiki/ORCA
+  📏 Length: 1769 chars
+  📝 Preview: -> output terminal
+error-
+jobID
+.txt
+-> log status job
+Monitor Sausage -
+Jalankan sausage:
+$
+sausage
+1. Menu
+sausage
+: Konsumsi Core Hour
+2. Menu
+sfair
+: Konsumsi alokasi komputasi
+dan sisa limit LFU
+...
+----------------------------------------------------------------------
+
+[Chunk 54] ID: 1b2ab5f5-42b5-4a5f-aa80-e5a154512503
+  📄 Title : Koneksi VPN ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Koneksi_VPN_ALELEON_Supercomputer
+  📏 Length: 1999 chars
+  📝 Preview: HOL'UP! Halaman ini bersifat LEGACY untuk ALELEON Mk.III (saat ini sudah Mk.V).
+Kebijakan keamanan ALELEON Supercomputer
+(Mk.III)
+mewajibkan user untuk login melalui koneksi VPN dari EFISON dengan
+Ope...
+----------------------------------------------------------------------
+
+[Chunk 55] ID: 3b9f67f0-bc76-4cf3-9d2d-0a16e0f56fe4
+  📄 Title : Koneksi VPN ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Koneksi_VPN_ALELEON_Supercomputer
+  📏 Length: 1899 chars
+  📝 Preview: Ikuti langkah berikut untuk menambah dan mengaktifkan profil OVPN sesuai perangkat user masing-masing:
+Langkah untuk user
+[
+Windows / MacOS / Android / iOS
+]
+Langkab untuk user
+[
+Linux
+]
+Langkah untuk...
+----------------------------------------------------------------------
+
+[Chunk 56] ID: b707a982-2c12-4442-9ab2-369d648cf9db
+  📄 Title : Koneksi VPN ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Koneksi_VPN_ALELEON_Supercomputer
+  📏 Length: 395 chars
+  📝 Preview: Jangan tutup terminal ini supaya koneksi OVPN tetap berjalan.
+- / 4 / -
+Untuk menutup koneksi VPN lakukan
+ctlr + C
+pada terminal tersebut.
+---
+4. Update Profil OVPN ALELEON
+Tim admin akan selalu membe...
+----------------------------------------------------------------------
+
+[Chunk 57] ID: ce5d4c66-21a8-4a3a-9cba-69b51f88451c
+  📄 Title : COMCOT
+  🔗 Source: https://wiki.efisonlt.com/wiki/COMCOT
+  📏 Length: 1982 chars
+  📝 Preview: COMCOT (Cornell Multi-grid Coupled Tsunami Grid)
+adalah software pemodelan tsunami yang menggunakan metode
+Shallow Water Equations
+.
+Daftar isi
+1
+Modul COMCOT
+2
+Pilihan Menjalankan Komputasi
+2.1
+Job S...
+----------------------------------------------------------------------
+
+[Chunk 58] ID: 9d325b59-cb34-4645-9d4d-494a4166d635
+  📄 Title : COMCOT
+  🔗 Source: https://wiki.efisonlt.com/wiki/COMCOT
+  📏 Length: 1990 chars
+  📝 Preview: #SBATCH --ntasks=////
+# Alokasi jumlah memori RAM (satuan GB)
+#SBATCH --mem=////GB
+# Alokasi limit waktu menjalankan job
+# Format HH:MM:SS atau D-HH:MM:SS
+#SBATCH --time=////
+# Definisi file untuk men...
+----------------------------------------------------------------------
+
+[Chunk 59] ID: eea5dab2-385d-43cf-940d-2d596925927f
+  📄 Title : COMCOT
+  🔗 Source: https://wiki.efisonlt.com/wiki/COMCOT
+  📏 Length: 1923 chars
+  📝 Preview: Job Composer
+di homepage EFIRO.
+Pilih menu
+New Job
+->
+From Template
+3
+Pilih template COMCOT yang diinginkan:
+Nama Template
+Penjelasan
+COMCOT 1.7
+Menjalankan COMCOT versi 1.7
+Isi
+Job Name
+dan klik
+Crea...
+----------------------------------------------------------------------
+
+[Chunk 60] ID: bc400a43-2046-4c79-91f2-8c815bcf245d
+  📄 Title : COMCOT
+  🔗 Source: https://wiki.efisonlt.com/wiki/COMCOT
+  📏 Length: 294 chars
+  📝 Preview: Pilih ruang job yang akan dihapus.
+Klik menu
+Delete
+Pelaporan Kendala dan Support
+Apabila menjumpai masalah teknis dalam menjalankan komputasi, silahkan lapor dengan klik gambar berikut ini.
+---
+Bila ...
+----------------------------------------------------------------------
+
+[Chunk 61] ID: ad855dc2-702b-412a-be14-c9ee86d0b07a
+  📄 Title : PHASE/0
+  🔗 Source: https://wiki.efisonlt.com/wiki/PHASE/0
+  📏 Length: 1986 chars
+  📝 Preview: [
+PHASE/0
+]
+adalah program untuk menghitung struktur elektronik yang berbasis DFT (density functional theory) dan skema pseudopotensial. Program ini dapat memperkirakan ciri fisik dari material yang t...
+----------------------------------------------------------------------
+
+[Chunk 62] ID: d002c988-975c-4c93-a2fb-6b3b5faceb84
+  📄 Title : PHASE/0
+  🔗 Source: https://wiki.efisonlt.com/wiki/PHASE/0
+  📏 Length: 1963 chars
+  📝 Preview: c.
+Klik
+[Save]
+untuk menyimpan script.
+Info lengkap submit script lihat
+[
+Submit Script ALELEON
+]
+.
+(5)
+Jalankan job dengan klik
+[Submit]
+.
+(6)
+Pantau status dan output job:
+Refresh halaman Job Compos...
+----------------------------------------------------------------------
+
+[Chunk 63] ID: 72555b09-c590-4851-a520-2bf1b8f2664c
+  📄 Title : PHASE/0
+  🔗 Source: https://wiki.efisonlt.com/wiki/PHASE/0
+  📏 Length: 1988 chars
+  📝 Preview: ]
+Panduan ini mengasumsikan user dapat menggunakan terminal Linux.
+(1)
+Buka terminal ALELEON dengan opsi:
+[
+Login SSH
+];
+atau
+Login
+[
+EFIRO Web Service
+]
+, menu
+Clusters > Aleleon Shell Access
+.
+(2)
+U...
+----------------------------------------------------------------------
+
+[Chunk 64] ID: 5a110d26-07aa-44a1-8e4d-8369b401e1d4
+  📄 Title : PHASE/0
+  🔗 Source: https://wiki.efisonlt.com/wiki/PHASE/0
+  📏 Length: 1992 chars
+  📝 Preview: # Memuat modul Lmod PHASE/0
+# Daftar nama dan info modul lihat subbab 1
+module load PHASE0////
+# Input binary untuk menjalankan PHASE/0
+# Pilihan:
+#   phase
+#   phase-3d    (alternatif phase)
+#   ekca...
+----------------------------------------------------------------------
+
+[Chunk 65] ID: 2f6cd4b5-0f7b-4de6-a489-16c921a99507
+  📄 Title : PHASE/0
+  🔗 Source: https://wiki.efisonlt.com/wiki/PHASE/0
+  📏 Length: 844 chars
+  📝 Preview: - job ditahan oleh tim admin.
+Notifikasi dan alasan dikabarkan via email support.
+Bila user merasa job gagal berjalan:
+Job tertahan
+(state
+PENDING
+)
+dalam waktu lama -> lihat
+[
+Troubleshooting 1
+]
+Kom...
+----------------------------------------------------------------------
+
+[Chunk 66] ID: 371517f9-864c-46dc-9f43-81aca4ded006
+  📄 Title : EasyBuild
+  🔗 Source: https://wiki.efisonlt.com/wiki/EasyBuild
+  📏 Length: 2106 chars
+  📝 Preview: Daftar isi
+1
+Deskripsi
+2
+Mengatur Direktori Instalasi Software
+3
+Melihat Daftar Software yang Tersedia dari EasyConfig
+4
+Melakukan Proses Instalasi Otomatis
+5
+Menambah Module
+5.1
+Sementara
+5.2
+Permane...
+----------------------------------------------------------------------
+
+[Chunk 67] ID: b0db9b71-5ae3-4976-9201-a7544e7a3e2b
+  📄 Title : MPI ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/MPI_ALELEON_Supercomputer
+  📏 Length: 1952 chars
+  📝 Preview: Halaman ini menjelaskan teknis menjalankan program
+MPI
+di ALELEON Supercomputer secara
+[
+batch job
+]
+melalui
+[
+submit script
+]
+. Ditujukan untuk
+user yang hendak mendalami
+dan menjalankan program MPI
+...
+----------------------------------------------------------------------
+
+[Chunk 68] ID: 77b02180-7c14-4474-9f8e-91ee55e52e97
+  📄 Title : MPI ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/MPI_ALELEON_Supercomputer
+  📏 Length: 1991 chars
+  📝 Preview: Mencakup berbagai kombinasi SBATCH yang berhubungan dengan alokasi CPU contoh
+ntasks
+*
+cpus-per-task
+,
+nodes
+*
+ntasks-per-node
+, dll.
+Flag
+--use-hwthread-cpus
+untuk menyebarkan proses MPI ke thread CP...
+----------------------------------------------------------------------
+
+[Chunk 69] ID: c14d0aea-e8ad-47c5-a629-bb30122eb7b3
+  📄 Title : MPI ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/MPI_ALELEON_Supercomputer
+  📏 Length: 1927 chars
+  📝 Preview: 192 proses MPI menggunakan 2 node.
+User mengisi SBATCH mem sebesar = 400GB / 2 =
+200GB
+`
+3.3. Opsi Skenario Menjalankan MPI CPU
+Berikut daftar opsi dan skenario berdasarkan penyebaran jumlah proses MP...
+----------------------------------------------------------------------
+
+[Chunk 70] ID: 27e901b6-b8c4-4591-a19b-f1e5b04b7314
+  📄 Title : MPI ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/MPI_ALELEON_Supercomputer
+  📏 Length: 573 chars
+  📝 Preview: # Lihat penjelasan di bawah, sesuaikan dengan jenis OMP
+# Perintah menjalankan program MPI
+# $SLURM_NTASKS mewakili ntasks * cpus-per-task
+mpirun -np
+${
+SLURM_NTASKS
+}
+--use-hwthread-cpus ////
+Berikut...
+----------------------------------------------------------------------
+
+[Chunk 71] ID: 2314cc2f-d434-4da6-a8d8-9145916cda70
+  📄 Title : MPI ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/MPI_ALELEON_Supercomputer
+  📏 Length: 333 chars
+  📝 Preview: # Threading OMP
+AMD BLIS
+(BLAS-like Library Instantiation Software)
+export BLIS_JC_NT=1
+export BLIS_IC_NT=${SLURM_CPUS_PER_TASK}
+export BLIS_JR_NT=1
+export BLIS_IR_NT=1
+
+# Threading OMP
+OpenBLAS
+threa...
+----------------------------------------------------------------------
+
+[Chunk 72] ID: e1ce21f9-304d-4b56-bcd3-0a49e422b285
+  📄 Title : MPI ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/MPI_ALELEON_Supercomputer
+  📏 Length: 1994 chars
+  📝 Preview: # Threading OMP
+Intel MKL
+(Math Kernel Library)
+threads=${SLURM_CPUS_PER_TASK}
+export OMP_NUM_THREADS=${threads}
+export MKL_NUM_THREADS=${threads}
+3.3.3. Pure MPI pada Core Fisik
+Secara standar Slurm ...
+----------------------------------------------------------------------
+
+[Chunk 73] ID: fcb38aef-97ec-435d-89f0-771b9322f9c4
+  📄 Title : MPI ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/MPI_ALELEON_Supercomputer
+  📏 Length: 1988 chars
+  📝 Preview: Selain Pure MPI, user juga dapat menjalankan program hybrid MPI/OMP secara multi-node manual dengan catatan:
+SBATCH
+cpus-per-task
+berlaku
+per node
+.
+Total alokasi CPU =
+nodes
+*
+ntasks-per-node
+*
+cpus-...
+----------------------------------------------------------------------
+
+[Chunk 74] ID: 04227a3a-b73d-4114-bb31-88a05710609d
+  📄 Title : MPI ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/MPI_ALELEON_Supercomputer
+  📏 Length: 1888 chars
+  📝 Preview: # Partisi GPU
+#SBATCH --partition=ampere
+# Alokasi jumlah core thread CPU dan jumlah proses MPI
+#SBATCH --ntasks=////
+# Alokasi jumlah GPU
+#SBATCH --gpus=////
+# SBATCH lain dan alur jalannya program ....
+----------------------------------------------------------------------
+
+[Chunk 75] ID: 2c474052-6a73-4569-ae30-4883262922ee
+  📄 Title : EUREKA!
+  🔗 Source: https://wiki.efisonlt.com/wiki/EUREKA!
+  📏 Length: 413 chars
+  📝 Preview: EUREKA! adalah
+program sponsorship layanan gratis penggunaan ALELEON Superkomputer
+bagi Warga Negara Indonesia yang sedang mengerjakan penelitian atau riset demi memajukan ilmu pengetahuan dan teknolo...
+----------------------------------------------------------------------
+
+[Chunk 76] ID: e9202446-0fa4-44de-afb0-a96ad590e8d5
+  📄 Title : EUREKA! Periode 2
+  🔗 Source: https://wiki.efisonlt.com/wiki/EUREKA!_Periode_2
+  📏 Length: 2044 chars
+  📝 Preview: EUREKA! Periode 2 adalah instalasi kedua dari
+EUREKA!
+yaitu program sponsorship layanan gratis penggunaan ALELEON bagi Warga Negara Indonesia yang sedang mengerjakan penelitian atau riset demi memajuk...
+----------------------------------------------------------------------
+
+[Chunk 77] ID: 734c66ef-8c3c-4419-be9f-53d4477c49b7
+  📄 Title : Daftar Software Komputasi dan Tutorial Penggunaan
+  🔗 Source: https://wiki.efisonlt.com/wiki/Daftar_Software_Komputasi_dan_Tutorial_Penggunaan
+  📏 Length: 1875 chars
+  📝 Preview: Halaman ini bagian dari:
+[
+Tutorial Menggunakan ALELEON Mk.V
+]
+Halaman ini merangkum daftar software komputasi dan tutorial menjalankannya di ALELEON Supercomputer.
+Sausage dan Pengenalan Komputasi
+AL...
+----------------------------------------------------------------------
+
+[Chunk 78] ID: 5184d8d2-edf0-44ad-9871-60e3cf275ff1
+  📄 Title : CP2K
+  🔗 Source: https://wiki.efisonlt.com/wiki/CP2K
+  📏 Length: 1967 chars
+  📝 Preview: [
+CP2K
+]
+adalah package untuk
+quantum chemistry
+dan
+solid state physics
+yang dapat melakukan simulasi liquid, molekolar, periodik, material, kristal, dan sistem biologis. CP2K menggunakan pemodelan DF...
+----------------------------------------------------------------------
+
+[Chunk 79] ID: b31c2943-33ce-4ac5-83b1-f1d6685c80d1
+  📄 Title : CP2K
+  🔗 Source: https://wiki.efisonlt.com/wiki/CP2K
+  📏 Length: 1991 chars
+  📝 Preview: Job Name
+dan klik
+[Create New Job]
+3
+Siapkan file komputasi yang dibutuhkan di ruang job ini:
+Upload / edit file di menu
+[Edit Files]
+Limit upload 100MB per file, bila lebih pakai
+[
+aplikasi SFTP
+]
+Bi...
+----------------------------------------------------------------------
+
+[Chunk 80] ID: 5f1685e4-6e06-4836-a2ab-79a8f88db69c
+  📄 Title : CP2K
+  🔗 Source: https://wiki.efisonlt.com/wiki/CP2K
+  📏 Length: 1986 chars
+  📝 Preview: Completed
+- job selesai.
+User dapat menjalankan ulang job dengan klik
+[Submit]
+Failed
+- job berhenti karena error atau distop user.
+Apabila user merasa job gagal berjalan:
+Job tertahan
+(status Queue)
+...
+----------------------------------------------------------------------
+
+[Chunk 81] ID: 1a80f32d-74a0-4a98-8934-6f57d2c0d1f5
+  📄 Title : CP2K
+  🔗 Source: https://wiki.efisonlt.com/wiki/CP2K
+  📏 Length: 1998 chars
+  📝 Preview: #    User dapat mengubah bagian yang perlu diubah.
+# -----------------------------------------------------
+# -----------------------------------------------------
+# Spesifikasi job (SBATCH)
+# --------...
+----------------------------------------------------------------------
+
+[Chunk 82] ID: 9c804993-03c3-4389-ba46-7ec410313a3c
+  📄 Title : CP2K
+  🔗 Source: https://wiki.efisonlt.com/wiki/CP2K
+  📏 Length: 1988 chars
+  📝 Preview: # -----------------------------------------------------
+# Partisi GPU
+#SBATCH --partition=ampere
+# Jumlah core thread CPU, minimal 2
+#SBATCH --ntasks=////
+# Jumlah GPU, minimal 1
+#SBATCH --gpus=////
+#...
+----------------------------------------------------------------------
+
+[Chunk 83] ID: 9f6e60e7-d82a-4c10-a235-825dc1bb127a
+  📄 Title : CP2K
+  🔗 Source: https://wiki.efisonlt.com/wiki/CP2K
+  📏 Length: 1537 chars
+  📝 Preview: Bila belum, ganti mode
+All Jobs
+ke
+Your Jobs
+Klik tombol
+>
+pada job user yang akan dipantau
+Pembacaan utilisasi CPU dan memori ada dibawah.
+Membaca cgroup usage, mean, last, max, min
+Bila merasa ada s...
+----------------------------------------------------------------------
+
+[Chunk 84] ID: d2b22b49-28d1-4810-b704-33aed454d881
+  📄 Title : SPECFEM3D
+  🔗 Source: https://wiki.efisonlt.com/wiki/SPECFEM3D
+  📏 Length: 30 chars
+  📝 Preview: SPECFEM3D adalah software .......
+----------------------------------------------------------------------
+
+[Chunk 85] ID: 2de2650f-3169-460d-a833-f451d24c5c30
+  📄 Title : SW-GXN
+  🔗 Source: https://wiki.efisonlt.com/wiki/SW-GXN
+  📏 Length: 1990 chars
+  📝 Preview: Ini adalah panduan spesifik bagi user group gxn untuk menggunakan ALELEON Supercomputer.
+- Daftar isi -
+Login dan Akun ALELEON
+Login Pertama Kali
+Opsi Login
+Sausage dan Pengenalan Komputasi
+Modul FLAC...
+----------------------------------------------------------------------
+
+[Chunk 86] ID: 0488a29b-7f61-4a09-af72-ee06eba16382
+  📄 Title : SW-GXN
+  🔗 Source: https://wiki.efisonlt.com/wiki/SW-GXN
+  📏 Length: 1994 chars
+  📝 Preview: Online Documentation:
+wiki ALELEON ini.
+Change HPC Password:
+lihat
+[
+EAM - Mengganti Password
+]
+.
+Submit Support Ticket:
+menghubungi support tim admin.
+---
+`
+Menggunakan ALELEON via SSH / Terminal
+Car...
+----------------------------------------------------------------------
+
+[Chunk 87] ID: bd9efee2-e5be-4565-9e63-332134897b8b
+  📄 Title : SW-GXN
+  🔗 Source: https://wiki.efisonlt.com/wiki/SW-GXN
+  📏 Length: 1975 chars
+  📝 Preview: 4. Pilihan Menjalankan Komputasi
+Berikut opsi yang dapat dipilih sesuai kebutuhan dan preferensi user.
+Pengenalan pilihan komputasi lihat
+[
+Metode Komputasi di ALELEON
+]
+Opsi 1
+/1
+- Batch Job
+Menjalan...
+----------------------------------------------------------------------
+
+[Chunk 88] ID: aa9a22bc-cf86-4191-b238-beb4f04e43ae
+  📄 Title : SW-GXN
+  🔗 Source: https://wiki.efisonlt.com/wiki/SW-GXN
+  📏 Length: 1992 chars
+  📝 Preview: Kolom
+Folder Contents
+Kolom
+Folder Contents
+Atau menu
+[Edit Files]
+Bila mengikuti template, Slurm menghasilkan output:
+result-
+[jobID]
+.txt
+-> merekap output terminal.
+error-
+[jobID]
+.txt
+-> merekap l...
+----------------------------------------------------------------------
+
+[Chunk 89] ID: d38d765b-f209-4243-b01d-a809bb2fbf76
+  📄 Title : SW-GXN
+  🔗 Source: https://wiki.efisonlt.com/wiki/SW-GXN
+  📏 Length: 1999 chars
+  📝 Preview: Buat script dengan format
+.sh
+Nama bebas, contoh
+submit.sh
+Lengkapi script dengan contoh template di bawah ini.
+Versi satu simulasi vs array
+lihat
+Appendix 1
+Ikuti petunjuk NOTES dan alur script di da...
+----------------------------------------------------------------------
+
+[Chunk 90] ID: a6a0250f-ccaa-458e-bac2-82e0bcc00489
+  📄 Title : SW-GXN
+  🔗 Source: https://wiki.efisonlt.com/wiki/SW-GXN
+  📏 Length: 1993 chars
+  📝 Preview: export
+OMP_NUM_THREADS
+=
+$SLURM_CPUS_PER_TASK
+# Perintah menjalankan FLACS-CFD
+fgc - ////
+run_runflacs version _omp ////
+NumThreads
+=
+$SLURM_CPUS_PER_TASK
+-  Template submit script -
+- versi array
+Unt...
+----------------------------------------------------------------------
+
+[Chunk 91] ID: fcdb93c5-e106-4d74-8849-20c9faef1f56
+  📄 Title : SW-GXN
+  🔗 Source: https://wiki.efisonlt.com/wiki/SW-GXN
+  📏 Length: 1979 chars
+  📝 Preview: # Daftar modul lihat subbab "Modul FLACS-CFD" di atas
+module load flacs-cfd////
+# FLACS CS INPUT FILES WITH WILDCARD. Example: cs??????.dat3
+INPUT_FILE
+=
+"cs////.dat3"
+# Abbreviate some SLURM variable...
+----------------------------------------------------------------------
+
+[Chunk 92] ID: 9a3fc091-173e-481c-bd0c-4a4a69e8bb4d
+  📄 Title : SW-GXN
+  🔗 Source: https://wiki.efisonlt.com/wiki/SW-GXN
+  📏 Length: 1978 chars
+  📝 Preview: - Output job -
+Gunakan perintah seperti:
+ls
+,
+cat
+,
+more
+,
+tail
+, dll
+Bila mengikuti template, Slurm menghasilkan output:
+result-
+[jobID]
+.txt
+-> merekap output terminal.
+error-
+[jobID]
+.txt
+-> mereka...
+----------------------------------------------------------------------
+
+[Chunk 93] ID: 7f1f4496-72c5-46df-9eea-5d3d3a008a6a
+  📄 Title : SW-GXN
+  🔗 Source: https://wiki.efisonlt.com/wiki/SW-GXN
+  📏 Length: 849 chars
+  📝 Preview: ---
+Ketentuan support:
+Respon cepat pada hari / jam kerja EFISON -> Senin - Jumat, 09.00 - 17.30 WIB.
+Hari libur -> Sabtu - Minggu serta Hari Libur Nasional dan Cuti Bersama Pemerintah Indonesia.
+Tim ...
+----------------------------------------------------------------------
+
+[Chunk 94] ID: 026d3c9d-1fc0-4739-b14f-b06c7fab9024
+  📄 Title : SW-GXN
+  🔗 Source: https://wiki.efisonlt.com/wiki/SW-GXN
+  📏 Length: 1023 chars
+  📝 Preview: # export OMP thread dan jalankan FLACS-CFD versi OMP
+export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+run_runflacs version _omp
+[perintah input]
+NumThreads=$SLURM_CPUS_PER_TASK
+Jalan Satu Simulasi vs Array...
+----------------------------------------------------------------------
+
+[Chunk 95] ID: f909707e-f130-425e-80ba-96181c6df4df
+  📄 Title : LAMMPS
+  🔗 Source: https://wiki.efisonlt.com/wiki/LAMMPS
+  📏 Length: 1989 chars
+  📝 Preview: [
+LAMMPS
+]
+(Large-scale Atomic/Molecular Massively Parallel Simulator)
+adalah framework molekular dinamik untuk pemodelan material (
+material modelling
+). LAMMPS adalah software open-source di bawah l...
+----------------------------------------------------------------------
+
+[Chunk 96] ID: f10d4871-4700-466a-bc2a-9fd8f8e2bcdf
+  📄 Title : LAMMPS
+  🔗 Source: https://wiki.efisonlt.com/wiki/LAMMPS
+  📏 Length: 1991 chars
+  📝 Preview: [Edit Files]
+Dapat upload / download / manajemen / edit file.
+Limit upload 100MB per file
+Bila lebih gunakan
+[
+Aplikasi SFTP
+]
+- arahkan ke direktori Job Composer.
+.
+E5.
+Isi
+submit script
+untuk menjal...
+----------------------------------------------------------------------
+
+[Chunk 97] ID: 6ca9df84-a69a-448d-9ea6-b7e13b013f46
+  📄 Title : LAMMPS
+  🔗 Source: https://wiki.efisonlt.com/wiki/LAMMPS
+  📏 Length: 1978 chars
+  📝 Preview: Bila user merasa job gagal berjalan:
+Job tertahan
+(status Queue)
+dalam waktu lama -> lihat
+[
+Troubleshooting 1
+]
+Komputasi error atau berjalan tidak semestinya -> lihat
+[
+Troubleshooting 2
+]
+.
+E8.
+Unt...
+----------------------------------------------------------------------
+
+[Chunk 98] ID: 27c6f1d5-878a-4d8c-bb29-305be7125681
+  📄 Title : LAMMPS
+  🔗 Source: https://wiki.efisonlt.com/wiki/LAMMPS
+  📏 Length: 1961 chars
+  📝 Preview: # Spesifikasi job (SBATCH)
+# -----------------------------------------------------
+# Jumlah core thread CPU, minimal 2
+#SBATCH --ntasks=////
+# Jumlah memori RAM (satuan GB)
+#SBATCH --mem=////GB
+# Limi...
+----------------------------------------------------------------------
+
+[Chunk 99] ID: 0153e741-086f-4084-bdd1-c64075e5fb21
+  📄 Title : LAMMPS
+  🔗 Source: https://wiki.efisonlt.com/wiki/LAMMPS
+  📏 Length: 1985 chars
+  📝 Preview: #SBATCH --gpus=////
+# Jumlah memori RAM (satuan GB)
+#SBATCH --mem=////GB
+# Limit waktu job (HH:MM:SS atau D-HH:MM:SS)
+# ex: 1 hari -> 24:00:00 atau 1-00:00:00
+#SBATCH --time=////
+# File output termina...
+----------------------------------------------------------------------
+
+[Chunk 100] ID: 256ce003-4528-4935-b8fb-9ee126278c6d
+  📄 Title : LAMMPS
+  🔗 Source: https://wiki.efisonlt.com/wiki/LAMMPS
+  📏 Length: 1322 chars
+  📝 Preview: Bila butuh job berhenti ...
+jalankan perintah:
+$
+scancel
+[job-ID]
+- Job ID ada pada squeue diatas.
+contoh membatalkan job ID 231:
+$
+scancel
+231
+CG (COMPLETING)
+- job selesai dan proses
+clean-up
+.
+CA (...
+----------------------------------------------------------------------
+
+[Chunk 101] ID: 2664066a-fbd2-4716-af8a-b8f6764407f8
+  📄 Title : DFTB%2B
+  🔗 Source: https://wiki.efisonlt.com/wiki/DFTB%2B
+  📏 Length: 1985 chars
+  📝 Preview: DFTB+
+adalah software package yang versatil untuk simulasi
+mechanical quantum
+. DFTB+ merupakan software tidak berbayar dengan lisensi
+GNU Lesser General Public License
+.
+Daftar isi
+1
+Modul DFTB+
+2
+Me...
+----------------------------------------------------------------------
+
+[Chunk 102] ID: 7e638954-2147-466d-8803-93cd783eb662
+  📄 Title : DFTB%2B
+  🔗 Source: https://wiki.efisonlt.com/wiki/DFTB%2B
+  📏 Length: 1946 chars
+  📝 Preview: #SBATCH --ntasks
+-> mewakili jumlah task MPI
+#SBATCH --cpus-per-task
+-> mewakili jumlah thread OpenMP
+Apabila ingin MPI saja,
+isi jumlah SBATCH cpus-per-task dengan 1:
+# Pure MPI
+#SBATCH --ntasks=
+[is...
+----------------------------------------------------------------------
+
+[Chunk 103] ID: 992dbd7f-7f80-4422-a512-a24b4f54fb1a
+  📄 Title : DFTB%2B
+  🔗 Source: https://wiki.efisonlt.com/wiki/DFTB%2B
+  📏 Length: 1947 chars
+  📝 Preview: # -----------------------------------------------------
+# -----------------------------------------------------
+# Alokasi komputasi SBATCH, input, dan module
+# ----------------------------------------...
+----------------------------------------------------------------------
+
+[Chunk 104] ID: ec84e792-d4eb-4558-a44e-64fab7ea6fb7
+  📄 Title : DFTB%2B
+  🔗 Source: https://wiki.efisonlt.com/wiki/DFTB%2B
+  📏 Length: 1969 chars
+  📝 Preview: Job selesai dan dalam proses clean-up
+CA (CANCELED)
+Job dibatalkan user
+PR (PREEMPETED)
+Job dibatalkan admin, alasan dikabarkan via email
+S (SUSPENDED)
+Job ditahan admin, alasan dikabarkan via email
+A...
+----------------------------------------------------------------------
+
+[Chunk 105] ID: 64b6cb50-13c3-4e39-abcf-c6ea8d7b8cae
+  📄 Title : DFTB%2B
+  🔗 Source: https://wiki.efisonlt.com/wiki/DFTB%2B
+  📏 Length: 765 chars
+  📝 Preview: Failed
+Job berhenti karena error atau di stop user.
+Untuk melihat alasan job yang queue:
+Buka pinned apps
+Active Jobs
+di homepage EFIRO. Ubah opsi All jobs ke
+Your Jobs
+. Klik simbol
+>
+untuk melihat s...
+----------------------------------------------------------------------
+
+[Chunk 106] ID: a65d2fda-6567-4634-9213-967f1df0a800
+  📄 Title : OpenMX
+  🔗 Source: https://wiki.efisonlt.com/wiki/OpenMX
+  📏 Length: 1994 chars
+  📝 Preview: [
+OpenMX
+]
+adalah software package untuk simulasi material skala nano berdasarkan DFT (Density Functional Theories), norm-conserving pseudopotensials, dan pseudo-atomic localized basis functions.
+Hala...
+----------------------------------------------------------------------
+
+[Chunk 107] ID: c7713ec7-dd56-4b56-ac27-30073fed8b6a
+  📄 Title : OpenMX
+  🔗 Source: https://wiki.efisonlt.com/wiki/OpenMX
+  📏 Length: 1973 chars
+  📝 Preview: Limit upload 100MB per file.
+Bila lebih gunakan
+[
+Aplikasi SFTP
+]
+ke direktori Job Composer.
+.
+(4)
+Isi kolom
+submit script
+untuk menulis alur jalannya job:
+a.
+Klik
+[Open Editor]
+b.
+Ikuti petunjuk
+NOTE...
+----------------------------------------------------------------------
+
+[Chunk 108] ID: 877e0a7d-2ff9-4ca3-bfaf-fb12a3aedc43
+  📄 Title : OpenMX
+  🔗 Source: https://wiki.efisonlt.com/wiki/OpenMX
+  📏 Length: 1988 chars
+  📝 Preview: Menu
+[Edit Files]
+Arahkan
+[
+Aplikasi SFTP
+]
+ke direktori Job Composer.
+.
+User dapat menghapus ruang job dan datanya:
+Pilih ruang job yang akan dihapus.
+Klik
+[Delete]
+*
+3B. Batch Job dengan Slurm di Te...
+----------------------------------------------------------------------
+
+[Chunk 109] ID: a2d3c6b4-9f25-40f4-99d2-ea6606aea014
+  📄 Title : OpenMX
+  🔗 Source: https://wiki.efisonlt.com/wiki/OpenMX
+  📏 Length: 1998 chars
+  📝 Preview: # > Jumlah memori RAM (satuan GB)
+#SBATCH --mem=////GB
+# > Total reservasi waktu job
+# > Format HH:MM:SS atau D-HH:MM:SS
+# > ex, 1 hari: 24:00:00 atau 1-00:00:00
+#SBATCH --time=////
+# > File output te...
+----------------------------------------------------------------------
+
+[Chunk 110] ID: 7745b1f1-69b0-4d70-a2c0-f3c1f346be43
+  📄 Title : OpenMX
+  🔗 Source: https://wiki.efisonlt.com/wiki/OpenMX
+  📏 Length: 1982 chars
+  📝 Preview: Membaca cgroup usage, mean, last, max, min
+Bila butuh job berhenti ...
+jalankan perintah:
+$
+scancel
+[job-ID]
+- Job ID lihat squeue diatas.
+- contoh membatalkan job ID 231:
+$
+scancel
+231
+CG (COMPLETING...
+----------------------------------------------------------------------
+
+[Chunk 111] ID: 40269e8e-54e0-4304-bd25-75165354875a
+  📄 Title : OpenMX
+  🔗 Source: https://wiki.efisonlt.com/wiki/OpenMX
+  📏 Length: 356 chars
+  📝 Preview: ,
+isi kedua parameter tersebut:
+Contoh 2 proses MPI dan 4 thread OMP per MPI sehingga total memakai 8 core CPU:
+- Hybrid MPI/OMP, contoh 2 proses MPI dan 4 thread OMP per MPI.
+#SBATCH --ntasks=2
+#SBAT...
+----------------------------------------------------------------------
+
+[Chunk 112] ID: 8db2320d-c502-48e6-8aa7-888852b2c2c5
+  📄 Title : Publikasi Pengguna ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Publikasi_Pengguna_ALELEON_Supercomputer
+  📏 Length: 1929 chars
+  📝 Preview: Berikut adalah daftar publikasi dari pengguna yang menyertakan kredit (
+acknowledge
+) akan sistem ALELEON Supercomputer. Kami mengucapakan terima kasih banyak telah mempercayakan ALELEON Supercomputer...
+----------------------------------------------------------------------
+
+[Chunk 113] ID: aeeba4a5-2000-46bd-9423-4f86468a16d2
+  📄 Title : Publikasi Pengguna ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Publikasi_Pengguna_ALELEON_Supercomputer
+  📏 Length: 1987 chars
+  📝 Preview: Defect formation energies of Ag- and Sr-doped 3C-SiC: A first-principles study
+International Journal of Computational Materials Science and Engineering.
+DOI 10.1142/S2047684123500410
+Yosephine Novita ...
+----------------------------------------------------------------------
+
+[Chunk 114] ID: 7a3c8047-8b03-4e8c-90bf-e0c03b1aaa6b
+  📄 Title : Publikasi Pengguna ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Publikasi_Pengguna_ALELEON_Supercomputer
+  📏 Length: 146 chars
+  📝 Preview: Density Functional Theory Study of Intermolecular Interactions between Amylum and Cellulose
+Indonesia Journal of Chemistry.
+DOI 10.22146/ijc.69241...
+----------------------------------------------------------------------
+
+[Chunk 115] ID: 835dc33c-d42c-477c-83b9-b9e89f60c909
+  📄 Title : Limitasi Fair Usage ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Limitasi_Fair_Usage_ALELEON_Supercomputer
+  📏 Length: 1967 chars
+  📝 Preview: Per tanggal 3 Februari 2023, ALELEON Supercomputer mengimplementasikan aturan baru berupa
+Limitasi Fair Usage (LFU)
+yaitu QoS (Quality of Service)
+atau limit alokasi komputasi per user atau grup
+. Hal...
+----------------------------------------------------------------------
+
+[Chunk 116] ID: 6ca73633-6444-4513-88d0-2c0f7f3fa186
+  📄 Title : Limitasi Fair Usage ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Limitasi_Fair_Usage_ALELEON_Supercomputer
+  📏 Length: 826 chars
+  📝 Preview: Alokasi Komputasi
+Limit Maksimal
+Akun Perseorangan
+Akun Institusi
+Akun Uji Coba
+Walltime
+1
+3 hari (72 jam)
+Sesuai PKSPIAS
+1 hari (24 jam)
+Keterangan:
+Walltime adalah waktu maksimal menjalankan job.
+Ma...
+----------------------------------------------------------------------
+
+[Chunk 117] ID: 9bd98616-87b3-428f-b173-8cb14dca33cd
+  📄 Title : Kode Reason ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Kode_Reason_ALELEON_Supercomputer
+  📏 Length: 1270 chars
+  📝 Preview: Pada pembacaan status antrian job squeue, tab NODELIST(REASON) dapat memberikan alasan kenapa job terpending. Berikut adakah daftar info REASON pada job PENDING yang telah dikonfirmasi terjadi. User d...
+----------------------------------------------------------------------
+
+[Chunk 118] ID: c439b8b6-4262-40bd-8577-36748db7e128
+  📄 Title : Komputasi Python dengan Conda Environment User
+  🔗 Source: https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User
+  📏 Length: 1991 chars
+  📝 Preview: Halaman ini menjelaskan langkah menjalankan komputasi Python di ALELEON dengan
+conda environment
+yang dibuat user.
+Pada panduan ini disebut
+conda env
+dan dijalankan dengan
+pyload
+- tool modul dari EFI...
+----------------------------------------------------------------------
+
+[Chunk 119] ID: 55cab3cc-2969-4d9b-b46f-1573653bde48
+  📄 Title : Komputasi Python dengan Conda Environment User
+  🔗 Source: https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User
+  📏 Length: 1992 chars
+  📝 Preview: *)
+Terkait Anaconda3 2024.06-1:
+Karena banyaknya laporan bug, sementara hindari Anaconda ini.
+Bagi user yang membuat conda env dengan Anaconda ini, disarankan:
+Hapus conda env bersangkutan.
+Buat ulang...
+----------------------------------------------------------------------
+
+[Chunk 120] ID: 3badfebd-648f-4c35-a2ad-a13d67afe64b
+  📄 Title : Komputasi Python dengan Conda Environment User
+  🔗 Source: https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User
+  📏 Length: 1998 chars
+  📝 Preview: nvidia-nccl
+.
+Perhatikan kelengkapan instalasi package NVIDIA CUDA yang dibutuhkan seperti cuDNN, cuBLAS, cuFFT, dll.
+.
+(4)
+Menjalankan komputasi -> subbab
+[ 5 ]
+Manajemen conda env dan modul pyload -...
+----------------------------------------------------------------------
+
+[Chunk 121] ID: 7e3f8f62-a624-4d8b-a3cd-a23743f2f5df
+  📄 Title : Komputasi Python dengan Conda Environment User
+  🔗 Source: https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User
+  📏 Length: 1233 chars
+  📝 Preview: a.
+Pilih template sesuai kebutuhan:
+Conda Environment User (CPU)
+Berjalan di
+c
+ompute node
+CPU
+Conda Environment User (GPU)
+Berjalan dengan akselerasi GPU di
+c
+ompute node
+GPU
+b.
+Isi
+Job Name
+(bebas)
+...
+----------------------------------------------------------------------
+
+[Chunk 122] ID: 67ea9f2f-3629-4083-bd6c-fa5d532f1b96
+  📄 Title : Komputasi Python dengan Conda Environment User
+  🔗 Source: https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User
+  📏 Length: 1943 chars
+  📝 Preview: - Jalankan:
+$
+pip install --user pyusb
+.
+(5)
+Isi kolom
+submit script
+untuk menulis alur jalannya job:
+a.
+Klik
+[Open Editor]
+b.
+Ikuti petunjuk
+NOTES
+dan alur script di dalamnya.
+c.
+Klik
+[Save]
+untuk me...
+----------------------------------------------------------------------
+
+[Chunk 123] ID: be963023-49b4-48fa-b1d7-5ebb5f42257e
+  📄 Title : Komputasi Python dengan Conda Environment User
+  🔗 Source: https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User
+  📏 Length: 1319 chars
+  📝 Preview: .
+User dapat menghapus ruang job dan datanya:
+Pilih ruang job yang akan dihapus.
+Klik
+[Delete]
+*
+5B. Batch Job dengan Slurm di Terminal
+.
+Batch job berjalan di
+[
+compute node
+]
+Panduan ini mengasumsik...
+----------------------------------------------------------------------
+
+[Chunk 124] ID: 2c1b9764-ff6d-48b6-b837-a03fd2f2689e
+  📄 Title : Komputasi Python dengan Conda Environment User
+  🔗 Source: https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User
+  📏 Length: 1978 chars
+  📝 Preview: - Jalankan:
+$
+pip install --user pyusb
+.
+(4)
+Buat
+submit script
+untuk menulis alur jalannya job:
+Format
+.sh
+dan nama script bebas. contoh
+submit.sh
+Isi script dengan contoh template di bawah ini.
+Perh...
+----------------------------------------------------------------------
+
+[Chunk 125] ID: a2c9f0a0-5e9d-49b5-b857-5a8611e4984b
+  📄 Title : Komputasi Python dengan Conda Environment User
+  🔗 Source: https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User
+  📏 Length: 1989 chars
+  📝 Preview: # Conda environment User (GPU)
+# rev.250226
+#
+# NOTES:
+# (1) Isi bagian yang ditandai 4 garing (////).
+# (2) Ikuti petunjuk script.
+# (3) Template ini bersifat referensi.
+#     User dapat mengubah bag...
+----------------------------------------------------------------------
+
+[Chunk 126] ID: ecd5787d-1091-41e2-bd06-3e5230ac0fad
+  📄 Title : Komputasi Python dengan Conda Environment User
+  🔗 Source: https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User
+  📏 Length: 1986 chars
+  📝 Preview: result-
+jobID
+.txt
+-> output terminal
+error-
+jobID
+.txt
+-> log status job
+Monitor Sausage -
+Jalankan sausage:
+$
+sausage
+1. Menu
+sausage
+: Konsumsi Core Hour
+2. Menu
+sfair
+: Konsumsi alokasi komputasi
+...
+----------------------------------------------------------------------
+
+[Chunk 127] ID: 81e68edb-6201-4f24-8cfe-ad723635e0e9
+  📄 Title : Komputasi Python dengan Conda Environment User
+  🔗 Source: https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User
+  📏 Length: 1935 chars
+  📝 Preview: Ditentukan pilihan jumlah CPU, GPU, dan sisa Core Hour.
+Mengetahui rentang waktu:
+1.
+Buka menu
+Clusters > Aleleon Shell Access
+2.
+Jalankan tool:
+$
+sausage
+1. Pilih menu
+slimit
+,
+2. Pilih job type
+Inte...
+----------------------------------------------------------------------
+
+[Chunk 128] ID: 71b9468a-466b-42e2-8992-1fbe61707f19
+  📄 Title : Komputasi Python dengan Conda Environment User
+  🔗 Source: https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User
+  📏 Length: 598 chars
+  📝 Preview: Ketika user
+keluar saat ada cell jalan
+dan kembali masuk:
+Bisa jadi cell tsb. tidak menampilkan aktivitas cell.
+Lihat status cell / output lainnya.
+*
+6. Support dan Kontak Admin
+User dapat menghubungi...
+----------------------------------------------------------------------
+
+[Chunk 129] ID: 123c36b2-95ab-4a42-a08a-ef438aa7d537
+  📄 Title : Komputasi Python
+  🔗 Source: https://wiki.efisonlt.com/wiki/Komputasi_Python
+  📏 Length: 203 chars
+  📝 Preview: Saat ini tidak ada teks di halaman ini.
+Anda dapat
+melakukan pencarian untuk judul halaman ini
+di halaman-halaman lain, atau
+mencari log terkait
+, tapi Anda tidak memiliki izin untuk membuat halaman i...
+----------------------------------------------------------------------
+
+[Chunk 130] ID: 0886cfa3-0ecd-4d87-9e4c-caaed4f2e38c
+  📄 Title : Komputasi dengan Container User via Apptainer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Komputasi_dengan_Container_User_via_Apptainer
+  📏 Length: 1996 chars
+  📝 Preview: Halaman ini menjelaskan langkah menjalankan software komputasi user yang dikemas dalam
+container image
+melalui platform
+Apptainer
+di ALELEON.
+[
+Apptainer
+]
+(dahulu bernama
+Singularity
+) adalah platfor...
+----------------------------------------------------------------------
+
+[Chunk 131] ID: c31669ab-cd2e-4843-8cdb-b0d90199c7bd
+  📄 Title : Komputasi dengan Container User via Apptainer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Komputasi_dengan_Container_User_via_Apptainer
+  📏 Length: 1993 chars
+  📝 Preview: $
+apptainer pull docker://
+[image-pull-tag]
+- Platform shub
+$
+apptainer pull shub://
+[image-pull-tag]
+- Platform OCI compatible
+$
+apptainer pull oras://
+[image-pull-tag
+- Contoh pull
+[
+NVIDIA NGC PyTo...
+----------------------------------------------------------------------
+
+[Chunk 132] ID: 4aa22794-1203-4cd5-a94a-e101bf1979fa
+  📄 Title : Komputasi dengan Container User via Apptainer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Komputasi_dengan_Container_User_via_Apptainer
+  📏 Length: 1816 chars
+  📝 Preview: ~/.pymodules
+---
+5. Pilihan Menjalankan Komputasi
+Pilih sesuai preferensi user:
+[ 5A ]
+- Batch job
+tampilan web
+dengan
+Job Composer EFIRO Web Service.
+[ 5B ]
+- Batch job
+terminal
+dengan
+Slurm.
+[ 5C ]
+...
+----------------------------------------------------------------------
+
+[Chunk 133] ID: 16bc54ca-b351-4200-b63a-ff70ead7a79e
+  📄 Title : Komputasi dengan Container User via Apptainer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Komputasi_dengan_Container_User_via_Apptainer
+  📏 Length: 1943 chars
+  📝 Preview: - Jalankan:
+$
+pip install --user pyusb
+.
+(5)
+Isi kolom
+submit script
+untuk menulis alur jalannya job:
+a.
+Klik
+[Open Editor]
+b.
+Ikuti petunjuk
+NOTES
+dan alur script di dalamnya.
+c.
+Klik
+[Save]
+untuk me...
+----------------------------------------------------------------------
+
+[Chunk 134] ID: 3341392f-fab3-4c29-9782-68b031b90e71
+  📄 Title : Komputasi dengan Container User via Apptainer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Komputasi_dengan_Container_User_via_Apptainer
+  📏 Length: 1342 chars
+  📝 Preview: .
+User dapat menghapus ruang job dan datanya:
+Pilih ruang job yang akan dihapus.
+Klik
+[Delete]
+*
+5B. Batch Job dengan Slurm di Terminal
+.
+Batch job berjalan di
+[
+compute node
+]
+Panduan ini mengasumsik...
+----------------------------------------------------------------------
+
+[Chunk 135] ID: 671cd35e-1770-45b0-8eb2-fdd1fa2680d2
+  📄 Title : Komputasi dengan Container User via Apptainer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Komputasi_dengan_Container_User_via_Apptainer
+  📏 Length: 1994 chars
+  📝 Preview: - Jalankan:
+$
+pip install --user pyusb
+.
+(4)
+Buat
+submit script
+untuk menulis alur jalannya job:
+Format
+.sh
+dan nama script bebas. contoh
+submit.sh
+Isi script dengan contoh template di bawah ini.
+Perh...
+----------------------------------------------------------------------
+
+[Chunk 136] ID: d015ed06-d80b-4f86-bb54-efe903635755
+  📄 Title : Komputasi dengan Container User via Apptainer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Komputasi_dengan_Container_User_via_Apptainer
+  📏 Length: 1981 chars
+  📝 Preview: apprun /bin/bash
+<< 'COMMAND'
+////
+COMMAND
+Template submit script -
+- versi GPU
+Berjalan dengan akselerasi GPU di
+compute node
+GPU.
+#!/bin/bash -l
+# --------------------------------------------------
+...
+----------------------------------------------------------------------
+
+[Chunk 137] ID: b6301e39-8241-42b2-b886-55df8e03728e
+  📄 Title : Komputasi dengan Container User via Apptainer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Komputasi_dengan_Container_User_via_Apptainer
+  📏 Length: 1998 chars
+  📝 Preview: $
+sbatch
+[nama-submit-script]
+- Contoh:
+$
+sbatch
+submit.sh
+.
+(6)
+Pantau status jalannya job dengan perintah
+squeue
+$
+squeue -ul $USER
+Bila tidak ada di squeue artinya job tersebut telah selesai.
+Dafta...
+----------------------------------------------------------------------
+
+[Chunk 138] ID: b442ce7c-a0ae-4f94-8d91-ccaa8cd204fe
+  📄 Title : Komputasi dengan Container User via Apptainer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Komputasi_dengan_Container_User_via_Apptainer
+  📏 Length: 1985 chars
+  📝 Preview: Sesi Jupyter berjalan di
+[
+interactive node
+]
+(1)
+Cek apakah image SIF yang akan digunakan punya package Jupyter:
+1.
+Buka terminal ALELEON. Aktifkan modul pyload user yang akan digunakan:
+$
+pyl load
+[...
+----------------------------------------------------------------------
+
+[Chunk 139] ID: 0666eb6c-2859-4c44-a2c0-0fa303e5862b
+  📄 Title : Komputasi dengan Container User via Apptainer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Komputasi_dengan_Container_User_via_Apptainer
+  📏 Length: 1793 chars
+  📝 Preview: $
+pyl info
+[nama-modul]
+3.
+Gunakan info pyload:
+Apptainer image PATH
+-> User provided .sif container
+User dapat save settings.
+.
+(4)
+Klik
+[Launch]
+User dilempar ke halaman
+My Interactive Sessions
+Tung...
+----------------------------------------------------------------------
+
+[Chunk 140] ID: 50d44f6a-1f38-475f-a957-c79b3b6b83d6
+  📄 Title : Trial Testing
+  🔗 Source: https://wiki.efisonlt.com/wiki/Trial_Testing
+  📏 Length: 360 chars
+  📝 Preview: Halaman ini menjabarkan tutorial pengujian komputasi di ALELEON Supercomputer.
+Lihat daftar isi
+(bila ada)
+untuk menjalankan pengujian yang diinginkan.
+DISCLAIMER!
+Selain akun testing, sistem tetap me...
+----------------------------------------------------------------------
+
+[Chunk 141] ID: 17da7dba-e33b-4a4e-8a80-642670c230fe
+  📄 Title : ALELEON Desktop
+  🔗 Source: https://wiki.efisonlt.com/wiki/ALELEON_Desktop
+  📏 Length: 2471 chars
+  📝 Preview: ALELEON Desktop adalah sesi interaktif virtual desktop berbasiskan Desktop Environment (DE) Linux xfce.
+Halaman ini bagian dari:
+[
+Daftar Software Komputasi dan Tutorial
+]
+- Daftar isi -
+Memulai Sesi ...
+----------------------------------------------------------------------
+
+[Chunk 142] ID: 5f81347e-1fef-49f3-872b-e80a1f54a789
+  📄 Title : Upload - Download File ALELEON
+  🔗 Source: https://wiki.efisonlt.com/wiki/Upload_-_Download_File_ALELEON
+  📏 Length: 2000 chars
+  📝 Preview: Halaman ini menjelaskan opsi dan langkah transfer data (
+upload - download file
+) ALELEON Supercomputer (Mk.V):
+Subbab
+[ 1 ]
+- Transfer data ke / dari direktori HOME.
+Subbab
+[ 2 ]
+- Transfer data untu...
+----------------------------------------------------------------------
+
+[Chunk 143] ID: 0ecf2828-456a-41d3-b8b5-67758a100309
+  📄 Title : TRIAL A6
+  🔗 Source: https://wiki.efisonlt.com/wiki/TRIAL_A6
+  📏 Length: 1995 chars
+  📝 Preview: Ini adalah panduan
+all-in-one
+untuk masa uji coba user dengan
+kode [A]/6
+.
+Daftar isi
+1
+Login ALELEON Supercomputer
+2
+Spesifikasi Trial dan Reproduksi Langkah
+2.1
+Conda Environment 'tensor'
+3
+Langkah ...
+----------------------------------------------------------------------
+
+[Chunk 144] ID: 108e9900-5a38-439f-be7a-86a1992338db
+  📄 Title : TRIAL A6
+  🔗 Source: https://wiki.efisonlt.com/wiki/TRIAL_A6
+  📏 Length: 1976 chars
+  📝 Preview: Supaya user dapat melakukan hal serupa apabila membutuhkan membuat conda env lain,
+contoh untuk instalasi package yang tidak dapat bersama TensorFlow karena ketidakcocokan
+depedencies
+seperti PyTorch....
+----------------------------------------------------------------------
+
+[Chunk 145] ID: e62449f4-08fc-4e08-b79a-593278df773b
+  📄 Title : TRIAL A6
+  🔗 Source: https://wiki.efisonlt.com/wiki/TRIAL_A6
+  📏 Length: 1998 chars
+  📝 Preview: Menggunakan terminal!
+User EFIRO klik app
+Aleleon Shell Access
+atau menu
+Apps > Aleleon Shell Access
+---| 1 |---
+Muat atau pastikan modul Anaconda 3 2024.02-1 aktif:
+$
+module load Anaconda3/2024.02-1
+...
+----------------------------------------------------------------------
+
+[Chunk 146] ID: d872ea46-e5a0-492f-add3-1ab7314b5424
+  📄 Title : TRIAL A6
+  🔗 Source: https://wiki.efisonlt.com/wiki/TRIAL_A6
+  📏 Length: 1988 chars
+  📝 Preview: user keluar (log out) dari ALELEON.
+Ketika user keluar dari sesi Jupyter saat ada cell berjalan dan kembali masuk:
+Bisa jadi cell tersebut tidak menampilkan proses jalannya komputasi.
+Lihat cell berik...
+----------------------------------------------------------------------
+
+[Chunk 147] ID: d5e7ace1-b16e-4ab5-bce8-e37404091468
+  📄 Title : TRIAL A6
+  🔗 Source: https://wiki.efisonlt.com/wiki/TRIAL_A6
+  📏 Length: 1971 chars
+  📝 Preview: 11.8
+cuda/11.8-cuDNN8.6.0
+12.0
+cuda/12.0-cuDNN8.7.0
+12.1
+cuda/12.1-cuDNN8.8.1
+12.3
+cuda/12.3-cuDNN8.9.6
+12.4
+cuda/12.4-cuDNN9.2.1
+12.5
+cuda/12.5-cuDNN9.2.1
+Permintaan instalasi CUDA versi lain:
+Hubung...
+----------------------------------------------------------------------
+
+[Chunk 148] ID: 0737468f-ae43-4d08-a6a9-ab1be65a3dba
+  📄 Title : TRIAL A6
+  🔗 Source: https://wiki.efisonlt.com/wiki/TRIAL_A6
+  📏 Length: 1997 chars
+  📝 Preview: Apabila menggunakan conda env selain
+'tensor'
+:
+Ganti isi variabel
+CONDA_NAME
+dengan conda env yang akan dipakai.
+#!/bin/bash
+# -----------------------------------------------------
+# Template SLURM S...
+----------------------------------------------------------------------
+
+[Chunk 149] ID: c06e2e7e-276e-4b6a-ae0f-08c38993f524
+  📄 Title : TRIAL A6
+  🔗 Source: https://wiki.efisonlt.com/wiki/TRIAL_A6
+  📏 Length: 1976 chars
+  📝 Preview: ]
+Apabila butuh
+, isi nama modul CUDA sebagai berikut:
+...
+module load ${PM}
+module load [Nama-modul-CUDA]
+...
+Perhatikan akun uji coba punya limit alokasi komputasi maksimal:
+CPU 16 core thread.
+GPU ...
+----------------------------------------------------------------------
+
+[Chunk 150] ID: 85c912e8-e050-4b97-be16-ce78faedd57b
+  📄 Title : TRIAL A6
+  🔗 Source: https://wiki.efisonlt.com/wiki/TRIAL_A6
+  📏 Length: 1991 chars
+  📝 Preview: # Modul NVIDIA CUDA telah tersedia di conda env tensor
+module load
+${
+PM
+}
+# Mengaktifkan Conda Environment
+source
+activate
+${
+CONDA_NAME
+}
+# Tuliskan perintah menjalankan komputasi Python user
+# cont...
+----------------------------------------------------------------------
+
+[Chunk 151] ID: 3a785c0d-4fb5-4c98-8a58-30479a1d790e
+  📄 Title : TRIAL A6
+  🔗 Source: https://wiki.efisonlt.com/wiki/TRIAL_A6
+  📏 Length: 1991 chars
+  📝 Preview: Job ID ada pada squeue diatas.
+contoh membatalkan job ID 231:
+$
+scancel 231
+---
+- Langkah Batch Job di web EFIRO -
+---| 1 |---
+[
+Login ke web EFIRO
+]
+ALELEON Supercomputer.
+---| 2 |---
+Klik app
+Job Co...
+----------------------------------------------------------------------
+
+[Chunk 152] ID: 3bdd9b82-8404-47b7-be1f-e9ff3b1d6094
+  📄 Title : TRIAL A6
+  🔗 Source: https://wiki.efisonlt.com/wiki/TRIAL_A6
+  📏 Length: 1936 chars
+  📝 Preview: ...
+Detail Submit Script lihat
+[
+Subm
+it Script ALELEON Supercomputer
+]
+Untuk SBATCH notifikasi email status jalannya job lihat
+[
+Slurm Jojo
+]
+---| 6 |---
+Jalankan job dengan klik tombol
+Submit
+Job be...
+----------------------------------------------------------------------
+
+[Chunk 153] ID: 51ddf8b1-65ef-4c22-8c29-d2e0a5299cb0
+  📄 Title : TRIAL A6
+  🔗 Source: https://wiki.efisonlt.com/wiki/TRIAL_A6
+  📏 Length: 1995 chars
+  📝 Preview: [
+interactive node
+].
+(klik expand / kembangkan)
+- Langkah Sesi Jupyter -
+---| 1 |---
+[
+Login ke web EFIRO
+]
+ALELEON Supercomputer.
+---| 2 |---
+Lakukan persiapan sebelum sesi Jupyter:
+Untuk efisiensi ...
+----------------------------------------------------------------------
+
+[Chunk 154] ID: a35729c6-b124-4ec2-8688-c38a7a4bd5a2
+  📄 Title : TRIAL A6
+  🔗 Source: https://wiki.efisonlt.com/wiki/TRIAL_A6
+  📏 Length: 1646 chars
+  📝 Preview: Additional Jupyter arguments
+Memuat argumen tambahan Jupyter,
+isi apabila ada
+.
+Email address
+Notifikasi email untuk status mulai dan selesainya Jupyter.
+Isi apabila berkenan.
+---| 5 |---
+Klik tombol
+...
+----------------------------------------------------------------------
+
+[Chunk 155] ID: 67b38c7d-df7e-411a-87b5-6a8233af6565
+  📄 Title : Troubleshooting dan Support
+  🔗 Source: https://wiki.efisonlt.com/wiki/Troubleshooting_dan_Support
+  📏 Length: 1993 chars
+  📝 Preview: Halaman ini membahas langkah troubleshooting dan support masalah user di ALELEON Supercomputer.
+- Pilih sesuai masalah yang dihadapi -
+Subbab
+Kategori Masalah
+[ 1 ]
+Job terus mengantri dan tidak berja...
+----------------------------------------------------------------------
+
+[Chunk 156] ID: 7cbcc0f3-31fb-45ee-940c-511a2b43a321
+  📄 Title : Troubleshooting dan Support
+  🔗 Source: https://wiki.efisonlt.com/wiki/Troubleshooting_dan_Support
+  📏 Length: 1992 chars
+  📝 Preview: File output program lainnya yang ada pesan error.
+---
+Sesi Interaktif Jupyter -
+Bagi user yang pilih
+Choose package to run > User provided
+:
+Pastikan telah mengisi parameter dengan benar.
+Pastikan env...
+----------------------------------------------------------------------
+
+[Chunk 157] ID: 72fb61f6-51d9-46ed-b55e-11f8601b3317
+  📄 Title : Troubleshooting dan Support
+  🔗 Source: https://wiki.efisonlt.com/wiki/Troubleshooting_dan_Support
+  📏 Length: 1980 chars
+  📝 Preview: AssocMaxWallDurationPerJobLimit
+Job tidak dapat berjalan karena alokasi
+limit waktu
+job melebihi walltime maksimum compute node yang dituju. Solusi lihat
+Appendix 2
+QOSMaxCpuPerUserLimit
+Job antara an...
+----------------------------------------------------------------------
+
+[Chunk 158] ID: 2fa2afbc-4439-459c-8e59-0b7abdf291fa
+  📄 Title : Troubleshooting dan Support
+  🔗 Source: https://wiki.efisonlt.com/wiki/Troubleshooting_dan_Support
+  📏 Length: 1956 chars
+  📝 Preview: SBATCH
+Fair Limit
+ntasks
+ntasks * cpus-per-task
+CPU
+mem
+Memory
+gpus
+GPU
+time
+Time limit
+Bila
+tidak ada yang lebih
+:
+Tidak ada masalah.
+Job mengantri hingga ada alokasi memadai
+sesuai rentang limit alo...
+----------------------------------------------------------------------
+
+[Chunk 159] ID: ddcedb3c-8cdd-4b38-ba4f-7d8c112b4512
+  📄 Title : Troubleshooting dan Support
+  🔗 Source: https://wiki.efisonlt.com/wiki/Troubleshooting_dan_Support
+  📏 Length: 595 chars
+  📝 Preview: User harus menambah kuota core hour.
+Langkah dan ketentuan lihat
+[
+Ketentuan dan Transaksi Kuota Core Hour
+]
+`
+Bila
+ada
+job yang jalan / antri maka user punya 2 opsi:
+Opsi 1
+- menunggu hingga job yang...
+----------------------------------------------------------------------
+
+[Chunk 160] ID: 8b6a88d0-cbea-4c61-99d0-6a660800e265
+  📄 Title : Tutorial Menggunakan ALELEON Supercomputer Mk.V
+  🔗 Source: https://wiki.efisonlt.com/wiki/Tutorial_Menggunakan_ALELEON_Supercomputer_Mk.V
+  📏 Length: 1996 chars
+  📝 Preview: ALELEON Mk.V
+adalah kelanjutan ALELEON Supercomputer Mk.III dengan platform EFIRO v2 yang sepenuhnya operasional Oktober 2025.
+- Daftar isi -
+Login Pertama Kali
+Menggunakan ALELEON Supercomputer
+Manaj...
+----------------------------------------------------------------------
+
+[Chunk 161] ID: f9304ae2-ead5-4287-86a6-b23d47832580
+  📄 Title : Tutorial Menggunakan ALELEON Supercomputer Mk.V
+  🔗 Source: https://wiki.efisonlt.com/wiki/Tutorial_Menggunakan_ALELEON_Supercomputer_Mk.V
+  📏 Length: 1249 chars
+  📝 Preview: belum dapat digunakan.
+Untuk keperluan support dan bantuan hubungi admin di:
+support@efisonlt.com
+---
+Login SSH / Akses Terminal
+Cara tradisional menggunakan superkomputer!
+Opsi 1
+Login SSH
+dengan pan...
+----------------------------------------------------------------------
+
+[Chunk 162] ID: 2756a971-641d-4310-b6d2-b680af26cbec
+  📄 Title : Login Pertama ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Login_Pertama_ALELEON_Supercomputer
+  📏 Length: 1863 chars
+  📝 Preview: Halaman ini bagian dari:
+[
+Tutorial Menggunakan ALELEON Mk.V
+]
+Halaman ini memandu login pertama kali di ALELEON Supercomputer (Mk.V) untuk
+aktivasi akun dan pembuatan password user.
+Support
+Apabila u...
+----------------------------------------------------------------------
+
+[Chunk 163] ID: 95e2197e-8043-4c14-92fe-396af4f9ad4d
+  📄 Title : EFIRO Account Manager
+  🔗 Source: https://wiki.efisonlt.com/wiki/EFIRO_Account_Manager
+  📏 Length: 1984 chars
+  📝 Preview: EFIRO Account Manager
+<
+EAM
+>
+adalah portal web untuk manajemen info akun dan password user ALELEON Supercomputer
+.
+Halaman ini menjabarkan fitur dan tutorial penggunaan EAM.
+Halaman ini bagian dari:
+...
+----------------------------------------------------------------------
+
+[Chunk 164] ID: db6e5c5b-c3c9-4385-8966-1a21289a5622
+  📄 Title : EFIRO Account Manager
+  🔗 Source: https://wiki.efisonlt.com/wiki/EFIRO_Account_Manager
+  📏 Length: 1086 chars
+  📝 Preview: Masukkan kode one-time code dari app authenticator.
+Isi Device Name untuk identitas perangkat mobile user.
+Klik
+[Submit]
+- / 4 / -
+2FA telah aktif untuk login berikutnya.
+User dapat menghapus 2FA deng...
+----------------------------------------------------------------------
+
+[Chunk 165] ID: cebe562a-fae0-4fe9-819f-05995f4199ab
+  📄 Title : Pengantar SSH Key
+  🔗 Source: https://wiki.efisonlt.com/wiki/Pengantar_SSH_Key
+  📏 Length: 1954 chars
+  📝 Preview: Halaman ini adalah
+pengantar
+bagi user yang pertama kali mengenal dan membuat SSH Key.
+Halaman ini bagian dari:
+[
+Login SSH dan SFTP ALELEON
+]
+- Daftar isi -
+Apa itu SSH Key?
+Bagaimana SSH Key Bekerja...
+----------------------------------------------------------------------
+
+[Chunk 166] ID: 2b1bb8c1-b8af-41fa-8c66-7a630cf96800
+  📄 Title : Pengantar SSH Key
+  🔗 Source: https://wiki.efisonlt.com/wiki/Pengantar_SSH_Key
+  📏 Length: 823 chars
+  📝 Preview: Private key
+Private key adalah "password email user".
+TIDAK BOLEH DIBAGIKAN KE PIHAK LUAR.
+---
+`
+Private Key itu ...
+TIDAK BOLEH dibagikan ke pihak luar termasuk tim admin EFISON!
+Tim admin tidak akan...
+----------------------------------------------------------------------
+
+[Chunk 167] ID: 7c8617af-e34d-4ce8-8d3c-357948455076
+  📄 Title : Sausage dan Aturan Metrik Penggunaan ALELEON
+  🔗 Source: https://wiki.efisonlt.com/wiki/Sausage_dan_Aturan_Metrik_Penggunaan_ALELEON
+  📏 Length: 1988 chars
+  📝 Preview: Halaman ini bagian dari:
+[
+Daftar Software Komputasi dan Tutorial
+]
+ALELEON memberlakukan serangkaian aturan metrik penggunaan ke user. Halaman ini menjabarkan metrik penggunaaan dan perintah
+sausage
+...
+----------------------------------------------------------------------
+
+[Chunk 168] ID: 741667b9-fa09-4555-b0a5-0f795b3da8c0
+  📄 Title : Sausage dan Aturan Metrik Penggunaan ALELEON
+  🔗 Source: https://wiki.efisonlt.com/wiki/Sausage_dan_Aturan_Metrik_Penggunaan_ALELEON
+  📏 Length: 1999 chars
+  📝 Preview: Ketika
+tidak ada job jalan
+, Effective Core Hour Remaining =
+sisa kuota Actual Core Hour.
+Bila ada
+job jalan
+, Effective Core Hour Remaining =
+sisa kuota Total Core Hour.
+Actual
+Core Hour Usage:
+Adala...
+----------------------------------------------------------------------
+
+[Chunk 169] ID: 8c01b930-fa30-4ee7-81af-228b79b9b33e
+  📄 Title : Sausage dan Aturan Metrik Penggunaan ALELEON
+  🔗 Source: https://wiki.efisonlt.com/wiki/Sausage_dan_Aturan_Metrik_Penggunaan_ALELEON
+  📏 Length: 1971 chars
+  📝 Preview: , dengan detail:
+Ketika
+tidak ada job jalan
+:
+Kebutuhan core hour job
+>
+sisa kuota
+Actual
+Core Hour
+Ketika
+ada job jalan atau tertahan
+:
+Kebutuhan Core Hour job
+>
+sisa kuota
+Total
+Core Hour
+Pada skena...
+----------------------------------------------------------------------
+
+[Chunk 170] ID: 1dc6fbed-8cb8-492e-b0e7-74d66f8c7fb0
+  📄 Title : Sausage dan Aturan Metrik Penggunaan ALELEON
+  🔗 Source: https://wiki.efisonlt.com/wiki/Sausage_dan_Aturan_Metrik_Penggunaan_ALELEON
+  📏 Length: 797 chars
+  📝 Preview: Software
+MPI
+- dapat memanfaatkan alokasi komputasi
+multi-node
+.
+Software
+non-MPI
+- hanya dapat berjalan di
+satu node
+.
+Setiap halaman software komputasi di
+[
+Daftar Software Komputasi dan Tutorial
+]
+...
+----------------------------------------------------------------------
+
+[Chunk 171] ID: 9c8d5b20-2a83-4364-953f-8fba9650dffd
+  📄 Title : Daftar Environment Python ALELEON
+  🔗 Source: https://wiki.efisonlt.com/wiki/Daftar_Environment_Python_ALELEON
+  📏 Length: 203 chars
+  📝 Preview: Saat ini tidak ada teks di halaman ini.
+Anda dapat
+melakukan pencarian untuk judul halaman ini
+di halaman-halaman lain, atau
+mencari log terkait
+, tapi Anda tidak memiliki izin untuk membuat halaman i...
+----------------------------------------------------------------------
+
+[Chunk 172] ID: f9c6d8d6-9466-41e6-a9b9-a52244301a53
+  📄 Title : Pengenalan Menggunakan ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Pengenalan_Menggunakan_ALELEON_Supercomputer
+  📏 Length: 1932 chars
+  📝 Preview: Halaman ini merangkum pengenalan budaya menggunakan ALELEON Supercomputer
+(dan superkomputer publik pada umumnya)
+.
+Halaman ini bagian dari:
+[
+Tutorial Menggunakan ALELEON Mk.V
+]
+- Daftar isi -
+Susuna...
+----------------------------------------------------------------------
+
+[Chunk 173] ID: 609dceff-3e73-49a6-be2f-bffd0f8b76bb
+  📄 Title : Pengenalan Menggunakan ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Pengenalan_Menggunakan_ALELEON_Supercomputer
+  📏 Length: 1309 chars
+  📝 Preview: Pada ALELEON, user nantinya akan dipandu deng
+an info
+[
+Sausage dan Aturan Metrik Penggunaan ALELEON
+]
+---
+Setelah konfirmasi cetak dan pembayaran, CS memproses order cetak ke bagian printing.
+Apabila...
+----------------------------------------------------------------------
+
+[Chunk 174] ID: a07e93cf-d68a-424a-90e2-a84350b9f2c2
+  📄 Title : Metode Komputasi di ALELEON
+  🔗 Source: https://wiki.efisonlt.com/wiki/Metode_Komputasi_di_ALELEON
+  📏 Length: 1970 chars
+  📝 Preview: Halaman ini menjelaskan
+konsep menjalankan komputasi
+di ALELEON yaitu manajemen Slurm, batch Job, dan sesi interaktif.
+Merupakan
+suplemen info
+untuk semua panduan di:
+[
+Daftar Software K
+omputasi dan ...
+----------------------------------------------------------------------
+
+[Chunk 175] ID: 0687419e-2a10-46ce-a352-a4ce060ae965
+  📄 Title : Metode Komputasi di ALELEON
+  🔗 Source: https://wiki.efisonlt.com/wiki/Metode_Komputasi_di_ALELEON
+  📏 Length: 1831 chars
+  📝 Preview: User mengisi "formulir" untuk memulai sesi interaktif.
+Slurm membuka akses ke compute node untuk sesi interaktif user.
+Daftar sesi interaktif ALELEON:
+[ 4A ]
+-
+App Jupyter di EFIRO Web Service
+[ 4B ]
+...
+----------------------------------------------------------------------
+
+[Chunk 176] ID: 0309f77f-6e98-4848-b3df-7f67657746ab
+  📄 Title : Migrasi Akun dan Data Mk.III ke Mk.V
+  🔗 Source: https://wiki.efisonlt.com/wiki/Migrasi_Akun_dan_Data_Mk.III_ke_Mk.V
+  📏 Length: 2000 chars
+  📝 Preview: Halaman ini ditujukan bagi
+user ALELEON Mk.III (dan Mk.II)
+untuk pengumuman dan teknis perpindahan akun dan data ke sistem baru yaitu
+ALELEON Mk.V
+.
+- Daftar isi -
+Pengumuman
+Support Tim Admin
+Backup ...
+----------------------------------------------------------------------
+
+[Chunk 177] ID: 7c388529-5dcd-4f5b-8b22-7a70e626cd8c
+  📄 Title : Migrasi Akun dan Data Mk.III ke Mk.V
+  🔗 Source: https://wiki.efisonlt.com/wiki/Migrasi_Akun_dan_Data_Mk.III_ke_Mk.V
+  📏 Length: 1952 chars
+  📝 Preview: support@efisonlt.com
+`
+1. Backup Data Akun Mk.III
+Silahkan Backup data user di akun Mk.III yang dibutuhkan dengan langkah:
+Sub
+[ 1A ]
+- login Mk.III
+Sub
+[ 1B ]
+- mengunduh data user dari Mk.III.
+---
+1...
+----------------------------------------------------------------------
+
+[Chunk 178] ID: 4d493b2c-7afd-404b-9776-53cbf5f132b4
+  📄 Title : Migrasi Akun dan Data Mk.III ke Mk.V
+  🔗 Source: https://wiki.efisonlt.com/wiki/Migrasi_Akun_dan_Data_Mk.III_ke_Mk.V
+  📏 Length: 1935 chars
+  📝 Preview: Lakukan proses download (backup) data
+---
+Bagi user yang hendak backup data job komputasi yang dijalankan via web EFIRO OnDemand (EWS) - app Job Composer:
+atau
+Data komputasi terletak di direktori ter...
+----------------------------------------------------------------------
+
+[Chunk 179] ID: 8174f362-a557-4436-a61d-7b7fddbc53ed
+  📄 Title : Migrasi Akun dan Data Mk.III ke Mk.V
+  🔗 Source: https://wiki.efisonlt.com/wiki/Migrasi_Akun_dan_Data_Mk.III_ke_Mk.V
+  📏 Length: 584 chars
+  📝 Preview: Spesifikasi besar dan limit alokasi komputasi dijelaskan di halaman
+[
+Sausage dan Aturan Metrik Penggunaan ALELEON
+]
+Mendapat
+masa penggunaan gratis
+hingga tanggal
+31 Oktober 2025, pukul 23:59 WIB.
+Se...
+----------------------------------------------------------------------
+
+[Chunk 180] ID: 0a6e4c0e-3159-4cc6-bc1e-0e8e1c1e39db
+  📄 Title : SW-AMK
+  🔗 Source: https://wiki.efisonlt.com/wiki/SW-AMK
+  📏 Length: 1985 chars
+  📝 Preview: Ini adalah panduan spesifik bagi grup user
+AMK
+untuk menggunakan ALELEON Supercomputer.
+- Daftar isi -
+Login
+Pengenalan Komputasi
+Pilihan Menjalankan Komputasi
+Batch Job
+Sesi JupyterLab
+Support dan Ko...
+----------------------------------------------------------------------
+
+[Chunk 181] ID: 4802d329-467e-4d2e-a085-912aa724903c
+  📄 Title : SW-AMK
+  🔗 Source: https://wiki.efisonlt.com/wiki/SW-AMK
+  📏 Length: 645 chars
+  📝 Preview: .
+2.
+Lakukan konversi ke file Python:
+$
+jupytext --to py
+[file-ipynb-user]
+---
+Contoh konversi file Notebook
+wololo.ipynb
+$
+jupytext --to py
+wololo.ipynb
+akan menghasilkan file Python
+wololo.py
+Apakah...
+----------------------------------------------------------------------
+
+[Chunk 182] ID: 65f41f5f-a5ad-47e6-9940-5eabece9bc68
+  📄 Title : SW-AMK
+  🔗 Source: https://wiki.efisonlt.com/wiki/SW-AMK
+  📏 Length: 1994 chars
+  📝 Preview: ---
+Jalankan:
+$
+pip install --user pyusb
+Ketentuan instalasi package:
+User tidak dapat update package bawaan environment.
+User hanya dapat instal package yang belum ada.
+.
+E6.
+Isi
+submit script
+untuk ...
+----------------------------------------------------------------------
+
+[Chunk 183] ID: 290d59e1-4407-49d7-885f-58ccd9760b82
+  📄 Title : SW-AMK
+  🔗 Source: https://wiki.efisonlt.com/wiki/SW-AMK
+  📏 Length: 1982 chars
+  📝 Preview: ]
+Komputasi error atau berjalan tidak semestinya -> lihat
+[
+Troubleshooting 2
+]
+.
+E9.
+User dapat download file output via menu
+[Edit Files]
+.
+User dapat menghapus ruang job dan datanya:
+Pilih ruang jo...
+----------------------------------------------------------------------
+
+[Chunk 184] ID: 22420436-db10-48f1-9904-1281e74b9339
+  📄 Title : SW-AMK
+  🔗 Source: https://wiki.efisonlt.com/wiki/SW-AMK
+  📏 Length: 909 chars
+  📝 Preview: User keluar dari sesi Jupyter.
+User log out dari EFIRO Web Service.
+User dapat kembali masuk ke sesi Jupyter sedang jalan via:
+menu
+My Interactive Sessions
+Ketika user
+keluar saat ada cell jalan
+dan k...
+----------------------------------------------------------------------
+
+[Chunk 185] ID: 786b3821-ede8-4062-9ef3-0fbc87bd0419
+  📄 Title : Login SSH dan SFTP ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Login_SSH_dan_SFTP_ALELEON_Supercomputer
+  📏 Length: 2000 chars
+  📝 Preview: Halaman ini bagian dari:
+[
+Tutorial ALELEON Supercomputer Mk.V
+]
+Halaman ini memandu login SSH dan aplikasi SFTP ke ALELEON Supercomputer (Mk.V).
+1. Ketentuan Login SSH / SFTP
+Autentikasi
+SSH key
+- ta...
+----------------------------------------------------------------------
+
+[Chunk 186] ID: b4d9293f-3b66-4aa4-9298-d8824103dfce
+  📄 Title : Login SSH dan SFTP ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Login_SSH_dan_SFTP_ALELEON_Supercomputer
+  📏 Length: 1980 chars
+  📝 Preview: [
+Reg
+istrasi SSH Key ALELEON
+]
+1.
+Unduh package XQuartz di
+[
+xquartz.org
+]
+dan instal.
+2.
+Login SSH di terminal dengan flag
+-X
+$
+ssh -X
+[
+username
+]
+@ssh.aleleonsuper.computer
+---
+[ C ] - Login SSH d...
+----------------------------------------------------------------------
+
+[Chunk 187] ID: 78053c59-b5f6-4adc-9fc9-bbde1a3a36a7
+  📄 Title : Login SSH dan SFTP ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Login_SSH_dan_SFTP_ALELEON_Supercomputer
+  📏 Length: 1088 chars
+  📝 Preview: Pilih Login Type
+Key File
+Input nama username user
+Browse file private key pasangan pub key terdaftar.
+Klik
+[Connect]
+Tips untuk user Windows:
+Untuk user Windows, ketika browse file private key:
+Pilih...
+----------------------------------------------------------------------
+
+[Chunk 188] ID: 8ca711a5-49d8-4372-8a4e-d11e94d60868
+  📄 Title : SIESTA
+  🔗 Source: https://wiki.efisonlt.com/wiki/SIESTA
+  📏 Length: 1992 chars
+  📝 Preview: [
+SIESTA
+]
+, dikembangkan oleh MaX Centre of Excellence, adalah metode dan framework untuk kalkulasi
+electronic structure
+serta simulasi molekular dinamik
+ab initio
+pada molekul dan material solid.
+Ha...
+----------------------------------------------------------------------
+
+[Chunk 189] ID: dbbf3d4b-edf3-42d9-b55b-dfdabe0755c1
+  📄 Title : SIESTA
+  🔗 Source: https://wiki.efisonlt.com/wiki/SIESTA
+  📏 Length: 1996 chars
+  📝 Preview: [
+Submit Script ALELEON
+]
+.
+(5)
+Jalankan job dengan klik
+[Submit]
+.
+(6)
+Pantau status dan output job:
+Refresh halaman Job Composer untuk update status.
+- Daftar status job -
+Not Submitted
+- job belum ...
+----------------------------------------------------------------------
+
+[Chunk 190] ID: 720dfb29-0fad-44ee-a008-52d38d86d4c4
+  📄 Title : SIESTA
+  🔗 Source: https://wiki.efisonlt.com/wiki/SIESTA
+  📏 Length: 1989 chars
+  📝 Preview: [
+Login SSH
+];
+atau
+Login
+[
+EFIRO Web Service
+]
+, menu
+Clusters > Aleleon Shell Access
+.
+(2)
+Upload / siapkan file komputasi di HOME dengan opsi:
+[
+Aplikasi SFTP
+]
+Login
+[
+EFIRO Web Service
+],
+menu
+Fi...
+----------------------------------------------------------------------
+
+[Chunk 191] ID: ba077ca7-1b18-43fc-91d6-a542e20a8522
+  📄 Title : SIESTA
+  🔗 Source: https://wiki.efisonlt.com/wiki/SIESTA
+  📏 Length: 1999 chars
+  📝 Preview: ml load SIESTA////
+# Input file
+INPUT_FILE
+=
+"////.fdf"
+# Output file
+OUTPUT_FILE
+=
+"////"
+# Perintah menjalankan SIESTA
+mpirun -np
+${
+SLURM_NTASKS
+}
+--use-hwthread-cpus
+\
+<
+${
+INPUT_FILE
+}
+>
+${
+OUTPU...
+----------------------------------------------------------------------
+
+[Chunk 192] ID: ba30335b-c960-41ca-a3d8-0ecd5f8d01a3
+  📄 Title : SIESTA
+  🔗 Source: https://wiki.efisonlt.com/wiki/SIESTA
+  📏 Length: 725 chars
+  📝 Preview: Job tertahan
+(state
+PENDING
+)
+dalam waktu lama -> lihat
+[
+Troubleshooting 1
+]
+Komputasi error atau berjalan tidak semestinya -> lihat
+[
+Troubleshooting 2
+]
+.
+Untuk download file output, gunakan opsi:
+...
+----------------------------------------------------------------------
+
+[Chunk 193] ID: 28ae5e5c-fdfc-459b-9111-ae08ceca6069
+  📄 Title : SW-AJFT
+  🔗 Source: https://wiki.efisonlt.com/wiki/SW-AJFT
+  📏 Length: 1969 chars
+  📝 Preview: Ini adalah panduan spesifik bagi user group ajft untuk menggunakan ALELEON Supercomputer.
+- Daftar Isi -
+Login dan Akun ALELEON
+Login Pertama Kali
+Opsi Login
+Sausage dan Pengenalan Komputasi
+Template ...
+----------------------------------------------------------------------
+
+[Chunk 194] ID: 10465569-e2cb-4faa-8c17-985c841d3d44
+  📄 Title : SW-AJFT
+  🔗 Source: https://wiki.efisonlt.com/wiki/SW-AJFT
+  📏 Length: 1990 chars
+  📝 Preview: Online Documentation:
+wiki ALELEON ini.
+Change HPC Password:
+lihat
+[
+EAM - Mengganti Password
+]
+.
+Submit Support Ticket:
+menghubungi support tim admin.
+---
+`
+Menggunakan ALELEON via SSH / Terminal
+Car...
+----------------------------------------------------------------------
+
+[Chunk 195] ID: c202d32d-efb4-4e59-aa78-1f11eb7f9cef
+  📄 Title : SW-AJFT
+  🔗 Source: https://wiki.efisonlt.com/wiki/SW-AJFT
+  📏 Length: 1978 chars
+  📝 Preview: # Limit waktu job (HH:MM:SS atau D-HH:MM:SS)
+# ex: 1 hari -> 24:00:00 atau 1-00:00:00
+#SBATCH --time=////
+# File output terminal, %j merekap no ID job
+#SBATCH --output=result-%j.txt
+# File output log ...
+----------------------------------------------------------------------
+
+[Chunk 196] ID: 991fcdb4-2507-4958-8c58-8755091d8f9e
+  📄 Title : SW-AJFT
+  🔗 Source: https://wiki.efisonlt.com/wiki/SW-AJFT
+  📏 Length: 1986 chars
+  📝 Preview: \
+-pbc nojump -center
+printf
+"Backbone\nBackbone\n"
+|
+gmx_mpi rms -s md_40.tpr
+\
+-f md_center_200ns.xtc -o rmsd_200ns.xvg -tu ns
+printf
+"Backbone"
+|
+gmx_mpi rmsf -s md_40.tpr
+\
+-f md_center_200ns.xtc ...
+----------------------------------------------------------------------
+
+[Chunk 197] ID: e2a7fb55-8819-4ed8-9014-2efd4ed3a119
+  📄 Title : SW-AJFT
+  🔗 Source: https://wiki.efisonlt.com/wiki/SW-AJFT
+  📏 Length: 1953 chars
+  📝 Preview: # Memuat modul software GROMACS versi GPU
+module load gromacs/2025.3-gcc-13.4.0-cuda-12.9.0-pue
+# Threading OMP
+export
+OMP_NUM_THREADS
+=
+${
+SLURM_CPUS_PER_TASK
+}
+declare
+-a
+xtc_files
+=(
+"md_20.xtc"
+)
+...
+----------------------------------------------------------------------
+
+[Chunk 198] ID: 5332b546-c1ad-48bd-9f4c-faa3e2020ae5
+  📄 Title : SW-AJFT
+  🔗 Source: https://wiki.efisonlt.com/wiki/SW-AJFT
+  📏 Length: 1994 chars
+  📝 Preview: printf
+"Protein\nSystem\n"
+|
+gmx_mpi trjconv -s md_40.tpr
+\
+-f md_full_200ns.xtc -o md_center_200ns.xtc
+\
+-pbc nojump -center
+printf
+"Backbone\nBackbone\n"
+|
+gmx_mpi rms -s md_40.tpr
+\
+-f md_center_20...
+----------------------------------------------------------------------
+
+[Chunk 199] ID: 367b1358-6901-4fa6-b76a-55a0c47a022a
+  📄 Title : SW-AJFT
+  🔗 Source: https://wiki.efisonlt.com/wiki/SW-AJFT
+  📏 Length: 1992 chars
+  📝 Preview: SBATCH untuk notifikasi email status job lihat
+[
+Slurm Jojo
+]
+Info lengkap submit script lihat
+[
+Submit Script ALELEON
+]
+Info lengkap sausage lihat
+[
+sausage
+]
+5
+Jalankan job dengan klik
+[Submit]
+6
+Pa...
+----------------------------------------------------------------------
+
+[Chunk 200] ID: 1c9bc1c1-9838-4a47-a7db-1b9965dd6099
+  📄 Title : SW-AJFT
+  🔗 Source: https://wiki.efisonlt.com/wiki/SW-AJFT
+  📏 Length: 1977 chars
+  📝 Preview: Tutorial ini mengasumsikan user dapat menggunakan CLI.
+1
+Akses / buka terminal ALELEON dengan opsi:
+[
+Login SSH
+];
+atau
+User yang login ke
+[
+EWS
+]
+, buka:
+menu
+Clusters > Aleleon Shell Access
+atau kli...
+----------------------------------------------------------------------
+
+[Chunk 201] ID: d5947abc-39b7-41a3-a613-461e1959b0cf
+  📄 Title : SW-AJFT
+  🔗 Source: https://wiki.efisonlt.com/wiki/SW-AJFT
+  📏 Length: 1629 chars
+  📝 Preview: dan tutup
+Hanya untuk mengaktifkan pembacaan utilisasi cgroup.
+Buka menu
+Jobs > Active Jobs
+Bila belum, ganti mode
+All Jobs
+ke
+Your Jobs
+Klik tombol
+>
+pada job user yang akan dipantau
+Pembacaan utilis...
+----------------------------------------------------------------------
+
+[Chunk 202] ID: 6417095b-2269-4702-8169-cfc62710d8fa
+  📄 Title : X
+  🔗 Source: https://wiki.efisonlt.com/wiki/X
+  📏 Length: 547 chars
+  📝 Preview: Maaf, halaman ini baru saja dihapus (dalam rentang waktu 24 jam).
+Log penghapusan, perlindungan, dan pemindahan halaman tersebut tersedia di bawah sebagai referensi.
+5 Maret 2026 12.18
+WilsonLisan
+bic...
+----------------------------------------------------------------------
+
+[Chunk 203] ID: 8a3a356f-c124-4f71-93ca-3a0169a56659
+  📄 Title : Komputasi Python dengan Python venv User
+  🔗 Source: https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Python_venv_User
+  📏 Length: 203 chars
+  📝 Preview: Saat ini tidak ada teks di halaman ini.
+Anda dapat
+melakukan pencarian untuk judul halaman ini
+di halaman-halaman lain, atau
+mencari log terkait
+, tapi Anda tidak memiliki izin untuk membuat halaman i...
+----------------------------------------------------------------------
+
+[Chunk 204] ID: a8cbfd3c-197e-4658-956d-a706db6a11d7
+  📄 Title : Software Komputasi Instalasi User
+  🔗 Source: https://wiki.efisonlt.com/wiki/Software_Komputasi_Instalasi_User
+  📏 Length: 1340 chars
+  📝 Preview: Halaman ini bagian dari:
+[
+Daftar Software Komputasi dan Tutorial
+]
+Halaman ini ditujukan bagi
+user yang membawa dan / atau melakukan sendiri instalasi software komputasi.
+Pilih panduan sesuai kebutuh...
+----------------------------------------------------------------------
+
+[Chunk 205] ID: 3e240947-6986-4393-a754-aababea1efa7
+  📄 Title : Phono3py dan Phonopy
+  🔗 Source: https://wiki.efisonlt.com/wiki/Phono3py_dan_Phonopy
+  📏 Length: 1991 chars
+  📝 Preview: [
+Phono3py
+]
+adalah package Python untuk kalkulasi
+lattice thermal conductivity
+suatu material. Phono3py bekerja beriringan dengan package Phonopy untuk kalkulasi phonon pada level
+harmonic
+dan
+quasi-...
+----------------------------------------------------------------------
+
+[Chunk 206] ID: 52bae97a-0be0-4f95-9529-addc37854ad3
+  📄 Title : Phono3py dan Phonopy
+  🔗 Source: https://wiki.efisonlt.com/wiki/Phono3py_dan_Phonopy
+  📏 Length: 987 chars
+  📝 Preview: Bila lebih gunakan
+[
+Aplikasi SFTP
+]
+- arahkan ke direktori Job Composer.
+.
+E5.
+Pada Python, batch job menjalankan file Python (
+.py
+).
+Lakukan pengecekan berikut supaya batch job berjalan:
+Upload fil...
+----------------------------------------------------------------------
+
+[Chunk 207] ID: d518e8b6-38bf-49a6-a8ab-78c5936c6964
+  📄 Title : Phono3py dan Phonopy
+  🔗 Source: https://wiki.efisonlt.com/wiki/Phono3py_dan_Phonopy
+  📏 Length: 1959 chars
+  📝 Preview: ---
+Jalankan:
+$
+pip install --user pyusb
+Ketentuan instalasi package:
+User tidak dapat update package bawaan environment.
+User hanya dapat instal package yang belum ada.
+.
+E6.
+Isi
+submit script
+untuk ...
+----------------------------------------------------------------------
+
+[Chunk 208] ID: 09bad99f-7cbd-4c07-9ba6-2d3e77362013
+  📄 Title : Phono3py dan Phonopy
+  🔗 Source: https://wiki.efisonlt.com/wiki/Phono3py_dan_Phonopy
+  📏 Length: 1766 chars
+  📝 Preview: [Submit]
+Failed
+- job berhenti karena error atau distop user.
+Bila user merasa job gagal berjalan:
+Job tertahan
+(status Queue)
+dalam waktu lama -> lihat
+[
+Troubleshooting 1
+]
+Komputasi error atau berj...
+----------------------------------------------------------------------
+
+[Chunk 209] ID: a0f6f49e-66c8-4ece-814c-d2c6242df3a8
+  📄 Title : Phono3py dan Phonopy
+  🔗 Source: https://wiki.efisonlt.com/wiki/Phono3py_dan_Phonopy
+  📏 Length: 1997 chars
+  📝 Preview: ---
+Jalankan:
+$
+pip install --user pyusb
+Ketentuan instalasi package:
+User tidak dapat update package bawaan environment.
+User hanya dapat instal package yang belum ada.
+.
+T4.
+Buat
+submit script
+untuk...
+----------------------------------------------------------------------
+
+[Chunk 210] ID: add39669-9d41-4149-ad0d-8c90dd02d374
+  📄 Title : Phono3py dan Phonopy
+  🔗 Source: https://wiki.efisonlt.com/wiki/Phono3py_dan_Phonopy
+  📏 Length: 1995 chars
+  📝 Preview: # Lihat Perintah Aktivasi pyload subbab 1
+pyload ////
+# Input perintah komputasi user
+////
+# Deaktivasi environment untuk clean up
+pyunload
+.
+T5.
+Jalankan job dengan perintah sbatch:
+$
+sbatch
+[nama-su...
+----------------------------------------------------------------------
+
+[Chunk 211] ID: 70c1ff4e-5dbe-4cf7-84a9-2528e0f2dc0b
+  📄 Title : Phono3py dan Phonopy
+  🔗 Source: https://wiki.efisonlt.com/wiki/Phono3py_dan_Phonopy
+  📏 Length: 1974 chars
+  📝 Preview: ]
+.
+T7.
+Untuk download file output, gunakan opsi:
+[
+Aplikasi SFTP
+]
+Melalui
+[
+EWS
+],
+menu
+Files > Home Directory
+*
+2C. Sesi Interaktif JupyterLab
+.
+Sesi Jupyter berjalan di
+[
+interactive node
+]
+CPU.
+J...
+----------------------------------------------------------------------
+
+[Chunk 212] ID: 2d42dedb-827c-4d9b-b427-3dc33f2c4ee6
+  📄 Title : Phono3py dan Phonopy
+  🔗 Source: https://wiki.efisonlt.com/wiki/Phono3py_dan_Phonopy
+  📏 Length: 878 chars
+  📝 Preview: User log out dari EFIRO Web Service.
+User dapat kembali masuk ke sesi Jupyter sedang jalan via:
+menu
+My Interactive Sessions
+Ketika user
+keluar saat ada cell jalan
+dan kembali masuk:
+Bisa jadi cell ts...
+----------------------------------------------------------------------
+
+[Chunk 213] ID: 2d847ea6-7583-4b3f-bf24-845a8caf76c3
+  📄 Title : Registrasi SSH Key ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Registrasi_SSH_Key_ALELEON_Supercomputer
+  📏 Length: 1991 chars
+  📝 Preview: Halaman ini bagian dari:
+[
+Tutorial ALELEON Supercomputer Mk.V
+]
+[
+Login SSH dan SFTP ALELEON Supercomputer
+]
+Halaman ini memandu:
+Subbab
+[ 1 ]
+- Membuat SSH key di komputer user.
+Subbab
+[ 2 ]
+- Menda...
+----------------------------------------------------------------------
+
+[Chunk 214] ID: e5546716-e4ee-4678-9761-45db7aa9da0c
+  📄 Title : Registrasi SSH Key ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Registrasi_SSH_Key_ALELEON_Supercomputer
+  📏 Length: 1969 chars
+  📝 Preview: - Tambahan info -
+SSH key tersimpan di direktori
+$HOME/.ssh
+user
+Proses no.1 membuat SSH key:
+Private key:
+Bila Ed25519 ->
+id_ed25519
+Bila RSA ->
+id_rsa
+Public key:
+Bila Ed25519 ->
+id_ed25519.pub
+Bila...
+----------------------------------------------------------------------
+
+[Chunk 215] ID: bbf9d98a-13d1-41fb-90c1-a12944845a2e
+  📄 Title : Registrasi SSH Key ALELEON Supercomputer
+  🔗 Source: https://wiki.efisonlt.com/wiki/Registrasi_SSH_Key_ALELEON_Supercomputer
+  📏 Length: 1574 chars
+  📝 Preview: User login: olala001
+  First name: Micin
+  Last name: Gondes
+  Home directory: /share/work_r640/olala001
+  Login shell: /bin/bash
+  Principal name: olala001@LOCAL.EFISONLT.COM
+  Principal alias: olala...
+----------------------------------------------------------------------
+
+[Chunk 216] ID: af4db84a-0e8a-4577-905b-2f1a9273bed7
+  📄 Title : BoltzTraP2
+  🔗 Source: https://wiki.efisonlt.com/wiki/BoltzTraP2
+  📏 Length: 1997 chars
+  📝 Preview: [
+BoltzTraP2
+]
+adalah implementasi modern berbasis package Python untuk
+smoothed Fourier interpolation algorithm
+berdasarkan BoltzTraP versi 1.2.5.
+Bagian dari:
+[
+Daftar Software Komputasi dan Tutoria...
+----------------------------------------------------------------------
+
+[Chunk 217] ID: a4e7366c-cc8f-4b2e-a95f-53d1f69e2bf0
+  📄 Title : BoltzTraP2
+  🔗 Source: https://wiki.efisonlt.com/wiki/BoltzTraP2
+  📏 Length: 1618 chars
+  📝 Preview: #    ${QE_BIN} -input ${INPUT_FILE}
+# Perintah aktivasi payload BoltzTraP2, contoh versi 25.3.1
+# Versi lain (bila ada) lihat subbab 1
+pyload boltztrap2-25.3.1
+# Tulis perintah menjalankan BoltzTraP2
+...
+----------------------------------------------------------------------
+
+[Chunk 218] ID: a9f72f8c-c608-4414-8516-10f3bd20459e
+  📄 Title : BoltzTraP2
+  🔗 Source: https://wiki.efisonlt.com/wiki/BoltzTraP2
+  📏 Length: 1959 chars
+  📝 Preview: ---
+Jalankan:
+$
+pip install --user pyusb
+Ketentuan instalasi package:
+User tidak dapat update package bawaan environment.
+User hanya dapat instal package yang belum ada.
+.
+E6.
+Isi
+submit script
+untuk ...
+----------------------------------------------------------------------
+
+[Chunk 219] ID: 02633b61-bb2e-49aa-8bb8-4844f47c3078
+  📄 Title : BoltzTraP2
+  🔗 Source: https://wiki.efisonlt.com/wiki/BoltzTraP2
+  📏 Length: 1768 chars
+  📝 Preview: [Submit]
+Failed
+- job berhenti karena error atau distop user.
+Bila user merasa job gagal berjalan:
+Job tertahan
+(status Queue)
+dalam waktu lama -> lihat
+[
+Troubleshooting 1
+]
+Komputasi error atau berj...
+----------------------------------------------------------------------
+
+[Chunk 220] ID: 3415b3b1-5944-4a78-9404-484f282fb31f
+  📄 Title : BoltzTraP2
+  🔗 Source: https://wiki.efisonlt.com/wiki/BoltzTraP2
+  📏 Length: 1997 chars
+  📝 Preview: ---
+Jalankan:
+$
+pip install --user pyusb
+Ketentuan instalasi package:
+User tidak dapat update package bawaan environment.
+User hanya dapat instal package yang belum ada.
+.
+T4.
+Buat
+submit script
+untuk...
+----------------------------------------------------------------------
+
+[Chunk 221] ID: d96b03d7-dd56-4921-9421-03010ea1c08e
+  📄 Title : BoltzTraP2
+  🔗 Source: https://wiki.efisonlt.com/wiki/BoltzTraP2
+  📏 Length: 1995 chars
+  📝 Preview: # Lihat Perintah Aktivasi pyload subbab 1
+pyload ////
+# Input perintah komputasi user
+////
+# Deaktivasi environment untuk clean up
+pyunload
+.
+T5.
+Jalankan job dengan perintah sbatch:
+$
+sbatch
+[nama-su...
+----------------------------------------------------------------------
+
+[Chunk 222] ID: 468e8059-5a63-4e58-b0bf-d1980ea92d3a
+  📄 Title : BoltzTraP2
+  🔗 Source: https://wiki.efisonlt.com/wiki/BoltzTraP2
+  📏 Length: 1976 chars
+  📝 Preview: ]
+.
+T7.
+Untuk download file output, gunakan opsi:
+[
+Aplikasi SFTP
+]
+Melalui
+[
+EWS
+],
+menu
+Files > Home Directory
+*
+2D. Sesi Interaktif JupyterLab
+.
+Sesi Jupyter berjalan di
+[
+interactive node
+]
+CPU.
+J...
+----------------------------------------------------------------------
+
+[Chunk 223] ID: d2715b9b-2f61-4e68-a457-c300bf8fce73
+  📄 Title : BoltzTraP2
+  🔗 Source: https://wiki.efisonlt.com/wiki/BoltzTraP2
+  📏 Length: 878 chars
+  📝 Preview: User log out dari EFIRO Web Service.
+User dapat kembali masuk ke sesi Jupyter sedang jalan via:
+menu
+My Interactive Sessions
+Ketika user
+keluar saat ada cell jalan
+dan kembali masuk:
+Bisa jadi cell ts...
+----------------------------------------------------------------------
+
+[Chunk 224] ID: ef808192-d1d3-4cbf-bda9-2b11a1cd93ce
+  📄 Title : AI Compilation
+  🔗 Source: https://wiki.efisonlt.com/wiki/AI_Compilation
+  📏 Length: 203 chars
+  📝 Preview: Saat ini tidak ada teks di halaman ini.
+Anda dapat
+melakukan pencarian untuk judul halaman ini
+di halaman-halaman lain, atau
+mencari log terkait
+, tapi Anda tidak memiliki izin untuk membuat halaman i...
+----------------------------------------------------------------------
+
+[Chunk 225] ID: 2c427b5b-b82f-4c3b-80b5-0c0885f5cb54
+  📄 Title : ACPYPE
+  🔗 Source: https://wiki.efisonlt.com/wiki/ACPYPE
+  📏 Length: 1969 chars
+  📝 Preview: [
+ACYPE
+]
+(AnteChamber PYthon Parser InterfacE) adalah package Python berbasis software Antechamber untuk menghasilkan topologi senyawa kimia (mendukung CNS/XPLOR, GROMACS, CHARMM, dan AMBER) serta be...
+----------------------------------------------------------------------
+
+[Chunk 226] ID: 77468178-cb4a-4b87-b09f-673eba73f615
+  📄 Title : ACPYPE
+  🔗 Source: https://wiki.efisonlt.com/wiki/ACPYPE
+  📏 Length: 1142 chars
+  📝 Preview: (bebas)
+dan klik
+[Create New Job]
+.
+E4.
+Siapkan file komputasi via
+[Edit Files]
+Dapat upload / download / manajemen / edit file.
+Limit upload 100MB per file
+Bila lebih gunakan
+[
+Aplikasi SFTP
+]
+- arah...
+----------------------------------------------------------------------
+
+[Chunk 227] ID: c8bfe291-c7ab-46f5-8f1e-52b407ad308b
+  📄 Title : ACPYPE
+  🔗 Source: https://wiki.efisonlt.com/wiki/ACPYPE
+  📏 Length: 1959 chars
+  📝 Preview: ---
+Jalankan:
+$
+pip install --user pyusb
+Ketentuan instalasi package:
+User tidak dapat update package bawaan environment.
+User hanya dapat instal package yang belum ada.
+.
+E6.
+Isi
+submit script
+untuk ...
+----------------------------------------------------------------------
+
+[Chunk 228] ID: 0b8d8f03-c822-4578-9ad7-2d949b5e059e
+  📄 Title : ACPYPE
+  🔗 Source: https://wiki.efisonlt.com/wiki/ACPYPE
+  📏 Length: 1764 chars
+  📝 Preview: [Submit]
+Failed
+- job berhenti karena error atau distop user.
+Bila user merasa job gagal berjalan:
+Job tertahan
+(status Queue)
+dalam waktu lama -> lihat
+[
+Troubleshooting 1
+]
+Komputasi error atau berj...
+----------------------------------------------------------------------
+
+[Chunk 229] ID: 3ce526fb-0c06-4454-9c8e-00cd919c2841
+  📄 Title : ACPYPE
+  🔗 Source: https://wiki.efisonlt.com/wiki/ACPYPE
+  📏 Length: 1997 chars
+  📝 Preview: ---
+Jalankan:
+$
+pip install --user pyusb
+Ketentuan instalasi package:
+User tidak dapat update package bawaan environment.
+User hanya dapat instal package yang belum ada.
+.
+T4.
+Buat
+submit script
+untuk...
+----------------------------------------------------------------------
+
+[Chunk 230] ID: 335cf466-ce14-4eb7-91ca-8e50e81bcc67
+  📄 Title : ACPYPE
+  🔗 Source: https://wiki.efisonlt.com/wiki/ACPYPE
+  📏 Length: 1995 chars
+  📝 Preview: # Lihat Perintah Aktivasi pyload subbab 1
+pyload ////
+# Input perintah komputasi user
+////
+# Deaktivasi environment untuk clean up
+pyunload
+.
+T5.
+Jalankan job dengan perintah sbatch:
+$
+sbatch
+[nama-su...
+----------------------------------------------------------------------
+
+[Chunk 231] ID: 569d5346-436a-4b1d-9316-57b503fe2528
+  📄 Title : ACPYPE
+  🔗 Source: https://wiki.efisonlt.com/wiki/ACPYPE
+  📏 Length: 1972 chars
+  📝 Preview: ]
+.
+T7.
+Untuk download file output, gunakan opsi:
+[
+Aplikasi SFTP
+]
+Melalui
+[
+EWS
+],
+menu
+Files > Home Directory
+*
+2C. Sesi Interaktif JupyterLab
+.
+Sesi Jupyter berjalan di
+[
+interactive node
+]
+CPU.
+J...
+----------------------------------------------------------------------
+
+[Chunk 232] ID: 42e37c85-05a1-4416-96d3-cb694e9000f6
+  📄 Title : ACPYPE
+  🔗 Source: https://wiki.efisonlt.com/wiki/ACPYPE
+  📏 Length: 878 chars
+  📝 Preview: User log out dari EFIRO Web Service.
+User dapat kembali masuk ke sesi Jupyter sedang jalan via:
+menu
+My Interactive Sessions
+Ketika user
+keluar saat ada cell jalan
+dan kembali masuk:
+Bisa jadi cell ts...
+----------------------------------------------------------------------
+
+[Chunk 233] ID: 8788fc6a-f171-49ea-8669-4153ae92ba4d
+  📄 Title : GMX-MMPBSA
+  🔗 Source: https://wiki.efisonlt.com/wiki/GMX-MMPBSA
+  📏 Length: 1995 chars
+  📝 Preview: [
+gmx_MMPBSA
+]
+adalah package Python berbasis MMPBSA.py dari AMBER untuk kalkulasi end-state free energy dengan file GROMACS.
+Bagian dari:
+[
+Daftar Software Komputasi dan Tutorial
+]
+- Daftar isi -
+Daf...
+----------------------------------------------------------------------
+
+[Chunk 234] ID: bcdbc5e3-42e0-4210-ba99-28dd9a579e7f
+  📄 Title : GMX-MMPBSA
+  🔗 Source: https://wiki.efisonlt.com/wiki/GMX-MMPBSA
+  📏 Length: 736 chars
+  📝 Preview: .
+2.
+Lakukan konversi ke file Python:
+$
+jupytext --to py
+[file-ipynb-user]
+---
+Contoh konversi file Notebook
+wololo.ipynb
+$
+jupytext --to py
+wololo.ipynb
+akan menghasilkan file Python
+wololo.py
+Apakah...
+----------------------------------------------------------------------
+
+[Chunk 235] ID: bf668af4-42a4-4f3f-b168-1e24922a9052
+  📄 Title : GMX-MMPBSA
+  🔗 Source: https://wiki.efisonlt.com/wiki/GMX-MMPBSA
+  📏 Length: 1959 chars
+  📝 Preview: ---
+Jalankan:
+$
+pip install --user pyusb
+Ketentuan instalasi package:
+User tidak dapat update package bawaan environment.
+User hanya dapat instal package yang belum ada.
+.
+E6.
+Isi
+submit script
+untuk ...
+----------------------------------------------------------------------
+
+[Chunk 236] ID: a7f17e27-4cfb-4ffd-a91e-c627b1ecee89
+  📄 Title : GMX-MMPBSA
+  🔗 Source: https://wiki.efisonlt.com/wiki/GMX-MMPBSA
+  📏 Length: 1768 chars
+  📝 Preview: [Submit]
+Failed
+- job berhenti karena error atau distop user.
+Bila user merasa job gagal berjalan:
+Job tertahan
+(status Queue)
+dalam waktu lama -> lihat
+[
+Troubleshooting 1
+]
+Komputasi error atau berj...
+----------------------------------------------------------------------
+
+[Chunk 237] ID: 072ca5dd-6330-4dea-b96e-daa975e273a9
+  📄 Title : GMX-MMPBSA
+  🔗 Source: https://wiki.efisonlt.com/wiki/GMX-MMPBSA
+  📏 Length: 1997 chars
+  📝 Preview: ---
+Jalankan:
+$
+pip install --user pyusb
+Ketentuan instalasi package:
+User tidak dapat update package bawaan environment.
+User hanya dapat instal package yang belum ada.
+.
+T4.
+Buat
+submit script
+untuk...
+----------------------------------------------------------------------
+
+[Chunk 238] ID: 8d2e3206-2659-426b-989f-67e74bb1c821
+  📄 Title : GMX-MMPBSA
+  🔗 Source: https://wiki.efisonlt.com/wiki/GMX-MMPBSA
+  📏 Length: 1992 chars
+  📝 Preview: # Lihat Perintah Aktivasi pyload subbab 1
+pyload ////
+# Input perintah komputasi user
+# Bila menggunakan MPI (mpirun), gunakan format:
+# mpirun -np $SLURM_NTASKS --use-hwthread-cpus ////
+////
+# Deakti...
+----------------------------------------------------------------------
+
+[Chunk 239] ID: e191dc14-3af8-44ab-a341-7ca8bd78c270
+  📄 Title : GMX-MMPBSA
+  🔗 Source: https://wiki.efisonlt.com/wiki/GMX-MMPBSA
+  📏 Length: 1992 chars
+  📝 Preview: [
+Troubleshooting 1
+]
+Komputasi error atau berjalan tidak semestinya -> lihat
+[
+Troubleshooting 2
+]
+.
+T7.
+Untuk download file output, gunakan opsi:
+[
+Aplikasi SFTP
+]
+Melalui
+[
+EWS
+],
+menu
+Files > Home...
+----------------------------------------------------------------------
+
+[Chunk 240] ID: e05732dd-6699-4664-b754-53f4d2e91f29
+  📄 Title : GMX-MMPBSA
+  🔗 Source: https://wiki.efisonlt.com/wiki/GMX-MMPBSA
+  📏 Length: 967 chars
+  📝 Preview: Termasuk ketika:
+Koneksi user terputus saat sesi Jupyter.
+User keluar dari sesi Jupyter.
+User log out dari EFIRO Web Service.
+User dapat kembali masuk ke sesi Jupyter sedang jalan via:
+menu
+My Interac...
+----------------------------------------------------------------------
+
+[Chunk 241] ID: a06579f7-29e6-4f77-aa74-f871a3c63708
+  📄 Title : AutoGluon
+  🔗 Source: https://wiki.efisonlt.com/wiki/AutoGluon
+  📏 Length: 203 chars
+  📝 Preview: Saat ini tidak ada teks di halaman ini.
+Anda dapat
+melakukan pencarian untuk judul halaman ini
+di halaman-halaman lain, atau
+mencari log terkait
+, tapi Anda tidak memiliki izin untuk membuat halaman i...
+----------------------------------------------------------------------
+
+[Chunk 242] ID: 93ba6c34-0bd0-4d24-a62f-e3d55a5f861f
+  📄 Title : XUIN Temporary
+  🔗 Source: https://wiki.efisonlt.com/wiki/XUIN_Temporary
+  📏 Length: 1998 chars
+  📝 Preview: Update 12 Januari 2026
+1. Daftar Instalasi Package AI
+Instalasi global per tanggal 12 Januari 2026:
+Nama
+Perintah Aktivasi pyload
+(terminal & batch job)
+Nama
+Sesi Jupyter
+Versi
+Python
+AI Compilation R...
+----------------------------------------------------------------------
+
+[Chunk 243] ID: 49313394-1f5f-47fd-9452-b3fae0538fb7
+  📄 Title : XUIN Temporary
+  🔗 Source: https://wiki.efisonlt.com/wiki/XUIN_Temporary
+  📏 Length: 544 chars
+  📝 Preview: $
+jupytext --to py
+wololo.ipynb
+akan menghasilkan file Python
+wololo.py
+Apakah kebutuhan package Python lengkap? -
+1.
+Buka
+[Open Terminal]
+.
+2.
+Aktifkan env sesuai template Job Composer:
+$
+pyl
+ss
+.
+3....
+----------------------------------------------------------------------
+
+[Chunk 244] ID: 4e788073-7bf7-4213-977f-adffd45c6644
+  📄 Title : XUIN Temporary
+  🔗 Source: https://wiki.efisonlt.com/wiki/XUIN_Temporary
+  📏 Length: 1979 chars
+  📝 Preview: ---
+Jalankan:
+$
+pip install --user pyusb
+Ketentuan instalasi package:
+User tidak dapat update package bawaan environment.
+User hanya dapat instal package yang belum ada.
+.
+E6.
+Isi
+submit script
+untuk ...
+----------------------------------------------------------------------
+
+[Chunk 245] ID: 36cd4947-a75f-4e4b-aa72-4c8cc8c49af7
+  📄 Title : XUIN Temporary
+  🔗 Source: https://wiki.efisonlt.com/wiki/XUIN_Temporary
+  📏 Length: 1642 chars
+  📝 Preview: Isi waktu maksimal sesi Jupyter
+Amount of memory/RAM (GB)
+Jumlah memori RAM dalam GB
+Use GPU for the job
+no
+-> tanpa GPU
+yes
+-> masukkan range MPS
+Untuk saat ini baru dibuka setting MPS
+Range presenta...
+----------------------------------------------------------------------
+
+[Chunk 246] ID: ed380f62-b83b-42c8-a31a-4a593436ae73
+  📄 Title : Software Komputasi dari User
+  🔗 Source: https://wiki.efisonlt.com/wiki/Software_Komputasi_dari_User
+  📏 Length: 203 chars
+  📝 Preview: Saat ini tidak ada teks di halaman ini.
+Anda dapat
+melakukan pencarian untuk judul halaman ini
+di halaman-halaman lain, atau
+mencari log terkait
+, tapi Anda tidak memiliki izin untuk membuat halaman i...
+----------------------------------------------------------------------
+
+======================================================================
+📊 Statistik per halaman:
+   12 chunks ← TRIAL A6
+   11 chunks ← Komputasi Python dengan Conda Environment User
+   10 chunks ← SW-GXN
+   10 chunks ← Komputasi dengan Container User via Apptainer
+    9 chunks ← SW-AJFT
+    8 chunks ← GROMACS
+    8 chunks ← MPI ALELEON Supercomputer
+    8 chunks ← Phono3py dan Phonopy
+    8 chunks ← BoltzTraP2
+    8 chunks ← ACPYPE
+    8 chunks ← GMX-MMPBSA
+    7 chunks ← R
+    6 chunks ← CP2K
+    6 chunks ← LAMMPS
+    6 chunks ← OpenMX
+    5 chunks ← Submit Script ALELEON Supercomputer
+    5 chunks ← Quantum ESPRESSO
+    5 chunks ← ORCA
+    5 chunks ← PHASE/0
+    5 chunks ← DFTB%2B
+    5 chunks ← Troubleshooting dan Support
+    5 chunks ← SW-AMK
+    5 chunks ← SIESTA
+    4 chunks ← Katalog Software ALELEON Supercomputer
+    4 chunks ← NWChem
+    4 chunks ← GAMESS
+    4 chunks ← NAMD
+    4 chunks ← COMCOT
+    4 chunks ← Sausage dan Aturan Metrik Penggunaan ALELEON
+    4 chunks ← Migrasi Akun dan Data Mk.III ke Mk.V
+    4 chunks ← XUIN Temporary
+    3 chunks ← Pendaftaran dan Biaya ALELEON Supercomputer
+    3 chunks ← Koneksi VPN ALELEON Supercomputer
+    3 chunks ← Publikasi Pengguna ALELEON Supercomputer
+    3 chunks ← Login SSH dan SFTP ALELEON Supercomputer
+    3 chunks ← Registrasi SSH Key ALELEON Supercomputer
+    2 chunks ← Core Hour
+    2 chunks ← Spesifikasi ALELEON Supercomputer
+    2 chunks ← Limitasi Fair Usage ALELEON Supercomputer
+    2 chunks ← Tutorial Menggunakan ALELEON Supercomputer Mk.V
+    2 chunks ← EFIRO Account Manager
+    2 chunks ← Pengantar SSH Key
+    2 chunks ← Pengenalan Menggunakan ALELEON Supercomputer
+    2 chunks ← Metode Komputasi di ALELEON
+    1 chunks ← ALELEON Supercomputer
+    1 chunks ← EasyBuild
+    1 chunks ← EUREKA!
+    1 chunks ← EUREKA! Periode 2
+    1 chunks ← Daftar Software Komputasi dan Tutorial Penggunaan
+    1 chunks ← SPECFEM3D
+    1 chunks ← Kode Reason ALELEON Supercomputer
+    1 chunks ← Komputasi Python
+    1 chunks ← Trial Testing
+    1 chunks ← ALELEON Desktop
+    1 chunks ← Upload - Download File ALELEON
+    1 chunks ← Login Pertama ALELEON Supercomputer
+    1 chunks ← Daftar Environment Python ALELEON
+    1 chunks ← X
+    1 chunks ← Komputasi Python dengan Python venv User
+    1 chunks ← Software Komputasi Instalasi User
+    1 chunks ← AI Compilation
+    1 chunks ← AutoGluon
+    1 chunks ← Software Komputasi dari User
+
+======================================================================
+🔍 Test search: "Bagaimana cara menjalankan GROMACS?"
+Failed to send telemetry event CollectionQueryEvent: capture() takes 1 positional argument but 3 were given
+
+  [1] Score: 0.2879
+      Title: SW-AJFT
+      Text:  # Limit waktu job (HH:MM:SS atau D-HH:MM:SS)
+# ex: 1 hari -> 24:00:00 atau 1-00:00:00
+#SBATCH --time=////
+# File output terminal, %j merekap no ID job...
+
+  [2] Score: 0.2943
+      Title: GROMACS
+      Text:  [
+GROMACS
+]
+adalah package berkecepatan tinggi untuk komputasi dinamika molekular baik untuk biokimia (seperti protein, lipids) maupun non-biokimia (s...
+
+  [3] Score: 0.3054
+      Title: SW-AJFT
+      Text:  # Memuat modul software GROMACS versi GPU
+module load gromacs/2025.3-gcc-13.4.0-cuda-12.9.0-pue
+# Threading OMP
+export
+OMP_NUM_THREADS
+=
+${
+SLURM_CPUS...

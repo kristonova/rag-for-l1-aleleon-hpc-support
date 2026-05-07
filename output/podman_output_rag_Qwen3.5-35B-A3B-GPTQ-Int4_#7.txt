@@ -1,0 +1,1528 @@
+Memulai proses RAG dengan mesin vLLM...
+
+[0] Menghubungi embedding-service API...
+/app/rag_app.py:137: UserWarning: Api key is used with an insecure connection.
+  client = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY)
+[1] ⚡ Memuat Qdrant dari 'http://qdrant:6333' (tanpa scraping)...
+/app/rag_app.py:193: UserWarning: Api key is used with an insecure connection.
+  client = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY)
+  Embedding batch 1/1 (1 texts)...
+    ✅ Berhasil memuat 442 chunks dari Qdrant
+
+[3] Membuat RAG chain...
+    Menunggu vLLM ready di http://vllm-rocm:8000/health ...
+    ✅ vLLM ready!
+
+[4] Menguji RAG chain dengan 69 pertanyaan...
+
+============================================================
+[Q1/69] Berapa kapasitas RAM efektif per node di partisi epyc-jumbo?
+------------------------------------------------------------
+Berdasarkan spesifikasi ALELEON Supercomputer, kapasitas RAM efektif per node di partisi epyc-jumbo adalah 500GB.
+
+Berikut detail spesifikasinya:
+1. Partisi: epyc-jumbo
+2. Jumlah Node: 1
+3. CPU per node: 1x AMD EPYC 7702P, 64 core / 128 thread, 2.0Ghz
+4. RAM per node: 500GB efektif
+5. Interkoneksi: Mellanox RoCE 100Gbps
+
+    📚 Sumber (10 chunks):
+    • Spesifikasi ALELEON Supercomputer → Partisi epyc-jumbo  (https://wiki.efisonlt.com/wiki/Spesifikasi_ALELEON_Supercomputer)
+    • Spesifikasi ALELEON Supercomputer → Partisi epyc  (https://wiki.efisonlt.com/wiki/Spesifikasi_ALELEON_Supercomputer)
+    • MPI ALELEON Supercomputer → 3.2. Jumlah Node dan Memori per Node  (https://wiki.efisonlt.com/wiki/MPI_ALELEON_Supercomputer)
+    • XUIN Temporary → 2B. Sesi Interaktif JupyterLab  (https://wiki.efisonlt.com/wiki/XUIN_Temporary)
+    • TRIAL A6 → Sesi Jupyter  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • BoltzTraP2 → 2D. Sesi Interaktif JupyterLab  (https://wiki.efisonlt.com/wiki/BoltzTraP2)
+    • Submit Script ALELEON Supercomputer → #SBATCH --partition  (https://wiki.efisonlt.com/wiki/Submit_Script_ALELEON_Supercomputer)
+    • ACPYPE → 2C. Sesi Interaktif JupyterLab  (https://wiki.efisonlt.com/wiki/ACPYPE)
+    • Sausage dan Aturan Metrik Penggunaan ALELEON → E. Kapasitas Storage HOME  (https://wiki.efisonlt.com/wiki/Sausage_dan_Aturan_Metrik_Penggunaan_ALELEON)
+    • Spesifikasi ALELEON Supercomputer → Daftar isi  (https://wiki.efisonlt.com/wiki/Spesifikasi_ALELEON_Supercomputer)
+
+============================================================
+[Q2/69] Berapa batas maksimal walltime (waktu komputasi) per job untuk golongan akun perseorangan?
+------------------------------------------------------------
+Batas maksimal walltime per job untuk golongan akun perseorangan adalah 3 hari (72 jam).
+
+Manajemen Slurm akan menahan job (status PENDING) apabila job menggunakan alokasi komputasi melebihi limit Fair Usage (LFU) ini.
+
+    📚 Sumber (10 chunks):
+    • Limitasi Fair Usage ALELEON Supercomputer → Berlaku untuk Setiap Job Komputasi  (https://wiki.efisonlt.com/wiki/Limitasi_Fair_Usage_ALELEON_Supercomputer)
+    • Limitasi Fair Usage ALELEON Supercomputer → Berlaku untuk Akumulasi Semua Job Komputasi  (https://wiki.efisonlt.com/wiki/Limitasi_Fair_Usage_ALELEON_Supercomputer)
+    • Sausage dan Aturan Metrik Penggunaan ALELEON → E. Kapasitas Storage HOME  (https://wiki.efisonlt.com/wiki/Sausage_dan_Aturan_Metrik_Penggunaan_ALELEON)
+    • Pendaftaran dan Biaya ALELEON Supercomputer → 4.1. Golongan Perseorangan  (https://wiki.efisonlt.com/wiki/Pendaftaran_dan_Biaya_ALELEON_Supercomputer)
+    • Troubleshooting dan Support → A1. Daftar Kode Reason ALELEON Supercomputer  (https://wiki.efisonlt.com/wiki/Troubleshooting_dan_Support)
+    • Sausage dan Aturan Metrik Penggunaan ALELEON → Contoh Penghitungan  (https://wiki.efisonlt.com/wiki/Sausage_dan_Aturan_Metrik_Penggunaan_ALELEON)
+    • Kode Reason ALELEON Supercomputer  (https://wiki.efisonlt.com/wiki/Kode_Reason_ALELEON_Supercomputer)
+    • Limitasi Fair Usage ALELEON Supercomputer → Permintaan Menambah LFU Sementara  (https://wiki.efisonlt.com/wiki/Limitasi_Fair_Usage_ALELEON_Supercomputer)
+    • SW-GXN → 4. Pilihan Menjalankan Komputasi  (https://wiki.efisonlt.com/wiki/SW-GXN)
+    • Troubleshooting dan Support → A2. Menangani Job Antri yang Melebihi Limit Komputasi  (https://wiki.efisonlt.com/wiki/Troubleshooting_dan_Support)
+
+============================================================
+[Q3/69] Saya ingin pakai partisi GPU. GPU jenis apa yang terpasang di partisi ampere?
+------------------------------------------------------------
+Partisi ampere di ALELEON Supercomputer terpasang 2x NVIDIA RTX 3090 24GB dengan fitur NVLink. GPU ini menggunakan arsitektur NVIDIA Ampere yang tidak mendukung CUDA versi 11 kebawah, sehingga Anda wajib menggunakan minimal CUDA 11.0.
+
+    📚 Sumber (10 chunks):
+    • Spesifikasi ALELEON Supercomputer → Partisi ampere  (https://wiki.efisonlt.com/wiki/Spesifikasi_ALELEON_Supercomputer)
+    • Spesifikasi ALELEON Supercomputer → Partisi tilla  (https://wiki.efisonlt.com/wiki/Spesifikasi_ALELEON_Supercomputer)
+    • Spesifikasi ALELEON Supercomputer → Partisi torti  (https://wiki.efisonlt.com/wiki/Spesifikasi_ALELEON_Supercomputer)
+    • Katalog Software ALELEON Supercomputer → 4.4. Library NVIDIA  (https://wiki.efisonlt.com/wiki/Katalog_Software_ALELEON_Supercomputer)
+    • Spesifikasi ALELEON Supercomputer → Partisi epyc-jumbo  (https://wiki.efisonlt.com/wiki/Spesifikasi_ALELEON_Supercomputer)
+    • Komputasi dengan Container User via Apptainer → 2. Kompatibilitas Komputasi  (https://wiki.efisonlt.com/wiki/Komputasi_dengan_Container_User_via_Apptainer)
+    • GROMACS → 1. Modul GROMACS  (https://wiki.efisonlt.com/wiki/GROMACS)
+    • MPI ALELEON Supercomputer → 4.2. Opsi Skenario Proses MPI di CPU vs GPU  (https://wiki.efisonlt.com/wiki/MPI_ALELEON_Supercomputer)
+    • Submit Script ALELEON Supercomputer → #SBATCH --partition  (https://wiki.efisonlt.com/wiki/Submit_Script_ALELEON_Supercomputer)
+    • MPI ALELEON Supercomputer → 4.1. NVIDIA CUDA dan CUDA-aware MPI  (https://wiki.efisonlt.com/wiki/MPI_ALELEON_Supercomputer)
+
+============================================================
+[Q4/69] Apa alamat website portal EFIRO Web Service (EWS) untuk login?
+------------------------------------------------------------
+Alamat website portal EFIRO Web Service (EWS) untuk login adalah https://aleleonsuper.computer. Anda dapat mengakses portal ini dengan membuka URL tersebut di browser dan melakukan login menggunakan username serta password yang diberikan oleh pengurus AMK.
+
+    📚 Sumber (10 chunks):
+    • SW-AMK → 1. Login  (https://wiki.efisonlt.com/wiki/SW-AMK)
+    • SW-GXN → EFIRO Web Service (EWS)  (https://wiki.efisonlt.com/wiki/SW-GXN)
+    • SW-AJFT → EFIRO Web Service (EWS)  (https://wiki.efisonlt.com/wiki/SW-AJFT)
+    • Tutorial Menggunakan ALELEON Supercomputer Mk.V → 2. Menggunakan ALELEON Supercomputer  (https://wiki.efisonlt.com/wiki/Tutorial_Menggunakan_ALELEON_Supercomputer_Mk.V)
+    • SW-AJFT → EFIRO Account Manager  (https://wiki.efisonlt.com/wiki/SW-AJFT)
+    • SW-GXN → EFIRO Account Manager  (https://wiki.efisonlt.com/wiki/SW-GXN)
+    • EFIRO Account Manager → Login ke EFIRO Account Manager  (https://wiki.efisonlt.com/wiki/EFIRO_Account_Manager)
+    • EFIRO Account Manager → Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/EFIRO_Account_Manager)
+    • EFIRO Account Manager  (https://wiki.efisonlt.com/wiki/EFIRO_Account_Manager)
+    • TRIAL A6 → Login ALELEON Supercomputer  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+
+============================================================
+[Q5/69] Perintah apa yang harus saya ketik di terminal untuk melihat daftar environment python/pyload yang saya buat?
+------------------------------------------------------------
+Untuk melihat daftar environment Python atau modul pyload yang telah Anda buat, silakan jalankan perintah berikut di terminal:
+
+1. Jalankan perintah `pyl list`.
+2. Lihat bagian output yang ditandai dengan label **USER-DEFINED** untuk melihat daftar modul yang dibuat sendiri.
+
+Perintah ini akan menampilkan semua modul pyload yang terdaftar, termasuk lingkungan kerja (environment) yang Anda instal secara manual.
+
+    📚 Sumber (10 chunks):
+    • XUIN Temporary → 1. Daftar Instalasi Package AI  (https://wiki.efisonlt.com/wiki/XUIN_Temporary)
+    • BoltzTraP2 → 2C. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/BoltzTraP2)
+    • ACPYPE → 2B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/ACPYPE)
+    • Komputasi Python dengan Conda Environment User → 5B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • Komputasi Python dengan Conda Environment User → 1. Ketentuan  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • SW-AMK → 3A. Batch Job  (https://wiki.efisonlt.com/wiki/SW-AMK)
+    • Komputasi Python dengan Conda Environment User  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • XUIN Temporary → 2A. Batch Job dengan Job Composer  (https://wiki.efisonlt.com/wiki/XUIN_Temporary)
+    • Komputasi dengan Container User via Apptainer → 4. Manajemen Image SIF dan Modul Pyload  (https://wiki.efisonlt.com/wiki/Komputasi_dengan_Container_User_via_Apptainer)
+    • Komputasi Python dengan Conda Environment User → 4. Manajemen Conda Env dan Modul Pyload  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+
+============================================================
+[Q6/69] Berapa harga 1 GPU Hour (GH) untuk pengguna golongan perseorangan non-akademia?
+------------------------------------------------------------
+Berdasarkan dokumen referensi, harga untuk 1 GPU Hour (GH) bagi pengguna golongan perseorangan non-akademia adalah Rp8.585,-/GH. Harga ini berlaku khusus untuk kategori pengguna yang bukan tenaga pendidik, peserta didik, atau peneliti yang berafiliasi dengan sekolah atau universitas. Perlu diingat bahwa harga tersebut sudah termasuk PPN mengikuti kebijakan berlaku Pemerintah Indonesia.
+
+    📚 Sumber (10 chunks):
+    • Pendaftaran dan Biaya ALELEON Supercomputer → 5. Biaya Layanan Core Hour ALELEON  (https://wiki.efisonlt.com/wiki/Pendaftaran_dan_Biaya_ALELEON_Supercomputer)
+    • Pendaftaran dan Biaya ALELEON Supercomputer → 3. Core Hour: Metrik Penggunaan Berbayar ALELEON  (https://wiki.efisonlt.com/wiki/Pendaftaran_dan_Biaya_ALELEON_Supercomputer)
+    • Core Hour → 1. CCH dan GH  (https://wiki.efisonlt.com/wiki/Core_Hour)
+    • Core Hour → 4. Harga Core Hour  (https://wiki.efisonlt.com/wiki/Core_Hour)
+    • Core Hour → Rumus Slurm Menghitung Core Hour  (https://wiki.efisonlt.com/wiki/Core_Hour)
+    • Pendaftaran dan Biaya ALELEON Supercomputer → 4.1. Golongan Perseorangan  (https://wiki.efisonlt.com/wiki/Pendaftaran_dan_Biaya_ALELEON_Supercomputer)
+    • Sausage dan Aturan Metrik Penggunaan ALELEON → A. Core Hour - Effective, Actual, Total  (https://wiki.efisonlt.com/wiki/Sausage_dan_Aturan_Metrik_Penggunaan_ALELEON)
+    • Core Hour  (https://wiki.efisonlt.com/wiki/Core_Hour)
+    • Core Hour → Ketentuan  (https://wiki.efisonlt.com/wiki/Core_Hour)
+    • Sausage dan Aturan Metrik Penggunaan ALELEON → Contoh Penghitungan  (https://wiki.efisonlt.com/wiki/Sausage_dan_Aturan_Metrik_Penggunaan_ALELEON)
+
+============================================================
+[Q7/69] Saya mau cek sisa kuota core hour saya. Perintah sausage apa yang harus diketik?
+------------------------------------------------------------
+Untuk mengecek sisa kuota core hour Anda, silakan buka shell atau terminal ALELEON dan jalankan perintah berikut:
+
+1. Jalankan perintah `sausage` di terminal.
+2. Pilih menu yang sesuai dengan kebutuhan untuk membaca penggunaan core hour user.
+
+Perintah dasar yang harus diketik adalah:
+$ sausage
+
+    📚 Sumber (10 chunks):
+    • Sausage dan Aturan Metrik Penggunaan ALELEON → Contoh Penghitungan  (https://wiki.efisonlt.com/wiki/Sausage_dan_Aturan_Metrik_Penggunaan_ALELEON)
+    • Sausage dan Aturan Metrik Penggunaan ALELEON → Jenis Core Hour  (https://wiki.efisonlt.com/wiki/Sausage_dan_Aturan_Metrik_Penggunaan_ALELEON)
+    • Troubleshooting dan Support → A3. Apakah User Perlu Menambah Kuota Core Hour?  (https://wiki.efisonlt.com/wiki/Troubleshooting_dan_Support)
+    • Core Hour → Monitor Penggunaan Core Hour  (https://wiki.efisonlt.com/wiki/Core_Hour)
+    • Daftar Software Komputasi dan Tutorial Penggunaan → Sausage dan Pengenalan Komputasi  (https://wiki.efisonlt.com/wiki/Daftar_Software_Komputasi_dan_Tutorial_Penggunaan)
+    • Sausage dan Aturan Metrik Penggunaan ALELEON → sausage  (https://wiki.efisonlt.com/wiki/Sausage_dan_Aturan_Metrik_Penggunaan_ALELEON)
+    • Core Hour → Alur transaksi  (https://wiki.efisonlt.com/wiki/Core_Hour)
+    • Sausage dan Aturan Metrik Penggunaan ALELEON → E. Kapasitas Storage HOME  (https://wiki.efisonlt.com/wiki/Sausage_dan_Aturan_Metrik_Penggunaan_ALELEON)
+    • SW-AJFT → 2. Sausage dan Pengenalan Komputasi  (https://wiki.efisonlt.com/wiki/SW-AJFT)
+    • Sausage dan Aturan Metrik Penggunaan ALELEON → Kapan Job Tertahan  (https://wiki.efisonlt.com/wiki/Sausage_dan_Aturan_Metrik_Penggunaan_ALELEON)
+
+============================================================
+[Q8/69] Apa itu PKSPIAS dalam pendaftaran akun ALELEON?
+------------------------------------------------------------
+PKSPIAS adalah singkatan dari Perjanjian Kerja Sama Pengguna Institusi ALELEON Supercomputer yang menjadi acuan penggunaan baik secara bisnis maupun teknis bagi golongan institusi. Dokumen ini ditandatangani atas nama institusi dengan kredensial resmi seperti cap resmi sebagai syarat utama dalam kerjasama legal dengan EFISON untuk menggunakan layanan superkomputer tersebut.
+
+    📚 Sumber (10 chunks):
+    • Pendaftaran dan Biaya ALELEON Supercomputer → 4.2. Golongan Institusi  (https://wiki.efisonlt.com/wiki/Pendaftaran_dan_Biaya_ALELEON_Supercomputer)
+    • Registrasi SSH Key ALELEON Supercomputer → 2. Registrasi SSH Key User ke ALELEON  (https://wiki.efisonlt.com/wiki/Registrasi_SSH_Key_ALELEON_Supercomputer)
+    • Migrasi Akun dan Data Mk.III ke Mk.V → 1A. Login Mk.III  (https://wiki.efisonlt.com/wiki/Migrasi_Akun_dan_Data_Mk.III_ke_Mk.V)
+    • Login Pertama ALELEON Supercomputer  (https://wiki.efisonlt.com/wiki/Login_Pertama_ALELEON_Supercomputer)
+    • SW-GXN → EFIRO Web Service (EWS)  (https://wiki.efisonlt.com/wiki/SW-GXN)
+    • SW-AMK → 1. Login  (https://wiki.efisonlt.com/wiki/SW-AMK)
+    • SW-AJFT → EFIRO Web Service (EWS)  (https://wiki.efisonlt.com/wiki/SW-AJFT)
+    • Pendaftaran dan Biaya ALELEON Supercomputer → [Inkuiri pendaftaran akun institusi]  (https://wiki.efisonlt.com/wiki/Pendaftaran_dan_Biaya_ALELEON_Supercomputer)
+    • Tutorial Menggunakan ALELEON Supercomputer Mk.V → 2. Menggunakan ALELEON Supercomputer  (https://wiki.efisonlt.com/wiki/Tutorial_Menggunakan_ALELEON_Supercomputer_Mk.V)
+    • Login SSH dan SFTP ALELEON Supercomputer → 4. Opsi Login Aplikasi SFTP  (https://wiki.efisonlt.com/wiki/Login_SSH_dan_SFTP_ALELEON_Supercomputer)
+
+============================================================
+[Q9/69] Jika saya pakai aplikasi SFTP seperti FileZilla, apakah ada limit ukuran file yang bisa diupload?
+------------------------------------------------------------
+Ya, ada batasan ukuran file yang dapat diunggah melalui aplikasi SFTP seperti FileZilla. Berdasarkan dokumen referensi, limit upload adalah **100MB per file**. Jika ukuran file Anda melebihi 100MB, Anda disarankan untuk menggunakan aplikasi SFTP (seperti FileZilla) sebagai alternatif dari metode transfer via EFIRO Web Service yang memiliki batas tersebut. Dokumen juga menyatakan bahwa tidak ada limit ukuran untuk download.
+
+    📚 Sumber (10 chunks):
+    • Upload - Download File ALELEON → 1. Transfer Data Direktori HOME  (https://wiki.efisonlt.com/wiki/Upload_-_Download_File_ALELEON)
+    • Sausage dan Aturan Metrik Penggunaan ALELEON → E. Kapasitas Storage HOME  (https://wiki.efisonlt.com/wiki/Sausage_dan_Aturan_Metrik_Penggunaan_ALELEON)
+    • Login SSH dan SFTP ALELEON Supercomputer → 4. Opsi Login Aplikasi SFTP  (https://wiki.efisonlt.com/wiki/Login_SSH_dan_SFTP_ALELEON_Supercomputer)
+    • SPECFEM3D  (https://wiki.efisonlt.com/wiki/SPECFEM3D)
+    • Upload - Download File ALELEON → 2. Transfer Data Job Composer EWS  (https://wiki.efisonlt.com/wiki/Upload_-_Download_File_ALELEON)
+    • SW-GXN → Pranala Lebih Lanjut  (https://wiki.efisonlt.com/wiki/SW-GXN)
+    • DFTB%2B → Pelaporan Kendala dan Support  (https://wiki.efisonlt.com/wiki/DFTB%2B)
+    • Upload - Download File ALELEON → SFTP ke Job Composer  (https://wiki.efisonlt.com/wiki/Upload_-_Download_File_ALELEON)
+    • Limitasi Fair Usage ALELEON Supercomputer → Permintaan Menambah LFU Sementara  (https://wiki.efisonlt.com/wiki/Limitasi_Fair_Usage_ALELEON_Supercomputer)
+    • Software Komputasi Instalasi User → [ E ] - Pull dan Menjalankan Image Container dengan Apptainer  (https://wiki.efisonlt.com/wiki/Software_Komputasi_Instalasi_User)
+
+============================================================
+[Q10/69] OS (Sistem Operasi) apa yang digunakan oleh ALELEON Mk.V?
+------------------------------------------------------------
+Sistem Operasi yang digunakan oleh ALELEON Mk.V adalah Rocky Linux 8 (berbasis Red-hat) dengan kernel 5.4.266-1.el8.elrepo.x86_64.
+
+    📚 Sumber (10 chunks):
+    • Spesifikasi ALELEON Supercomputer  (https://wiki.efisonlt.com/wiki/Spesifikasi_ALELEON_Supercomputer)
+    • Tutorial Menggunakan ALELEON Supercomputer Mk.V  (https://wiki.efisonlt.com/wiki/Tutorial_Menggunakan_ALELEON_Supercomputer_Mk.V)
+    • Migrasi Akun dan Data Mk.III ke Mk.V → 2. Spesifikasi Akun Mk.V  (https://wiki.efisonlt.com/wiki/Migrasi_Akun_dan_Data_Mk.III_ke_Mk.V)
+    • Migrasi Akun dan Data Mk.III ke Mk.V → 3. Migrasi Akun dan Data ke Mk.V  (https://wiki.efisonlt.com/wiki/Migrasi_Akun_dan_Data_Mk.III_ke_Mk.V)
+    • Migrasi Akun dan Data Mk.III ke Mk.V  (https://wiki.efisonlt.com/wiki/Migrasi_Akun_dan_Data_Mk.III_ke_Mk.V)
+    • Spesifikasi ALELEON Supercomputer → Spesifikasi Software Sistem  (https://wiki.efisonlt.com/wiki/Spesifikasi_ALELEON_Supercomputer)
+    • Migrasi Akun dan Data Mk.III ke Mk.V → 1A. Login Mk.III  (https://wiki.efisonlt.com/wiki/Migrasi_Akun_dan_Data_Mk.III_ke_Mk.V)
+    • SW-GXN → Opsi Login  (https://wiki.efisonlt.com/wiki/SW-GXN)
+    • Katalog Software ALELEON Supercomputer → 4.2. Compiler MPI (Message Passing Interface)  (https://wiki.efisonlt.com/wiki/Katalog_Software_ALELEON_Supercomputer)
+    • SW-AJFT → Opsi Login  (https://wiki.efisonlt.com/wiki/SW-AJFT)
+
+============================================================
+[Q11/69] Versi SLURM berapa yang terpasang di sistem ALELEON saat ini?
+------------------------------------------------------------
+Sistem ALELEON saat ini menggunakan SLURM versi 23.11.1-1.
+
+Versi tersebut dikonfigurasi dengan protokol PMIX, UCX, CUDA, dan fitur auto load-balancing yang menyesuaikan spesifikasi ALELEON Supercomputer.
+
+    📚 Sumber (10 chunks):
+    • Metode Komputasi di ALELEON → 4C. Slurm srun  (https://wiki.efisonlt.com/wiki/Metode_Komputasi_di_ALELEON)
+    • Sausage dan Aturan Metrik Penggunaan ALELEON → C. Alokasi Core CPU Minimum 2 dan Genap  (https://wiki.efisonlt.com/wiki/Sausage_dan_Aturan_Metrik_Penggunaan_ALELEON)
+    • Spesifikasi ALELEON Supercomputer → Spesifikasi Software Sistem  (https://wiki.efisonlt.com/wiki/Spesifikasi_ALELEON_Supercomputer)
+    • Metode Komputasi di ALELEON → 1. Manajemen Slurm  (https://wiki.efisonlt.com/wiki/Metode_Komputasi_di_ALELEON)
+    • Sausage dan Aturan Metrik Penggunaan ALELEON → Jenis Core Hour  (https://wiki.efisonlt.com/wiki/Sausage_dan_Aturan_Metrik_Penggunaan_ALELEON)
+    • LAMMPS → 2B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/LAMMPS)
+    • GROMACS → 1. Modul GROMACS  (https://wiki.efisonlt.com/wiki/GROMACS)
+    • PHASE/0 → 2B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/PHASE/0)
+    • CP2K → 2B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/CP2K)
+    • NWChem → Modul NWChem  (https://wiki.efisonlt.com/wiki/NWChem)
+
+============================================================
+[Q12/69] Bagaimana cara membatalkan/menghentikan job yang berstatus PENDING di terminal?
+------------------------------------------------------------
+Untuk membatalkan atau menghentikan job yang berstatus PENDING di terminal, Anda dapat menggunakan perintah `scancel` diikuti dengan ID job tersebut. Berikut adalah langkah-langkahnya:
+
+1. Lihat status dan ID job Anda terlebih dahulu dengan menjalankan perintah `$ squeue -ul $USER`.
+2. Identifikasi ID job yang ingin dibatalkan (misalnya, jika ID job adalah 231).
+3. Jalankan perintah pembatalan dengan format `$ scancel [job-ID]`, contohnya: `$ scancel 231`.
+
+Perintah ini akan mengubah status job menjadi CA (CANCELED) yang berarti job dibatalkan oleh user.
+
+    📚 Sumber (10 chunks):
+    • SIESTA → 2B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/SIESTA)
+    • GMX-MMPBSA → 2B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/GMX-MMPBSA)
+    • PHASE/0 → 2B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/PHASE/0)
+    • OpenMX → 3B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/OpenMX)
+    • ORCA → 3B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/ORCA)
+    • NAMD → Job Submission Terminal  (https://wiki.efisonlt.com/wiki/NAMD)
+    • Phono3py dan Phonopy → 2B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/Phono3py_dan_Phonopy)
+    • Quantum ESPRESSO → 2B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/Quantum_ESPRESSO)
+    • R → Job Submission Terminal  (https://wiki.efisonlt.com/wiki/R)
+    • DFTB%2B → Job Submission Terminal  (https://wiki.efisonlt.com/wiki/DFTB%2B)
+
+============================================================
+[Q13/69] Berapa kapasitas limit storage HOME untuk akun perseorangan?
+------------------------------------------------------------
+Kapasitas limit storage HOME untuk akun golongan perseorangan adalah sebesar 150 GiB. Bagi golongan ini, tanggung jawab memantau penggunaan storage menjadi kewajiban user dengan cara memantaunya berkala menggunakan perintah `sausage ncdu`.
+
+    📚 Sumber (10 chunks):
+    • Sausage dan Aturan Metrik Penggunaan ALELEON → E. Kapasitas Storage HOME  (https://wiki.efisonlt.com/wiki/Sausage_dan_Aturan_Metrik_Penggunaan_ALELEON)
+    • Pendaftaran dan Biaya ALELEON Supercomputer → 4.1. Golongan Perseorangan  (https://wiki.efisonlt.com/wiki/Pendaftaran_dan_Biaya_ALELEON_Supercomputer)
+    • Upload - Download File ALELEON → 1. Transfer Data Direktori HOME  (https://wiki.efisonlt.com/wiki/Upload_-_Download_File_ALELEON)
+    • Limitasi Fair Usage ALELEON Supercomputer → Berlaku untuk Akumulasi Semua Job Komputasi  (https://wiki.efisonlt.com/wiki/Limitasi_Fair_Usage_ALELEON_Supercomputer)
+    • Limitasi Fair Usage ALELEON Supercomputer → Permintaan Menambah LFU Sementara  (https://wiki.efisonlt.com/wiki/Limitasi_Fair_Usage_ALELEON_Supercomputer)
+    • EUREKA! → EUREKA! Periode 2: Maret 2022  (https://wiki.efisonlt.com/wiki/EUREKA!)
+    • Daftar Software Komputasi dan Tutorial Penggunaan → Panduan (Lama) ALELEON Mk.III  (https://wiki.efisonlt.com/wiki/Daftar_Software_Komputasi_dan_Tutorial_Penggunaan)
+    • Spesifikasi ALELEON Supercomputer → Spesifikasi Storage  (https://wiki.efisonlt.com/wiki/Spesifikasi_ALELEON_Supercomputer)
+    • Pengantar SSH Key → Private Key itu ...  (https://wiki.efisonlt.com/wiki/Pengantar_SSH_Key)
+    • Core Hour → Alur transaksi  (https://wiki.efisonlt.com/wiki/Core_Hour)
+
+============================================================
+[Q14/69] Apakah sistem ALELEON memiliki backup jika saya tidak sengaja menghapus data di HOME?
+------------------------------------------------------------
+Ya, sistem ALELEON memiliki mekanisme backup dan pemulihan data. Sistem melakukan checkpoint snapshot storage setiap 24 jam untuk keperluan tersebut.
+
+Jika Anda tidak sengaja menghapus data, Anda dapat melayangkan permintaan recovery ke email support di alamat **support@efisonlt.com**.
+
+    📚 Sumber (10 chunks):
+    • Spesifikasi ALELEON Supercomputer → Spesifikasi Storage  (https://wiki.efisonlt.com/wiki/Spesifikasi_ALELEON_Supercomputer)
+    • Sausage dan Aturan Metrik Penggunaan ALELEON → E. Kapasitas Storage HOME  (https://wiki.efisonlt.com/wiki/Sausage_dan_Aturan_Metrik_Penggunaan_ALELEON)
+    • Migrasi Akun dan Data Mk.III ke Mk.V → 1B. Backup Data Mk.III  (https://wiki.efisonlt.com/wiki/Migrasi_Akun_dan_Data_Mk.III_ke_Mk.V)
+    • Pengantar SSH Key → Private Key itu ...  (https://wiki.efisonlt.com/wiki/Pengantar_SSH_Key)
+    • Upload - Download File ALELEON → 1. Transfer Data Direktori HOME  (https://wiki.efisonlt.com/wiki/Upload_-_Download_File_ALELEON)
+    • Pendaftaran dan Biaya ALELEON Supercomputer → 7. Hak Pengguna ALELEON  (https://wiki.efisonlt.com/wiki/Pendaftaran_dan_Biaya_ALELEON_Supercomputer)
+    • Login Pertama ALELEON Supercomputer  (https://wiki.efisonlt.com/wiki/Login_Pertama_ALELEON_Supercomputer)
+    • Upload - Download File ALELEON  (https://wiki.efisonlt.com/wiki/Upload_-_Download_File_ALELEON)
+    • ALELEON Supercomputer → Kontak dan Support  (https://wiki.efisonlt.com/wiki/ALELEON_Supercomputer)
+    • Pendaftaran dan Biaya ALELEON Supercomputer → 4.1. Golongan Perseorangan  (https://wiki.efisonlt.com/wiki/Pendaftaran_dan_Biaya_ALELEON_Supercomputer)
+
+============================================================
+[Q15/69] Email resmi apa yang harus saya hubungi jika ingin submit support ticket?
+------------------------------------------------------------
+Untuk menghubungi tim admin guna mengajukan tiket support, Anda dapat mengirimkan email resmi ke **support@efisonlt.com**. Selain melalui email, Anda juga memiliki opsi untuk login ke [EFIRO Web Service] atau [aleleonsuper.computer] (tergantung sumber dokumen) lalu membuka menu Help (?) > Submit Support Ticket.
+
+    📚 Sumber (10 chunks):
+    • OpenMX → 4. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/OpenMX)
+    • PHASE/0 → 3. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/PHASE/0)
+    • LAMMPS → 3. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/LAMMPS)
+    • CP2K → 3. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/CP2K)
+    • SW-GXN → 5. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/SW-GXN)
+    • SIESTA → 3. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/SIESTA)
+    • ORCA → 4. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/ORCA)
+    • Troubleshooting dan Support → S. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/Troubleshooting_dan_Support)
+    • GMX-MMPBSA → 3. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/GMX-MMPBSA)
+    • Phono3py dan Phonopy → 3. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/Phono3py_dan_Phonopy)
+
+============================================================
+[Q16/69] Saya mau menjalankan simulasi GROMACS, apa nama binary MPI yang dipakai? Apakah gmx atau yang lain?
+------------------------------------------------------------
+Binary MPI yang digunakan untuk menjalankan simulasi GROMACS di ALELEON Supercomputer adalah `gmx_mpi`, bukan `gmx`.
+
+Sistem menginstalasi GROMACS dengan MPI (untuk multi-core CPU dan multi-node) sehingga user wajib menggunakan binary `gmx_mpi` untuk komputasi.
+
+    📚 Sumber (10 chunks):
+    • GROMACS → 2. gmx_mpi  (https://wiki.efisonlt.com/wiki/GROMACS)
+    • SW-AJFT → 3. Template Submit Script GROMACS  (https://wiki.efisonlt.com/wiki/SW-AJFT)
+    • GROMACS → 4. Pilihan Menjalankan Komputasi  (https://wiki.efisonlt.com/wiki/GROMACS)
+    • GROMACS → 1. Modul GROMACS  (https://wiki.efisonlt.com/wiki/GROMACS)
+    • GROMACS → 3. Pilihan Pre-processing Input dan Parameter  (https://wiki.efisonlt.com/wiki/GROMACS)
+    • GMX-MMPBSA  (https://wiki.efisonlt.com/wiki/GMX-MMPBSA)
+    • GROMACS  (https://wiki.efisonlt.com/wiki/GROMACS)
+    • MPI ALELEON Supercomputer → 4.2. Opsi Skenario Proses MPI di CPU vs GPU  (https://wiki.efisonlt.com/wiki/MPI_ALELEON_Supercomputer)
+    • OpenMX → Appendix 1. Pilihan Hybrid Menjalankan OpenMX  (https://wiki.efisonlt.com/wiki/OpenMX)
+
+============================================================
+[Q17/69] Di EFIRO Account Manager, aplikasi authenticator apa saja yang didukung untuk fitur 2FA?
+------------------------------------------------------------
+Di EFIRO Account Manager, aplikasi authenticator yang didukung untuk fitur Two-factor Authentication (2FA) adalah Microsoft Authenticator, Google Authenticator, dan FreeOTP.
+
+Jika Anda belum memiliki salah satu aplikasi tersebut di perangkat mobile, silakan instal terlebih dahulu sebelum melanjutkan proses setup 2FA dengan memindai barcode yang ditampilkan di web.
+
+    📚 Sumber (10 chunks):
+    • EFIRO Account Manager → Mengganti Password dan Two-factor Authentication  (https://wiki.efisonlt.com/wiki/EFIRO_Account_Manager)
+    • EFIRO Account Manager  (https://wiki.efisonlt.com/wiki/EFIRO_Account_Manager)
+    • EFIRO Account Manager → Fitur EFIRO Account Manager  (https://wiki.efisonlt.com/wiki/EFIRO_Account_Manager)
+    • Tutorial Menggunakan ALELEON Supercomputer Mk.V → 3. Manajemen Akun dengan EFIRO Account Manager  (https://wiki.efisonlt.com/wiki/Tutorial_Menggunakan_ALELEON_Supercomputer_Mk.V)
+    • SW-AJFT → EFIRO Account Manager  (https://wiki.efisonlt.com/wiki/SW-AJFT)
+    • SW-GXN → EFIRO Account Manager  (https://wiki.efisonlt.com/wiki/SW-GXN)
+    • Migrasi Akun dan Data Mk.III ke Mk.V → 1B. Backup Data Mk.III  (https://wiki.efisonlt.com/wiki/Migrasi_Akun_dan_Data_Mk.III_ke_Mk.V)
+    • EFIRO Account Manager → Login ke EFIRO Account Manager  (https://wiki.efisonlt.com/wiki/EFIRO_Account_Manager)
+    • SW-AJFT → EFIRO Web Service (EWS)  (https://wiki.efisonlt.com/wiki/SW-AJFT)
+    • SW-GXN → EFIRO Web Service (EWS)  (https://wiki.efisonlt.com/wiki/SW-GXN)
+
+============================================================
+[Q18/69] Apa perintah terminal untuk mengecek status antrian job saya di Slurm?
+------------------------------------------------------------
+Untuk mengecek status antrian job Anda di Slurm, gunakan perintah terminal berikut:
+
+1. Jalankan perintah `squeue -ul $USER` untuk melihat daftar job yang sedang berjalan atau mengantri milik user saat ini.
+2. Jika hasil perintah tersebut kosong (tidak ada output), hal itu berarti job Anda telah selesai.
+
+Status job dapat dilihat berdasarkan kode ST/STATE seperti PD (PENDING) untuk job yang mengantri dan R (RUN) untuk job yang sedang berjalan.
+
+    📚 Sumber (10 chunks):
+    • ORCA → 3B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/ORCA)
+    • PHASE/0 → 2B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/PHASE/0)
+    • GMX-MMPBSA → 2B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/GMX-MMPBSA)
+    • OpenMX → 3B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/OpenMX)
+    • GROMACS → 4. Pilihan Menjalankan Komputasi  (https://wiki.efisonlt.com/wiki/GROMACS)
+    • SIESTA → 2B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/SIESTA)
+    • SW-GXN → 4. Pilihan Menjalankan Komputasi  (https://wiki.efisonlt.com/wiki/SW-GXN)
+    • SW-AJFT → 4. Pilihan Menjalankan Komputasi  (https://wiki.efisonlt.com/wiki/SW-AJFT)
+    • BoltzTraP2 → 2C. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/BoltzTraP2)
+    • ACPYPE → 2B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/ACPYPE)
+
+============================================================
+[Q19/69] Apakah ALELEON mendukung instalasi package Python menggunakan pip?
+------------------------------------------------------------
+Ya, ALELEON mendukung instalasi package Python menggunakan `pip` sebagai salah satu dari dua metode package manager yang tersedia (bersama dengan `conda`).
+
+Berikut adalah rincian langkah-langkah dan ketentuan berdasarkan dokumen referensi:
+
+1.  User dapat menginstal package Python kebutuhan secara umum untuk CPU maupun GPU dengan mendukung package manager `pip`.
+2.  Untuk sesi JupyterLab di EWS, user dapat menginstal package langsung melalui terminal conda env dengan perintah: `(env) $ pip install jupyter notebook`.
+3.  Jika menggunakan `pip`, user wajib mengecek ketersediaan library NVIDIA (seperti CUDA) di dalam conda env tersebut dengan menjalankan perintah: `(env) $ pip list | grep cuda`.
+4.  Apabila hasil pengecekan tidak menampilkan output, user harus memuat modul CUDA yang sesuai dengan versi yang dibutuhkan oleh package tersebut sebelum menjalankan komputasi.
+
+    📚 Sumber (10 chunks):
+    • Katalog Software ALELEON Supercomputer → 4.5. Python  (https://wiki.efisonlt.com/wiki/Katalog_Software_ALELEON_Supercomputer)
+    • Komputasi Python dengan Conda Environment User → 3. Mengaktifkan Conda Env dan Instalasi Package  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • ACPYPE → 1. Daftar Instalasi ACPYPE  (https://wiki.efisonlt.com/wiki/ACPYPE)
+    • BoltzTraP2 → 1. Daftar Instalasi BoltzTraP2  (https://wiki.efisonlt.com/wiki/BoltzTraP2)
+    • TRIAL A6 → Spesifikasi Trial dan Reproduksi Langkah  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • SW-AMK → AI Compilation r0.1  (https://wiki.efisonlt.com/wiki/SW-AMK)
+    • TRIAL A6 → Menjalankan Package Python versi GPU?  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • MPI ALELEON Supercomputer → ALELEON Memilih Open MPI  (https://wiki.efisonlt.com/wiki/MPI_ALELEON_Supercomputer)
+    • Komputasi Python dengan Conda Environment User  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • R → Instalasi Library Package R  (https://wiki.efisonlt.com/wiki/R)
+
+============================================================
+[Q20/69] Modul Lmod apa yang harus saya load jika ingin menggunakan compiler GCC versi 15.2.0?
+------------------------------------------------------------
+Untuk menggunakan compiler GCC versi 15.2.0 di sistem ALELEON, Anda harus memuat modul Lmod dengan nama `gcc/15.2.0-gcc-13.4.0-pnb`.
+
+Langkah-langkah untuk memuat modul tersebut adalah sebagai berikut:
+1. Akses terminal ALELEON melalui opsi [Login SSH] atau bagi pengguna EWS buka menu Clusters > Aleleon Shell Access.
+2. Jalankan perintah `ml gcc/15.2.0-gcc-13.4.0-pnb` untuk mengaktifkan modul compiler tersebut.
+
+    📚 Sumber (10 chunks):
+    • Katalog Software ALELEON Supercomputer → 4.1. Compiler C/C++/Fortran  (https://wiki.efisonlt.com/wiki/Katalog_Software_ALELEON_Supercomputer)
+    • PHASE/0 → 1. Daftar Instalasi PHASE/0  (https://wiki.efisonlt.com/wiki/PHASE/0)
+    • ORCA → 1. Daftar Instalasi ORCA  (https://wiki.efisonlt.com/wiki/ORCA)
+    • CP2K → 1. Daftar Instalasi CP2K  (https://wiki.efisonlt.com/wiki/CP2K)
+    • Katalog Software ALELEON Supercomputer → 4.6. Make dan CMake  (https://wiki.efisonlt.com/wiki/Katalog_Software_ALELEON_Supercomputer)
+    • LAMMPS → 1. Daftar Instalasi LAMMPS  (https://wiki.efisonlt.com/wiki/LAMMPS)
+    • OpenMX → 1. Daftar Instalasi OpenMX  (https://wiki.efisonlt.com/wiki/OpenMX)
+    • SIESTA → 1. Daftar Instalasi SIESTA  (https://wiki.efisonlt.com/wiki/SIESTA)
+    • Katalog Software ALELEON Supercomputer → 3. Mengakses Modul Software dengan Lmod  (https://wiki.efisonlt.com/wiki/Katalog_Software_ALELEON_Supercomputer)
+    • Katalog Software ALELEON Supercomputer → 4.4. Library NVIDIA  (https://wiki.efisonlt.com/wiki/Katalog_Software_ALELEON_Supercomputer)
+
+============================================================
+[Q21/69] Saya ingin buka sesi interaktif JupyterLab menggunakan GPU. Apa bedanya partisi torti dan tilla, dan mana yang harus saya pilih?
+------------------------------------------------------------
+Berikut adalah perbedaan dan panduan pemilihan partisi untuk sesi JupyterLab GPU berdasarkan dokumen referensi:
+
+1. **Partisi torti** adalah *interactive node CPU* yang tidak dilengkapi dengan GPU, sehingga cocok untuk komputasi yang hanya membutuhkan sumber daya prosesor.
+2. **Partisi tilla** adalah *interactive node GPU* yang memiliki spesifikasi 1x NVIDIA RTX 3090 24GB dengan arsitektur NVIDIA Ampere, namun partisi ini tidak mendukung CUDA versi 11 kebawah.
+
+Untuk membuka sesi interaktif JupyterLab menggunakan GPU, Anda harus memilih **partisi tilla**. Saat mengisi formulir di menu Apps > Jupyter, pastikan kolom "Partition" diisi dengan "tilla" dan pada kolom "Number of GPUs" (apabila pilih partition tilla) isi angka 1.
+
+    📚 Sumber (10 chunks):
+    • Spesifikasi ALELEON Supercomputer → Partisi tilla  (https://wiki.efisonlt.com/wiki/Spesifikasi_ALELEON_Supercomputer)
+    • Spesifikasi ALELEON Supercomputer → Partisi torti  (https://wiki.efisonlt.com/wiki/Spesifikasi_ALELEON_Supercomputer)
+    • TRIAL A6 → Sesi Jupyter  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • BoltzTraP2 → 2D. Sesi Interaktif JupyterLab  (https://wiki.efisonlt.com/wiki/BoltzTraP2)
+    • XUIN Temporary → 2B. Sesi Interaktif JupyterLab  (https://wiki.efisonlt.com/wiki/XUIN_Temporary)
+    • Phono3py dan Phonopy → 2C. Sesi Interaktif JupyterLab  (https://wiki.efisonlt.com/wiki/Phono3py_dan_Phonopy)
+    • Komputasi Python dengan Conda Environment User → 5C. Sesi Interaktif JupyterLab  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • GMX-MMPBSA → 2C. Sesi Interaktif JupyterLab  (https://wiki.efisonlt.com/wiki/GMX-MMPBSA)
+    • SW-AMK → 3B. Sesi JupyterLab  (https://wiki.efisonlt.com/wiki/SW-AMK)
+    • Komputasi dengan Container User via Apptainer → 5C. Sesi Interaktif JupyterLab  (https://wiki.efisonlt.com/wiki/Komputasi_dengan_Container_User_via_Apptainer)
+
+============================================================
+[Q22/69] Saya punya file simulasi.ipynb. Bagaimana urutan langkah menjalankannya sebagai batch job di Job Composer EWS menggunakan conda environment saya sendiri?
+------------------------------------------------------------
+Untuk menjalankan file simulasi.ipynb Anda sebagai batch job di Job Composer EWS menggunakan Conda Environment User, ikuti langkah-langkah berikut sesuai dokumen referensi:
+
+1. Login ke EFIRO Web Service, buka menu Jobs > Job Composer, lalu buat ruang job dengan memilih New Jobs > From Template.
+2. Pilih template "Conda Environment User (CPU)" untuk berjalan di compute node CPU atau "Conda Environment User (GPU)" jika memerlukan akselerasi GPU di compute node GPU, kemudian isi Job Name dan klik [Create New Job].
+3. Siapkan file komputasi melalui menu [Edit Files] untuk upload file simulasi.ipynb (limit upload 100MB per file; jika lebih gunakan Aplikasi SFTP).
+4. Lakukan konversi file Notebook menjadi file Python karena batch job hanya menjalankan file .py dengan perintah berikut di [Open Terminal]:
+   $ jupytext --to py simulasi.ipynb
+5. Cek kelengkapan package conda environment user yang akan digunakan dengan membuka [Open Terminal], mengaktifkan modul pyload user ($ pyl load [nama-modul]), lalu jalankan pengecekan pada file Python hasil konversi ($ pycheck simulasi.py).
+6. Jika output menunjukkan MISSING PACKAGE, instal package yang kurang menggunakan perintah pip install --user sesuai panduan output (contoh: $ pip install --user pyusb); perhatikan bahwa user tidak dapat update package bawaan environment, hanya dapat menginstal package yang belum ada.
+7. Isi kolom submit script dengan klik [Open Editor], ikuti petunjuk NOTES dan alur script di dalamnya, lalu klik [Save] untuk menyimpan script.
+8. Jalankan job dengan mengklik tombol [Submit].
+9. Pantau status dan output job dengan meremfresh halaman Job Composer; status Running memungkinkan pemantauan output di kolom Folder Contents (result-jobID.txt untuk output terminal dan error-jobID.txt untuk log status) serta utilisasi CPU dan memori via Monitoring > Grafana.
+
+    📚 Sumber (10 chunks):
+    • Komputasi Python dengan Conda Environment User → 5A. Batch Job dengan Job Composer EWS  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • ACPYPE → 2A. Batch Job dengan Job Composer EWS  (https://wiki.efisonlt.com/wiki/ACPYPE)
+    • Komputasi dengan Container User via Apptainer → 5A. Batch Job dengan Job Composer EWS  (https://wiki.efisonlt.com/wiki/Komputasi_dengan_Container_User_via_Apptainer)
+    • ORCA → 3A. Batch Job dengan Job Composer EWS  (https://wiki.efisonlt.com/wiki/ORCA)
+    • CP2K → 2A. Batch Job dengan Job Composer EWS  (https://wiki.efisonlt.com/wiki/CP2K)
+    • XUIN Temporary → 2A. Batch Job dengan Job Composer  (https://wiki.efisonlt.com/wiki/XUIN_Temporary)
+    • BoltzTraP2 → 2B. Batch Job dengan Job Composer EWS  (https://wiki.efisonlt.com/wiki/BoltzTraP2)
+    • PHASE/0 → 2A. Batch Job dengan Job Composer EWS  (https://wiki.efisonlt.com/wiki/PHASE/0)
+    • LAMMPS → 2A. Batch Job dengan Job Composer EWS  (https://wiki.efisonlt.com/wiki/LAMMPS)
+    • Quantum ESPRESSO → 2A. Batch Job dengan Job Composer EWS  (https://wiki.efisonlt.com/wiki/Quantum_ESPRESSO)
+
+============================================================
+[Q23/69] Jelaskan perbedaan arti status job 'PD' dan 'CG' saat saya mengecek squeue. Lalu sebutkan satu contoh Reason kenapa job bisa berstatus PD!
+------------------------------------------------------------
+Berdasarkan dokumen referensi, berikut adalah perbedaan arti status tersebut dan contoh penyebabnya:
+
+1. **PD (PENDING)** artinya job tertahan atau mengantri dan belum berjalan.
+2. **CG (COMPLETING)** artinya job sudah selesai dan sedang dalam proses *clean-up*.
+
+Untuk alasan spesifik mengapa job berstatus PD, dokumen menyebutkan bahwa Anda perlu melihat kolom **NODELIST(REASON)** pada hasil perintah `squeue` untuk mengetahui detailnya, namun dokumen tidak memberikan daftar contoh *reason* spesifik secara eksplisit selain mengarahkan pengguna untuk memeriksanya di kolom tersebut.
+
+    📚 Sumber (10 chunks):
+    • NAMD → Job Submission Terminal  (https://wiki.efisonlt.com/wiki/NAMD)
+    • TRIAL A6 → Batch Job  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • R → Job Submission Terminal  (https://wiki.efisonlt.com/wiki/R)
+    • GROMACS → 4. Pilihan Menjalankan Komputasi  (https://wiki.efisonlt.com/wiki/GROMACS)
+    • CP2K → 2B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/CP2K)
+    • SW-GXN → 4. Pilihan Menjalankan Komputasi  (https://wiki.efisonlt.com/wiki/SW-GXN)
+    • Quantum ESPRESSO → 2B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/Quantum_ESPRESSO)
+    • SW-AJFT → 4. Pilihan Menjalankan Komputasi  (https://wiki.efisonlt.com/wiki/SW-AJFT)
+    • Komputasi dengan Container User via Apptainer → 5B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/Komputasi_dengan_Container_User_via_Apptainer)
+    • Komputasi Python dengan Conda Environment User → 5B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+
+============================================================
+[Q24/69] Sebagai pengguna dari Akun Institusi, apakah job saya dibatasi maksimal 128 core CPU seperti akun perseorangan, dan apakah saya menggunakan sistem kuota (beli di awal)?
+------------------------------------------------------------
+Untuk Akun Institusi, batas maksimal core CPU tidak dibatasi pada angka 128 seperti akun perseorangan, melainkan disesuaikan dengan ketentuan dalam PKSPIAS (Perjanjian Kerja Sama Pengguna Institusi ALELEON Supercomputer). Mengenai sistem kuota, pengguna golongan institusi umumnya menggunakan sistem pascabayar bulanan yang tidak memiliki kuota core hour, kecuali jika pihak institusi secara khusus memutuskan untuk menggunakan metode prabayar.
+
+    📚 Sumber (10 chunks):
+    • Limitasi Fair Usage ALELEON Supercomputer → Berlaku untuk Akumulasi Semua Job Komputasi  (https://wiki.efisonlt.com/wiki/Limitasi_Fair_Usage_ALELEON_Supercomputer)
+    • Pendaftaran dan Biaya ALELEON Supercomputer → 4.1. Golongan Perseorangan  (https://wiki.efisonlt.com/wiki/Pendaftaran_dan_Biaya_ALELEON_Supercomputer)
+    • Core Hour → Pascabayar Bulanan  (https://wiki.efisonlt.com/wiki/Core_Hour)
+    • Pendaftaran dan Biaya ALELEON Supercomputer → 4.2. Golongan Institusi  (https://wiki.efisonlt.com/wiki/Pendaftaran_dan_Biaya_ALELEON_Supercomputer)
+    • Sausage dan Aturan Metrik Penggunaan ALELEON → Contoh Penghitungan  (https://wiki.efisonlt.com/wiki/Sausage_dan_Aturan_Metrik_Penggunaan_ALELEON)
+    • Core Hour → Prabayar dan Kuota Core Hour  (https://wiki.efisonlt.com/wiki/Core_Hour)
+    • Troubleshooting dan Support → A3. Apakah User Perlu Menambah Kuota Core Hour?  (https://wiki.efisonlt.com/wiki/Troubleshooting_dan_Support)
+    • Core Hour → Ketentuan  (https://wiki.efisonlt.com/wiki/Core_Hour)
+    • Limitasi Fair Usage ALELEON Supercomputer → Berlaku untuk Setiap Job Komputasi  (https://wiki.efisonlt.com/wiki/Limitasi_Fair_Usage_ALELEON_Supercomputer)
+    • Core Hour → Alur transaksi  (https://wiki.efisonlt.com/wiki/Core_Hour)
+
+============================================================
+[Q25/69] Saya mau ganti password akun ALELEON saya. Di portal web mana saya harus login, dan menu apa yang harus diklik?
+------------------------------------------------------------
+Untuk mengganti password akun ALELEON Anda, silakan buka portal web EFIRO Account Manager (EAM) di alamat https://login.efisonlt.com dan lakukan login menggunakan username serta password user yang saat ini aktif. Setelah masuk ke dalam portal tersebut, Anda dapat langsung mengakses fitur untuk mengganti password melalui menu manajemen akun yang tersedia di halaman utama EAM sesuai dengan panduan "Manajemen Akun dengan EFIRO Account Manager".
+
+    📚 Sumber (10 chunks):
+    • SW-GXN → EFIRO Account Manager  (https://wiki.efisonlt.com/wiki/SW-GXN)
+    • SW-AJFT → EFIRO Account Manager  (https://wiki.efisonlt.com/wiki/SW-AJFT)
+    • SW-AMK → 1. Login  (https://wiki.efisonlt.com/wiki/SW-AMK)
+    • Login Pertama ALELEON Supercomputer  (https://wiki.efisonlt.com/wiki/Login_Pertama_ALELEON_Supercomputer)
+    • EFIRO Account Manager  (https://wiki.efisonlt.com/wiki/EFIRO_Account_Manager)
+    • Tutorial Menggunakan ALELEON Supercomputer Mk.V → 3. Manajemen Akun dengan EFIRO Account Manager  (https://wiki.efisonlt.com/wiki/Tutorial_Menggunakan_ALELEON_Supercomputer_Mk.V)
+    • Registrasi SSH Key ALELEON Supercomputer → 2. Registrasi SSH Key User ke ALELEON  (https://wiki.efisonlt.com/wiki/Registrasi_SSH_Key_ALELEON_Supercomputer)
+    • SW-AJFT → Opsi Login  (https://wiki.efisonlt.com/wiki/SW-AJFT)
+    • SW-AJFT → 1. Login dan Akun ALELEON  (https://wiki.efisonlt.com/wiki/SW-AJFT)
+    • Migrasi Akun dan Data Mk.III ke Mk.V → 1A. Login Mk.III  (https://wiki.efisonlt.com/wiki/Migrasi_Akun_dan_Data_Mk.III_ke_Mk.V)
+
+============================================================
+[Q26/69] File upload saya ukurannya 500 MB. Kenapa saya selalu gagal upload lewat menu Files di EWS, dan apa solusi spesifik serta alamat host yang harus saya gunakan?
+------------------------------------------------------------
+Upload file berukuran 500 MB gagal melalui menu Files di EWS karena terdapat batasan ukuran upload sebesar 100 MB per file pada aplikasi tersebut. Solusi spesifik yang harus Anda gunakan adalah mengunggah data melalui aplikasi SFTP, bukan melalui web interface.
+
+Untuk melakukan transfer menggunakan aplikasi SFTP, berikut adalah langkah dan alamat host yang harus digunakan:
+
+1. Aktifkan koneksi OVPN ALELEON terlebih dahulu.
+2. Login pada aplikasi SFTP (seperti FileZilla atau WinSCP) dengan kredensial username dan password akun user Anda.
+3. Gunakan alamat Host sesuai sistem operasi komputer Anda:
+   - Untuk User Windows atau MacOS: gunakan hostname **aleleon.hpc**
+   - Untuk User Linux: gunakan IP address **19.192.50.10**
+4. Pastikan Port diatur ke **22** (default).
+5. Setelah berhasil login, Anda akan masuk ke direktori HOME akun user untuk melakukan proses download atau upload data tanpa batas ukuran file.
+
+    📚 Sumber (10 chunks):
+    • Upload - Download File ALELEON → 2. Transfer Data Job Composer EWS  (https://wiki.efisonlt.com/wiki/Upload_-_Download_File_ALELEON)
+    • Upload - Download File ALELEON → 1. Transfer Data Direktori HOME  (https://wiki.efisonlt.com/wiki/Upload_-_Download_File_ALELEON)
+    • Migrasi Akun dan Data Mk.III ke Mk.V → 1B. Backup Data Mk.III  (https://wiki.efisonlt.com/wiki/Migrasi_Akun_dan_Data_Mk.III_ke_Mk.V)
+    • SW-AJFT → EFIRO Web Service (EWS)  (https://wiki.efisonlt.com/wiki/SW-AJFT)
+    • SW-GXN → EFIRO Web Service (EWS)  (https://wiki.efisonlt.com/wiki/SW-GXN)
+    • Sausage dan Aturan Metrik Penggunaan ALELEON → E. Kapasitas Storage HOME  (https://wiki.efisonlt.com/wiki/Sausage_dan_Aturan_Metrik_Penggunaan_ALELEON)
+    • Limitasi Fair Usage ALELEON Supercomputer → Permintaan Menambah LFU Sementara  (https://wiki.efisonlt.com/wiki/Limitasi_Fair_Usage_ALELEON_Supercomputer)
+    • BoltzTraP2 → 2B. Batch Job dengan Job Composer EWS  (https://wiki.efisonlt.com/wiki/BoltzTraP2)
+    • SW-AJFT → 4. Pilihan Menjalankan Komputasi  (https://wiki.efisonlt.com/wiki/SW-AJFT)
+    • GROMACS → 5. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/GROMACS)
+
+============================================================
+[Q27/69] Saya ingin mengkompilasi code C++ menggunakan compiler AMD target Zen 2 dan OpenMPI terbaru. Modul apa saja yang harus saya module load secara berurutan?
+------------------------------------------------------------
+Untuk mengkompilasi kode C++ dengan target AMD Zen 2 menggunakan OpenMPI terbaru di ALELEON, Anda perlu memuat modul compiler GCC dan modul OpenMPI yang sesuai. Berdasarkan dokumen referensi, berikut adalah langkah-langkahnya:
+
+1. Muat modul compiler GCC versi terbaru yang tersedia (misalnya `gcc/15.2.0-gcc-13.4.0-pnb` atau `GCC/15.2.0`) untuk mendukung kompilasi C++.
+2. Muat modul OpenMPI versi terbaru yang tersedia, seperti `openmpi/5.0.8-gcc-15.2.0-bip` atau `OpenMPI/5.0.7-GCC-14.2.0`, tergantung kebutuhan spesifik Anda.
+3. Pastikan Anda menambahkan flag `-march=znver2` saat mengompilasi kode C++ untuk menargetkan arsitektur AMD Zen 2 secara optimal.
+
+Contoh perintah:
+```bash
+module load gcc/15.2.0-gcc-13.4.0-pnb
+module load openmpi/5.0.8-gcc-15.2.0-bip
+g++ -march=znver2 -o program program.cpp
+mpirun -np <jumlah_task> ./program
+```
+
+    📚 Sumber (10 chunks):
+    • Katalog Software ALELEON Supercomputer → 4.2. Compiler MPI (Message Passing Interface)  (https://wiki.efisonlt.com/wiki/Katalog_Software_ALELEON_Supercomputer)
+    • Katalog Software ALELEON Supercomputer → 4.1. Compiler C/C++/Fortran  (https://wiki.efisonlt.com/wiki/Katalog_Software_ALELEON_Supercomputer)
+    • MPI ALELEON Supercomputer → ALELEON Memilih Open MPI  (https://wiki.efisonlt.com/wiki/MPI_ALELEON_Supercomputer)
+    • Katalog Software ALELEON Supercomputer → 4. Daftar Modul Software Esensial  (https://wiki.efisonlt.com/wiki/Katalog_Software_ALELEON_Supercomputer)
+    • MPI ALELEON Supercomputer → 4.1. NVIDIA CUDA dan CUDA-aware MPI  (https://wiki.efisonlt.com/wiki/MPI_ALELEON_Supercomputer)
+    • CP2K → 1. Daftar Instalasi CP2K  (https://wiki.efisonlt.com/wiki/CP2K)
+    • SW-AMK → AI Compilation r0.1  (https://wiki.efisonlt.com/wiki/SW-AMK)
+    • Sausage dan Aturan Metrik Penggunaan ALELEON → Jumlah Genap untuk Performa Baik  (https://wiki.efisonlt.com/wiki/Sausage_dan_Aturan_Metrik_Penggunaan_ALELEON)
+    • R → Modul R  (https://wiki.efisonlt.com/wiki/R)
+    • OpenMX → Appendix 1. Pilihan Hybrid Menjalankan OpenMX  (https://wiki.efisonlt.com/wiki/OpenMX)
+
+============================================================
+[Q28/69] Saya mau pre-processing data GROMACS menggunakan binary gmx_mpi. Boleh tidak saya menjalankannya di Login Node? Jika boleh, apa syaratnya agar tidak di-kill admin?
+------------------------------------------------------------
+Tentu, Anda diperbolehkan menjalankan pre-processing data GROMACS menggunakan binary `gmx_mpi` di Login Node dengan syarat hanya untuk **pre-processing ringan** dan menggunakan alokasi komputasi kecil.
+
+Agar tidak diinterupsi atau di-kill oleh Tim Admin, pastikan memenuhi ketentuan berikut:
+1. Pastikan proses tersebut tidak membebani kinerja Login Node.
+2. Pastikan proses tersebut tidak dinilai mengganggu user lainnya.
+
+Jika Anda membutuhkan alokasi komputasi yang besar, maka Anda wajib menjalankannya melalui batch job, bukan di Login Node.
+
+    📚 Sumber (10 chunks):
+    • GROMACS → 3. Pilihan Pre-processing Input dan Parameter  (https://wiki.efisonlt.com/wiki/GROMACS)
+    • GROMACS → 2. gmx_mpi  (https://wiki.efisonlt.com/wiki/GROMACS)
+    • SW-AJFT → 3. Template Submit Script GROMACS  (https://wiki.efisonlt.com/wiki/SW-AJFT)
+    • GROMACS  (https://wiki.efisonlt.com/wiki/GROMACS)
+    • GROMACS → 1. Modul GROMACS  (https://wiki.efisonlt.com/wiki/GROMACS)
+    • GROMACS → 4. Pilihan Menjalankan Komputasi  (https://wiki.efisonlt.com/wiki/GROMACS)
+    • MPI ALELEON Supercomputer → 4.2. Opsi Skenario Proses MPI di CPU vs GPU  (https://wiki.efisonlt.com/wiki/MPI_ALELEON_Supercomputer)
+
+============================================================
+[Q29/69] Jika saya menjalankan batch job lalu tiba-tiba koneksi internet rumah saya mati dan laptop saya disconnect dari VPN ALELEON, apakah job saya di Slurm ikut berhenti?
+------------------------------------------------------------
+Tidak, job Anda di Slurm tidak akan berhenti meskipun koneksi internet rumah Anda mati atau laptop Anda terputus dari VPN ALELEON.
+
+Sesuai dengan dokumen referensi, batch job sudah dititipkan ke Slurm untuk dijalankan di compute node, sehingga jalannya job (antrian, eksekusi, output, dll) diatur sepenuhnya oleh sistem dan tidak bergantung pada koneksi user. Job hanya akan berhenti jika program komputasi selesai berjalan secara normal (exit 0), menyentuh limit waktu yang ditentukan, atau terkena error yang menyebabkan selesai prematur (exit 1).
+
+    📚 Sumber (10 chunks):
+    • Metode Komputasi di ALELEON → 3. Batch Job  (https://wiki.efisonlt.com/wiki/Metode_Komputasi_di_ALELEON)
+    • CP2K → 2B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/CP2K)
+    • Sausage dan Aturan Metrik Penggunaan ALELEON → Kapan Job Tertahan  (https://wiki.efisonlt.com/wiki/Sausage_dan_Aturan_Metrik_Penggunaan_ALELEON)
+    • BoltzTraP2 → 2C. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/BoltzTraP2)
+    • OpenMX → 3B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/OpenMX)
+    • PHASE/0 → 2B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/PHASE/0)
+    • LAMMPS → 2B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/LAMMPS)
+    • ACPYPE → 2B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/ACPYPE)
+    • GMX-MMPBSA → 2B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/GMX-MMPBSA)
+    • Phono3py dan Phonopy → 2B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/Phono3py_dan_Phonopy)
+
+============================================================
+[Q30/69] Apa bedanya Effective Core Hour dengan Actual Core Hour di dalam sistem ALELEON?
+------------------------------------------------------------
+Berikut adalah perbedaan antara Effective Core Hour dan Actual Core Hour berdasarkan sistem ALELEON:
+
+1. **Effective Core Hour Remaining** adalah sisa kuota core hour efektif yang menjadi dasar Slurm menjalankan job, di mana nilainya berubah tergantung status job:
+   - Ketika tidak ada job berjalan, Effective Core Hour Remaining sama dengan sisa kuota Actual Core Hour.
+   - Ketika ada job berjalan, Effective Core Hour Remaining sama dengan sisa kuota Total Core Hour (yang mencakup Booked Core Hour).
+
+2. **Actual Core Hour Usage** adalah penggunaan core hour sesungguhnya secara *realtime* yang dihitung dari waktu job benar-benar berjalan, dan nilai ini menjadi basis perhitungan biaya penggunaan ALELEON.
+
+Secara ringkas, Effective Core Hour Remaining menunjukkan sisa kuota yang tersedia untuk alokasi atau penggunaan saat ini, sedangkan Actual Core Hour Usage mencatat konsumsi sumber daya yang sudah terjadi secara nyata.
+
+    📚 Sumber (10 chunks):
+    • Sausage dan Aturan Metrik Penggunaan ALELEON → Jenis Core Hour  (https://wiki.efisonlt.com/wiki/Sausage_dan_Aturan_Metrik_Penggunaan_ALELEON)
+    • Sausage dan Aturan Metrik Penggunaan ALELEON → A. Core Hour - Effective, Actual, Total  (https://wiki.efisonlt.com/wiki/Sausage_dan_Aturan_Metrik_Penggunaan_ALELEON)
+    • Sausage dan Aturan Metrik Penggunaan ALELEON → Contoh Penghitungan  (https://wiki.efisonlt.com/wiki/Sausage_dan_Aturan_Metrik_Penggunaan_ALELEON)
+    • Core Hour → 1. CCH dan GH  (https://wiki.efisonlt.com/wiki/Core_Hour)
+    • Core Hour → Rumus Slurm Menghitung Core Hour  (https://wiki.efisonlt.com/wiki/Core_Hour)
+    • Pendaftaran dan Biaya ALELEON Supercomputer → 3. Core Hour: Metrik Penggunaan Berbayar ALELEON  (https://wiki.efisonlt.com/wiki/Pendaftaran_dan_Biaya_ALELEON_Supercomputer)
+    • Core Hour  (https://wiki.efisonlt.com/wiki/Core_Hour)
+    • Core Hour → Prabayar dan Kuota Core Hour  (https://wiki.efisonlt.com/wiki/Core_Hour)
+    • Core Hour → 3. Bagaimana ALELEON Menghitung Core Hour  (https://wiki.efisonlt.com/wiki/Core_Hour)
+    • Core Hour → Alur transaksi  (https://wiki.efisonlt.com/wiki/Core_Hour)
+
+============================================================
+[Q31/69] Saya menjalankan simulasi FLACS-CFD dengan 192 proses MPI murni. Di partisi epyc, otomatis job ini butuh lebih dari 1 node. Berapa angka yang harus saya tulis persisnya di #SBATCH --mem= jika total RAM yang saya butuhkan untuk seluruh job adalah 400GB?
+------------------------------------------------------------
+Berdasarkan dokumen referensi, untuk menjalankan 192 proses MPI di partisi epyc yang menggunakan 2 node dengan total alokasi memori 400GB, Anda harus menulis angka **200** pada parameter `#SBATCH --mem`.
+
+Berikut adalah rincian langkah-langkah perhitungannya sesuai dokumen:
+1. Tentukan jumlah node yang digunakan oleh 192 proses MPI di partisi epyc, yaitu **2 node**.
+2. Hitung alokasi memori per node dengan membagi total memori yang diinginkan (400GB) dengan jumlah node (2).
+3. Hasil perhitungan adalah 400GB dibagi 2, sehingga nilai yang ditulis di script adalah **200GB**.
+
+Perintah yang benar dalam script SBATCH adalah:
+`#SBATCH --mem=200GB`
+
+    📚 Sumber (10 chunks):
+    • SW-GXN → 4. Pilihan Menjalankan Komputasi  (https://wiki.efisonlt.com/wiki/SW-GXN)
+    • SW-GXN → Jalan Satu Simulasi vs Array  (https://wiki.efisonlt.com/wiki/SW-GXN)
+    • MPI ALELEON Supercomputer → 3.2. Jumlah Node dan Memori per Node  (https://wiki.efisonlt.com/wiki/MPI_ALELEON_Supercomputer)
+    • GROMACS → 4. Pilihan Menjalankan Komputasi  (https://wiki.efisonlt.com/wiki/GROMACS)
+    • Submit Script ALELEON Supercomputer → SBATCH lainnya untuk job MPI  (https://wiki.efisonlt.com/wiki/Submit_Script_ALELEON_Supercomputer)
+    • TRIAL A6 → Batch Job  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • Submit Script ALELEON Supercomputer → #SBATCH --ntasks, --mem, dan --gpus  (https://wiki.efisonlt.com/wiki/Submit_Script_ALELEON_Supercomputer)
+    • MPI ALELEON Supercomputer → 4.2. Opsi Skenario Proses MPI di CPU vs GPU  (https://wiki.efisonlt.com/wiki/MPI_ALELEON_Supercomputer)
+    • SW-AJFT → 3. Template Submit Script GROMACS  (https://wiki.efisonlt.com/wiki/SW-AJFT)
+
+============================================================
+[Q32/69] (Troubleshooting) Saya submit job GROMACS tapi selalu gagal dengan pesan error Invalid syntax. Di script saya menulis #SBATCH --mem= 64 GB. Apa yang salah dari tulisan saya?
+------------------------------------------------------------
+Masalah pada penulisan perintah `#SBATCH --mem= 64 GB` Anda terletak pada adanya spasi yang tidak seharusnya di antara tanda sama dengan (`=`) dan nilai, serta pemisahan angka satuan (GB) menjadi terpisah.
+
+Berdasarkan dokumen referensi, format penulisan SBATCH yang benar **tidak boleh** memiliki spasi di parameter, tanda sama dengan, maupun nilai, dan satuan harus menyatu dengan angka. Berikut adalah perbandingan kesalahan dan perbaikan sesuai contoh di dokumen:
+
+1. Penulisan yang salah (seperti kasus Anda):
+   #SBATCH --mem= 64 GB
+   #SBATCH --ntasks = 32
+   #SBATCH --time =01:00:00
+
+2. Penulisan yang benar (harus tanpa spasi tambahan dan satuan menyatu):
+   #SBATCH --mem=64GB
+   #SBATCH --ntasks=32
+   #SBATCH --time=01:00:00
+
+Silakan ubah baris tersebut menjadi `#SBATCH --mem=64GB` tanpa spasi setelah tanda sama dengan dan tanpa spasi sebelum "GB".
+
+    📚 Sumber (10 chunks):
+    • Submit Script ALELEON Supercomputer → Mengisi Template dan Script  (https://wiki.efisonlt.com/wiki/Submit_Script_ALELEON_Supercomputer)
+    • GROMACS → 4. Pilihan Menjalankan Komputasi  (https://wiki.efisonlt.com/wiki/GROMACS)
+    • SW-AJFT → 3. Template Submit Script GROMACS  (https://wiki.efisonlt.com/wiki/SW-AJFT)
+    • Submit Script ALELEON Supercomputer → #SBATCH --error  (https://wiki.efisonlt.com/wiki/Submit_Script_ALELEON_Supercomputer)
+    • SW-GXN → 4. Pilihan Menjalankan Komputasi  (https://wiki.efisonlt.com/wiki/SW-GXN)
+    • Submit Script ALELEON Supercomputer → #SBATCH --time  (https://wiki.efisonlt.com/wiki/Submit_Script_ALELEON_Supercomputer)
+    • Submit Script ALELEON Supercomputer → #SBATCH --output  (https://wiki.efisonlt.com/wiki/Submit_Script_ALELEON_Supercomputer)
+    • Troubleshooting dan Support → 2. Job Gagal atau Tidak Berjalan Semestinya  (https://wiki.efisonlt.com/wiki/Troubleshooting_dan_Support)
+
+============================================================
+[Q33/69] Saya submit 3 batch job berturut-turut. Job 1 pakai 64 CPU. Job 2 pakai 32 CPU. Kenapa saat saya submit Job 3 yang butuh 64 CPU, statusnya malah PENDING dengan tulisan QOSMaxCpuPerUserLimit, padahal node epyc masih banyak yang kosong?
+------------------------------------------------------------
+Status job Anda yang PENDING dengan alasan `QOSMaxCpuPerUserLimit` terjadi karena total alokasi CPU dari Job 1 dan Job 2 telah melebihi batas Limitasi Fair Usage (LFU) atau sisa limit komputasi per user, sehingga sistem menahan Job 3 meskipun node fisik masih tersedia.
+
+Berdasarkan dokumen referensi, berikut adalah penjelasan dan langkah-langkah yang harus Anda lakukan:
+
+1.  **Penyebab Masalah**
+    Status `QOSMaxCpuPerUserLimit` menandakan bahwa alokasi CPU yang diminta oleh job melebihi limit atau sisa limit komputasi [Limitasi Fair Usage (LFU)] milik user Anda. Sistem Slurm akan menahan job tersebut sampai ada alokasi sesuai limit QOS yang tersedia, misalnya ketika Job 1 atau Job 2 selesai berjalan.
+
+2.  **Langkah Cek Awal**
+    Anda perlu memverifikasi apakah alokasi job Anda melebihi *Fair Limit* dengan menjalankan tool `sausage` pada menu `sfair`:
+    ```bash
+    sausage sfair
+    ```
+    Perhatikan kolom "Fair Limit" dan bandingkan dengan alokasi di submit script Anda (padanan SBATCH `-ntasks` untuk CPU).
+
+3.  **Solusi Jika Alokasi Melebihi Limit**
+    Jika hasil pengecekan menunjukkan ada alokasi yang lebih besar dari limit, Anda memiliki dua opsi:
+    
+    *   **Opsi 1: Batalkan dan Revisi Job**
+        Batalkan job yang berlebih, ubah jumlah alokasi CPU di submit script agar sesuai limit, lalu jalankan ulang. Untuk membatalkan job secara manual di terminal, gunakan perintah berikut:
+        ```bash
+        squeue -lu $USER
+        scancel [job-ID]
+        ```
+        Contoh membatalkan job ID 231:
+        ```bash
+        scancel 231
+        ```
+        
+    *   **Opsi 2: Ajukan Pembukaan Limitasi Sementara**
+        Ajukan permohonan pembukaan limitasi sementara ke tim support admin. Tim admin akan memutuskan permintaan Anda menyesuaikan ketersediaan sumber daya komputasi dan antrian job pengguna lain di ALELEON Supercomputer.
+
+4.  **Catatan Penting**
+    Jika tidak ada alokasi yang melebihi limit, maka tidak ada masalah teknis; job hanya mengantri hingga ada alokasi memadai sesuai rentang limit alokasi komputasi user atau menunggu job lain milik user/sekelompok akun institusi selesai.
+
+    📚 Sumber (10 chunks):
+    • Kode Reason ALELEON Supercomputer  (https://wiki.efisonlt.com/wiki/Kode_Reason_ALELEON_Supercomputer)
+    • Troubleshooting dan Support → A1. Daftar Kode Reason ALELEON Supercomputer  (https://wiki.efisonlt.com/wiki/Troubleshooting_dan_Support)
+    • Limitasi Fair Usage ALELEON Supercomputer → Berlaku untuk Akumulasi Semua Job Komputasi  (https://wiki.efisonlt.com/wiki/Limitasi_Fair_Usage_ALELEON_Supercomputer)
+    • Troubleshooting dan Support → A2. Menangani Job Antri yang Melebihi Limit Komputasi  (https://wiki.efisonlt.com/wiki/Troubleshooting_dan_Support)
+    • ACPYPE → 2. Pilihan Menjalankan Komputasi  (https://wiki.efisonlt.com/wiki/ACPYPE)
+    • TRIAL A6 → Batch Job  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • Troubleshooting dan Support → A3. Apakah User Perlu Menambah Kuota Core Hour?  (https://wiki.efisonlt.com/wiki/Troubleshooting_dan_Support)
+    • SW-GXN → 4. Pilihan Menjalankan Komputasi  (https://wiki.efisonlt.com/wiki/SW-GXN)
+    • OpenMX → Appendix 1. Pilihan Hybrid Menjalankan OpenMX  (https://wiki.efisonlt.com/wiki/OpenMX)
+
+============================================================
+[Q34/69] (Troubleshooting) Job saya berstatus PD dengan alasan AssocMaxWallDurationPerJobLimit. Di script saya menulis #SBATCH --time=4-00:00:00. Akun saya adalah akun perseorangan biasa. Mengapa tertahan?
+------------------------------------------------------------
+Job Anda tertahan dengan status **PENDING** dan alasan **AssocMaxWallDurationPerJobLimit** karena durasi waktu yang Anda ajukan melebihi batas maksimal (walltime) yang diperbolehkan untuk akun perseorangan.
+
+Berdasarkan dokumen referensi, berikut adalah rincian batasan waktu (walltime) per jenis akun:
+1.  **Akun Perseorangan:** Maksimal **3 hari (72 jam)**.
+2.  **Akun Institusi:** Sesuai PKSPIAS.
+3.  **Akun Uji Coba:** Maksimal **1 hari (24 jam)**.
+
+Dalam script Anda, Anda menulis `#SBATCH --time=4-00:00:00` yang setara dengan **4 hari**. Karena akun Anda adalah **Akun Perseorangan**, batas maksimalnya hanya **3 hari (72 jam)**, sehingga sistem menahan job tersebut agar tidak melebihi limit LFU (Fair Usage Limit).
+
+Untuk memperbaiki masalah ini, Anda perlu mengubah nilai waktu di dalam submit script menjadi maksimal **3 hari** atau kurang. Format penulisan yang benar sesuai dokumen adalah:
+*   `#SBATCH --time=3-00:00:00` (untuk tepat 3 hari)
+*   Atau format alternatif `HH:MM:SS`, misalnya `#SBATCH --time=72:00:00`.
+
+Setelah mengedit script dengan durasi yang sesuai (maksimal 3 hari), jalankan kembali perintah `sbatch [nama-submit-script]` untuk menjalankan job.
+
+    📚 Sumber (10 chunks):
+    • Submit Script ALELEON Supercomputer → #SBATCH --time  (https://wiki.efisonlt.com/wiki/Submit_Script_ALELEON_Supercomputer)
+    • TRIAL A6 → Batch Job  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • Komputasi dengan Container User via Apptainer → 5B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/Komputasi_dengan_Container_User_via_Apptainer)
+    • Limitasi Fair Usage ALELEON Supercomputer → Berlaku untuk Setiap Job Komputasi  (https://wiki.efisonlt.com/wiki/Limitasi_Fair_Usage_ALELEON_Supercomputer)
+    • SW-GXN → 4. Pilihan Menjalankan Komputasi  (https://wiki.efisonlt.com/wiki/SW-GXN)
+    • DFTB%2B → Job Submission Terminal  (https://wiki.efisonlt.com/wiki/DFTB%2B)
+    • R → Job Submission Terminal  (https://wiki.efisonlt.com/wiki/R)
+    • Troubleshooting dan Support → A1. Daftar Kode Reason ALELEON Supercomputer  (https://wiki.efisonlt.com/wiki/Troubleshooting_dan_Support)
+    • BoltzTraP2 → 2C. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/BoltzTraP2)
+
+============================================================
+[Q35/69] Saya mau menjalankan 10 simulasi FLACS-CFD sekaligus menggunakan fitur Slurm Array. Setiap simulasi butuh 4 core CPU dan 8GB RAM. Di script, apakah saya harus menulis --cpus-per-task=40 atau --cpus-per-task=4?
+------------------------------------------------------------
+Berdasarkan dokumen referensi, Anda harus menulis `#SBATCH --cpus-per-task=4` pada script submit.
+
+Berikut adalah penjelasan dan langkah-langkah yang benar sesuai dokumen:
+1. Parameter `--cpus-per-task` mendefinisikan jumlah core thread CPU yang digunakan oleh **setiap** job array (satu simulasi), bukan total keseluruhan. Dalam contoh dokumen untuk 8 job array dengan masing-masing 2 core, penulisannya adalah `#SBATCH --cpus-per-task=2`.
+2. Untuk skenario Anda yang menjalankan 10 simulasi (array) dengan masing-masing 4 core, penulisan di script adalah sebagai berikut:
+   - `#SBATCH --array=1-10`
+   - `#SBATCH --cpus-per-task=4`
+3. Total alokasi CPU akan dihitung secara otomatis oleh sistem menjadi 40 core (10 job * 4 core per job), namun perintah di dalam script tetap harus ditulis per task individual.
+4. Demikian pula untuk memori RAM, jika setiap simulasi butuh 8GB, maka tulis `#SBATCH --mem=8GB`, sehingga total alokasi memori menjadi 80GB (10 * 8GB).
+
+    📚 Sumber (10 chunks):
+    • SW-GXN → Jalan Satu Simulasi vs Array  (https://wiki.efisonlt.com/wiki/SW-GXN)
+    • SW-GXN → 4. Pilihan Menjalankan Komputasi  (https://wiki.efisonlt.com/wiki/SW-GXN)
+    • SW-GXN → Jalan Paralel dengan OpenMP Threading  (https://wiki.efisonlt.com/wiki/SW-GXN)
+    • Core Hour → Rumus Slurm Menghitung Core Hour  (https://wiki.efisonlt.com/wiki/Core_Hour)
+    • GROMACS → 4. Pilihan Menjalankan Komputasi  (https://wiki.efisonlt.com/wiki/GROMACS)
+    • SW-AJFT → 3. Template Submit Script GROMACS  (https://wiki.efisonlt.com/wiki/SW-AJFT)
+    • Submit Script ALELEON Supercomputer → #SBATCH --cpus-per-task untuk Threading OpenMP  (https://wiki.efisonlt.com/wiki/Submit_Script_ALELEON_Supercomputer)
+    • Sausage dan Aturan Metrik Penggunaan ALELEON → C. Alokasi Core CPU Minimum 2 dan Genap  (https://wiki.efisonlt.com/wiki/Sausage_dan_Aturan_Metrik_Penggunaan_ALELEON)
+
+============================================================
+[Q36/69] Saya menjalankan script dengan #SBATCH --ntasks=4 dan #SBATCH --cpus-per-task=8 untuk OpenMX hibrida. Berapa total core thread CPU yang saya konsumsi, dan berapa Actual Core Hour yang terpotong jika job ini jalan 2 jam?
+------------------------------------------------------------
+Total core thread CPU yang Anda konsumsi adalah 32, dihitung dari perkalian parameter `ntasks` sebanyak 4 dengan `cpus-per-task` sebanyak 8 (4 * 8 = 32).
+
+Jika job tersebut berjalan selama 2 jam, maka Actual Core Hour (CCH) yang terpotong adalah 64 CCH, berdasarkan perhitungan 32 core dikalikan durasi waktu 2 jam.
+
+    📚 Sumber (10 chunks):
+    • OpenMX → Appendix 1. Pilihan Hybrid Menjalankan OpenMX  (https://wiki.efisonlt.com/wiki/OpenMX)
+    • Submit Script ALELEON Supercomputer → #SBATCH --cpus-per-task untuk Threading OpenMP  (https://wiki.efisonlt.com/wiki/Submit_Script_ALELEON_Supercomputer)
+    • Sausage dan Aturan Metrik Penggunaan ALELEON → Contoh Penghitungan  (https://wiki.efisonlt.com/wiki/Sausage_dan_Aturan_Metrik_Penggunaan_ALELEON)
+    • GROMACS → 4. Pilihan Menjalankan Komputasi  (https://wiki.efisonlt.com/wiki/GROMACS)
+    • Submit Script ALELEON Supercomputer → #SBATCH --time  (https://wiki.efisonlt.com/wiki/Submit_Script_ALELEON_Supercomputer)
+    • TRIAL A6 → Batch Job  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • SW-GXN → Jalan Paralel dengan OpenMP Threading  (https://wiki.efisonlt.com/wiki/SW-GXN)
+    • SW-GXN → 4. Pilihan Menjalankan Komputasi  (https://wiki.efisonlt.com/wiki/SW-GXN)
+    • Core Hour → Rumus Slurm Menghitung Core Hour  (https://wiki.efisonlt.com/wiki/Core_Hour)
+    • Submit Script ALELEON Supercomputer → #SBATCH --ntasks, --mem, dan --gpus  (https://wiki.efisonlt.com/wiki/Submit_Script_ALELEON_Supercomputer)
+
+============================================================
+[Q37/69] Saya butuh komputasi memori raksasa sebesar 350 GB untuk satu aplikasi yang non-MPI (tidak bisa dibagi ke banyak node). Partisi apa yang WAJIB saya gunakan agar tidak error kehabisan memori?
+------------------------------------------------------------
+Untuk menjalankan aplikasi non-MPI yang membutuhkan total alokasi memori 350 GB pada satu node, Anda **WAJIB** menggunakan partisi **epyc-jumbo**.
+
+Berdasarkan spesifikasi dokumen referensi:
+1. Partisi **epyc** hanya menyediakan RAM efektif sebesar **240GB per node**, sehingga tidak cukup untuk kebutuhan 350 GB Anda.
+2. Partisi **epyc-jumbo** menyediakan RAM efektif sebesar **500GB per node**, yang memenuhi syarat minimal 350 GB tersebut.
+3. Karena aplikasi bersifat non-MPI (hanya berjalan di satu node), maka seluruh alokasi memori harus tersedia dalam satu node tersebut, dan perhitungan `#SBATCH --mem` akan diterapkan langsung ke nilai 350 GB atau lebih pada partisi epyc-jumbo ini.
+
+Anda dapat menentukan partisi ini dengan perintah berikut dalam script submit:
+`#SBATCH --partition=epyc-jumbo`
+
+    📚 Sumber (10 chunks):
+    • MPI ALELEON Supercomputer → 3.2. Jumlah Node dan Memori per Node  (https://wiki.efisonlt.com/wiki/MPI_ALELEON_Supercomputer)
+    • MPI ALELEON Supercomputer → 4.2. Opsi Skenario Proses MPI di CPU vs GPU  (https://wiki.efisonlt.com/wiki/MPI_ALELEON_Supercomputer)
+    • Spesifikasi ALELEON Supercomputer → Partisi torti  (https://wiki.efisonlt.com/wiki/Spesifikasi_ALELEON_Supercomputer)
+    • Spesifikasi ALELEON Supercomputer → Partisi tilla  (https://wiki.efisonlt.com/wiki/Spesifikasi_ALELEON_Supercomputer)
+    • Spesifikasi ALELEON Supercomputer → Partisi epyc-jumbo  (https://wiki.efisonlt.com/wiki/Spesifikasi_ALELEON_Supercomputer)
+    • Sausage dan Aturan Metrik Penggunaan ALELEON → D. Software MPI vs Non-MPI  (https://wiki.efisonlt.com/wiki/Sausage_dan_Aturan_Metrik_Penggunaan_ALELEON)
+    • Spesifikasi ALELEON Supercomputer → Partisi epyc  (https://wiki.efisonlt.com/wiki/Spesifikasi_ALELEON_Supercomputer)
+    • Spesifikasi ALELEON Supercomputer → Partisi ampere  (https://wiki.efisonlt.com/wiki/Spesifikasi_ALELEON_Supercomputer)
+    • SW-AJFT → 3. Template Submit Script GROMACS  (https://wiki.efisonlt.com/wiki/SW-AJFT)
+    • Submit Script ALELEON Supercomputer → #SBATCH --partition  (https://wiki.efisonlt.com/wiki/Submit_Script_ALELEON_Supercomputer)
+
+============================================================
+[Q38/69] Saya mencoba mengisi form Sesi JupyterLab di EFIRO. Saya set waktu 3 hari (72 jam) dan minta 1 GPU. Namun tombol Launch ditolak karena saldo kurang. Jika sisa kuota GPU Hour (GH) saya tinggal 50 GH, berapa maksimal hari/jam yang bisa saya ajukan?
+------------------------------------------------------------
+Berdasarkan dokumen referensi yang tersedia, tidak ada informasi mengenai konversi spesifik antara GPU Hour (GH) dengan durasi waktu dalam jam atau hari untuk alokasi 1 GPU. Dokumen hanya menyebutkan bahwa "Reservasi waktu sesi Jupyter" ditentukan oleh pilihan jumlah CPU, GPU, dan sisa Core Hour, serta membatasi maksimal waktu sesi (Walltime) pada akun uji coba adalah 24 jam, namun tidak menjelaskan rumus pengurangan saldo GH terhadap durasi tersebut.
+
+Oleh karena itu, saya tidak dapat menghitung berapa maksimal hari atau jam yang bisa diajukan dari sisa kuota 50 GH Anda tanpa data konversi yang diperlukan.
+
+    📚 Sumber (10 chunks):
+    • XUIN Temporary → 2B. Sesi Interaktif JupyterLab  (https://wiki.efisonlt.com/wiki/XUIN_Temporary)
+    • GMX-MMPBSA → 2C. Sesi Interaktif JupyterLab  (https://wiki.efisonlt.com/wiki/GMX-MMPBSA)
+    • BoltzTraP2 → 2D. Sesi Interaktif JupyterLab  (https://wiki.efisonlt.com/wiki/BoltzTraP2)
+    • ACPYPE → 2C. Sesi Interaktif JupyterLab  (https://wiki.efisonlt.com/wiki/ACPYPE)
+    • Phono3py dan Phonopy → 2C. Sesi Interaktif JupyterLab  (https://wiki.efisonlt.com/wiki/Phono3py_dan_Phonopy)
+    • TRIAL A6 → Sesi Jupyter  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • SW-AMK → 3B. Sesi JupyterLab  (https://wiki.efisonlt.com/wiki/SW-AMK)
+    • Komputasi Python dengan Conda Environment User → 5C. Sesi Interaktif JupyterLab  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • Limitasi Fair Usage ALELEON Supercomputer → Berlaku untuk Setiap Job Komputasi  (https://wiki.efisonlt.com/wiki/Limitasi_Fair_Usage_ALELEON_Supercomputer)
+    • Core Hour → Alur transaksi  (https://wiki.efisonlt.com/wiki/Core_Hour)
+
+============================================================
+[Q39/69] Kenapa saat saya meminta alokasi #SBATCH --ntasks=7, sistem Slurm ALELEON akan membulatkannya menjadi 8 dan saya ditagih biaya untuk 8 core?
+------------------------------------------------------------
+Sistem Slurm ALELEON membulatkan alokasi core CPU ganjil menjadi genap ke atas demi optimasi performa karena fitur SMT (Simultaneous Multi-Threading) yang aktif di mana 2 thread dalam 1 core tidak boleh dipakai oleh 2 job berbeda.
+
+Berdasarkan dokumen referensi, berikut adalah penjelasan rincinya:
+1. ALELEON mengaktifkan SMT pada semua CPU compute node sehingga berjalan 2 thread per core.
+2. Konfigurasi Slurm memastikan 2 thread dalam 1 core CPU tidak dipakai oleh 2 job berbeda untuk optimasi performa.
+3. Oleh karena itu, jumlah alokasi CPU ganjil akan dibulatkan genap ke atas oleh Slurm, contohnya jumlah 7 menjadi 8, 23 menjadi 24, dst.
+4. Aturan ini menetapkan bahwa alokasi minimum core CPU haruslah 2 dan genap.
+
+    📚 Sumber (10 chunks):
+    • Sausage dan Aturan Metrik Penggunaan ALELEON → C. Alokasi Core CPU Minimum 2 dan Genap  (https://wiki.efisonlt.com/wiki/Sausage_dan_Aturan_Metrik_Penggunaan_ALELEON)
+    • Submit Script ALELEON Supercomputer → #SBATCH --ntasks, --mem, dan --gpus  (https://wiki.efisonlt.com/wiki/Submit_Script_ALELEON_Supercomputer)
+    • Sausage dan Aturan Metrik Penggunaan ALELEON → Contoh Penghitungan  (https://wiki.efisonlt.com/wiki/Sausage_dan_Aturan_Metrik_Penggunaan_ALELEON)
+    • MPI ALELEON Supercomputer → 3.2. Jumlah Node dan Memori per Node  (https://wiki.efisonlt.com/wiki/MPI_ALELEON_Supercomputer)
+    • LAMMPS → 2B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/LAMMPS)
+    • MPI ALELEON Supercomputer → 2. Sintaks Menjalankan MPI di ALELEON  (https://wiki.efisonlt.com/wiki/MPI_ALELEON_Supercomputer)
+    • CP2K → 2B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/CP2K)
+    • Sausage dan Aturan Metrik Penggunaan ALELEON → Jenis Core Hour  (https://wiki.efisonlt.com/wiki/Sausage_dan_Aturan_Metrik_Penggunaan_ALELEON)
+    • Core Hour → Rumus Slurm Menghitung Core Hour  (https://wiki.efisonlt.com/wiki/Core_Hour)
+    • Metode Komputasi di ALELEON → 4C. Slurm srun  (https://wiki.efisonlt.com/wiki/Metode_Komputasi_di_ALELEON)
+
+============================================================
+[Q40/69] Apakah ada gunanya saya upload file Slaster-Koster (SK) ke setiap ruang Job Composer DFTB+? Ataukah ada cara yang lebih hemat storage?
+------------------------------------------------------------
+Tidak, Anda tidak perlu mengunggah file Slaster-Koster (SK) ke setiap ruang Job Composer karena cara tersebut akan memakan banyak penyimpanan.
+
+Admin menyarankan untuk menaruh atau mengunggah folder SK pada direktori HOME agar dapat diakses oleh banyak job secara efisien.
+
+Berikut adalah langkah-langkah yang harus dilakukan:
+1. Upload folder file SK yang dibutuhkan ke direktori HOME akun Anda dengan struktur path $HOME /<folder-file-SK-yang-dibutuhkan>.
+2. Pastikan file input dftb_in.hsd pada bagian Hamiltonian menunjuk ke direktori file SK spesifik yang berada di HOME tersebut.
+
+    📚 Sumber (10 chunks):
+    • DFTB%2B → Menyiapkan File Slaster-Koster (SK)  (https://wiki.efisonlt.com/wiki/DFTB%2B)
+    • DFTB%2B → Daftar isi  (https://wiki.efisonlt.com/wiki/DFTB%2B)
+    • Migrasi Akun dan Data Mk.III ke Mk.V → 1B. Backup Data Mk.III  (https://wiki.efisonlt.com/wiki/Migrasi_Akun_dan_Data_Mk.III_ke_Mk.V)
+    • DFTB%2B → File Input dftb_in.hsd  (https://wiki.efisonlt.com/wiki/DFTB%2B)
+    • Upload - Download File ALELEON → SFTP ke Job Composer  (https://wiki.efisonlt.com/wiki/Upload_-_Download_File_ALELEON)
+    • SIESTA → 2A. Batch Job dengan Job Composer EWS  (https://wiki.efisonlt.com/wiki/SIESTA)
+    • GMX-MMPBSA → 2A. Batch Job dengan Job Composer EWS  (https://wiki.efisonlt.com/wiki/GMX-MMPBSA)
+    • BoltzTraP2 → 2B. Batch Job dengan Job Composer EWS  (https://wiki.efisonlt.com/wiki/BoltzTraP2)
+    • SW-GXN → 4. Pilihan Menjalankan Komputasi  (https://wiki.efisonlt.com/wiki/SW-GXN)
+    • Komputasi dengan Container User via Apptainer → 5A. Batch Job dengan Job Composer EWS  (https://wiki.efisonlt.com/wiki/Komputasi_dengan_Container_User_via_Apptainer)
+
+============================================================
+[Q41/69] Berapa kapasitas ukuran penyimpanan (storage) SSD untuk satu node Login di ALELEON?
+------------------------------------------------------------
+Berdasarkan dokumen referensi yang tersedia, tidak ditemukan informasi mengenai kapasitas penyimpanan SSD khusus untuk node Login di ALELEON.
+
+Dokumen hanya menyebutkan spesifikasi storage untuk "HOME and workdir" secara umum (Hot storage - SSD SAS 28TB efektif) dan spesifikasi partisi komputasi seperti epyc atau tilla, namun tidak merinci kapasitas per node login.
+
+    📚 Sumber (10 chunks):
+    • Sausage dan Aturan Metrik Penggunaan ALELEON → E. Kapasitas Storage HOME  (https://wiki.efisonlt.com/wiki/Sausage_dan_Aturan_Metrik_Penggunaan_ALELEON)
+    • Spesifikasi ALELEON Supercomputer → Spesifikasi Storage  (https://wiki.efisonlt.com/wiki/Spesifikasi_ALELEON_Supercomputer)
+    • Pendaftaran dan Biaya ALELEON Supercomputer → 4.1. Golongan Perseorangan  (https://wiki.efisonlt.com/wiki/Pendaftaran_dan_Biaya_ALELEON_Supercomputer)
+    • ALELEON Supercomputer → Kontak dan Support  (https://wiki.efisonlt.com/wiki/ALELEON_Supercomputer)
+    • Pendaftaran dan Biaya ALELEON Supercomputer → 7. Hak Pengguna ALELEON  (https://wiki.efisonlt.com/wiki/Pendaftaran_dan_Biaya_ALELEON_Supercomputer)
+    • Limitasi Fair Usage ALELEON Supercomputer → Permintaan Menambah LFU Sementara  (https://wiki.efisonlt.com/wiki/Limitasi_Fair_Usage_ALELEON_Supercomputer)
+    • Migrasi Akun dan Data Mk.III ke Mk.V → 3. Migrasi Akun dan Data ke Mk.V  (https://wiki.efisonlt.com/wiki/Migrasi_Akun_dan_Data_Mk.III_ke_Mk.V)
+    • Spesifikasi ALELEON Supercomputer → Partisi epyc  (https://wiki.efisonlt.com/wiki/Spesifikasi_ALELEON_Supercomputer)
+    • Trial Testing  (https://wiki.efisonlt.com/wiki/Trial_Testing)
+    • Spesifikasi ALELEON Supercomputer → Partisi tilla  (https://wiki.efisonlt.com/wiki/Spesifikasi_ALELEON_Supercomputer)
+
+============================================================
+[Q42/69] Bagaimana langkah-langkah submit job menggunakan aplikasi MATLAB di ALELEON?
+------------------------------------------------------------
+Saya tidak menemukan informasi mengenai langkah-langkah submit job untuk aplikasi MATLAB di sistem ALELEON Supercomputer berdasarkan dokumen referensi yang tersedia. Dokumen hanya mencakup panduan untuk aplikasi DFTB+, R, GAMESS, COMCOT, NWChem, dan NAMD.
+
+    📚 Sumber (10 chunks):
+    • DFTB%2B → Job Submission Web EFIRO  (https://wiki.efisonlt.com/wiki/DFTB%2B)
+    • R → Job Submission Web EFIRO  (https://wiki.efisonlt.com/wiki/R)
+    • DFTB%2B → Job Submission Terminal  (https://wiki.efisonlt.com/wiki/DFTB%2B)
+    • GAMESS → Job Submission Web EFIRO  (https://wiki.efisonlt.com/wiki/GAMESS)
+    • COMCOT → Job Submission Web EFIRO  (https://wiki.efisonlt.com/wiki/COMCOT)
+    • NWChem → Job Submission Web EFIRO  (https://wiki.efisonlt.com/wiki/NWChem)
+    • NAMD → Job Submission Web EFIRO  (https://wiki.efisonlt.com/wiki/NAMD)
+    • GAMESS → Job Submission Terminal  (https://wiki.efisonlt.com/wiki/GAMESS)
+    • COMCOT → Job Submission Terminal  (https://wiki.efisonlt.com/wiki/COMCOT)
+    • NWChem → Job Submission Terminal  (https://wiki.efisonlt.com/wiki/NWChem)
+
+============================================================
+[Q43/69] Berapa biaya denda yang harus dibayar jika file di HOME saya melebihi kuota 150GB?
+------------------------------------------------------------
+Saya tidak menemukan informasi mengenai biaya denda yang harus dibayar jika file di HOME melebihi kuota 150 GiB di sistem.
+
+Dokumen hanya menyebutkan bahwa bagi golongan perseorangan, monitor penggunaan storage menjadi tanggung jawab user dan job komputasi akan putus atau tidak dapat berjalan apabila storage HOME penuh.
+
+    📚 Sumber (10 chunks):
+    • Sausage dan Aturan Metrik Penggunaan ALELEON → E. Kapasitas Storage HOME  (https://wiki.efisonlt.com/wiki/Sausage_dan_Aturan_Metrik_Penggunaan_ALELEON)
+    • Upload - Download File ALELEON → 1. Transfer Data Direktori HOME  (https://wiki.efisonlt.com/wiki/Upload_-_Download_File_ALELEON)
+    • Pendaftaran dan Biaya ALELEON Supercomputer → 4.1. Golongan Perseorangan  (https://wiki.efisonlt.com/wiki/Pendaftaran_dan_Biaya_ALELEON_Supercomputer)
+    • Core Hour → Ketentuan  (https://wiki.efisonlt.com/wiki/Core_Hour)
+    • Core Hour → Alur transaksi  (https://wiki.efisonlt.com/wiki/Core_Hour)
+    • Limitasi Fair Usage ALELEON Supercomputer → Permintaan Menambah LFU Sementara  (https://wiki.efisonlt.com/wiki/Limitasi_Fair_Usage_ALELEON_Supercomputer)
+    • Daftar Software Komputasi dan Tutorial Penggunaan → Panduan (Lama) ALELEON Mk.III  (https://wiki.efisonlt.com/wiki/Daftar_Software_Komputasi_dan_Tutorial_Penggunaan)
+    • Limitasi Fair Usage ALELEON Supercomputer → Berlaku untuk Akumulasi Semua Job Komputasi  (https://wiki.efisonlt.com/wiki/Limitasi_Fair_Usage_ALELEON_Supercomputer)
+    • TRIAL A6 → Batch Job  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • EUREKA! → EUREKA! Periode 2: Maret 2022  (https://wiki.efisonlt.com/wiki/EUREKA!)
+
+============================================================
+[Q44/69] Apakah saya bisa menginstal package R menggunakan perintah conda install r-seurat di ALELEON?
+------------------------------------------------------------
+Tidak, Anda tidak dapat menggunakan perintah `conda install r-seurat` untuk menginstal package R di ALELEON karena prosedur instalasi package R yang tersedia hanya melalui terminal R itu sendiri.
+
+Berdasarkan dokumen referensi, langkah yang benar adalah mengaktifkan modul R terlebih dahulu dengan perintah `$ module load [nama-modul-R]`, kemudian menjalankan R dan menginstal package menggunakan format perintah standar `$ R` diikuti oleh `> install.packages('r-seurat')`.
+
+Instalasi ini akan dilakukan secara langsung ke dalam lingkungan R dan package akan terpasang di direktori HOME user, bukan melalui manajer paket Conda seperti `conda install`.
+
+    📚 Sumber (10 chunks):
+    • R → Instalasi Library Package R  (https://wiki.efisonlt.com/wiki/R)
+    • Komputasi Python dengan Conda Environment User → 3. Mengaktifkan Conda Env dan Instalasi Package  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • R → Interactive Job Jupyter  (https://wiki.efisonlt.com/wiki/R)
+    • TRIAL A6 → Mengaktifkan Conda Env dan Instalasi Package  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • TRIAL A6 → Membuat Conda Environment  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • TRIAL A6 → Daftar isi  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • Komputasi Python dengan Conda Environment User  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • R → Job Submission Web EFIRO  (https://wiki.efisonlt.com/wiki/R)
+    • TRIAL A6 → Spesifikasi Trial dan Reproduksi Langkah  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • TRIAL A6 → Menjalankan Package Python versi GPU?  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+
+============================================================
+[Q45/69] Berapa kecepatan internet/bandwidth VPN jika saya akses dari luar pulau Jawa?
+------------------------------------------------------------
+Saya tidak menemukan informasi mengenai kecepatan internet atau bandwidth VPN jika diakses dari luar pulau Jawa di dalam dokumen referensi yang tersedia. Dokumen hanya menyebutkan bahwa pengguna harus mengaktifkan profil OVPN EFISON sebelum login, namun tidak merinci spesifikasi teknis terkait kecepatan koneksi berdasarkan lokasi geografis.
+
+    📚 Sumber (10 chunks):
+    • Pendaftaran dan Biaya ALELEON Supercomputer → 4.1. Golongan Perseorangan  (https://wiki.efisonlt.com/wiki/Pendaftaran_dan_Biaya_ALELEON_Supercomputer)
+    • EUREKA! → EUREKA! Periode 2: Maret 2022  (https://wiki.efisonlt.com/wiki/EUREKA!)
+    • SW-GXN → Pranala Lebih Lanjut  (https://wiki.efisonlt.com/wiki/SW-GXN)
+    • Migrasi Akun dan Data Mk.III ke Mk.V → 1A. Login Mk.III  (https://wiki.efisonlt.com/wiki/Migrasi_Akun_dan_Data_Mk.III_ke_Mk.V)
+    • EUREKA! Periode 2 → Hasil EUREKA! Periode 2  (https://wiki.efisonlt.com/wiki/EUREKA!_Periode_2)
+    • SPECFEM3D  (https://wiki.efisonlt.com/wiki/SPECFEM3D)
+    • ALELEON Supercomputer → Kontak dan Support  (https://wiki.efisonlt.com/wiki/ALELEON_Supercomputer)
+    • Limitasi Fair Usage ALELEON Supercomputer → Permintaan Menambah LFU Sementara  (https://wiki.efisonlt.com/wiki/Limitasi_Fair_Usage_ALELEON_Supercomputer)
+    • Quantum ESPRESSO → 4. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/Quantum_ESPRESSO)
+    • Migrasi Akun dan Data Mk.III ke Mk.V → 3. Migrasi Akun dan Data ke Mk.V  (https://wiki.efisonlt.com/wiki/Migrasi_Akun_dan_Data_Mk.III_ke_Mk.V)
+
+============================================================
+[Q46/69] Bagaimana cara mereset environment Python bawaan sistem (python 3.9) ke kondisi pabrik jika saya merusaknya?
+------------------------------------------------------------
+Berdasarkan dokumen referensi yang tersedia, tidak ada informasi mengenai prosedur untuk mereset atau mengembalikan environment Python bawaan sistem (Python 3.9.21) ke kondisi pabrik setelah rusak.
+
+Dokumen hanya menjelaskan bahwa user tidak dapat mengupdate package bawaan environment dan hanya diperbolehkan menginstal package yang belum ada, serta menyediakan panduan untuk membuat *Conda Environment* baru atau menghapusnya menggunakan perintah `conda remove -n [nama-env] --all`.
+
+    📚 Sumber (10 chunks):
+    • Katalog Software ALELEON Supercomputer → 4.5. Python  (https://wiki.efisonlt.com/wiki/Katalog_Software_ALELEON_Supercomputer)
+    • XUIN Temporary → 2A. Batch Job dengan Job Composer  (https://wiki.efisonlt.com/wiki/XUIN_Temporary)
+    • SW-AMK → 3A. Batch Job  (https://wiki.efisonlt.com/wiki/SW-AMK)
+    • Komputasi Python dengan Conda Environment User → 2. Membuat Conda Env dan Modul Pyload  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • Komputasi Python dengan Conda Environment User → 5A. Batch Job dengan Job Composer EWS  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • ACPYPE → 2A. Batch Job dengan Job Composer EWS  (https://wiki.efisonlt.com/wiki/ACPYPE)
+    • Komputasi Python dengan Conda Environment User → 5B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • TRIAL A6 → Membuat Conda Environment  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • Komputasi Python dengan Conda Environment User → 4. Manajemen Conda Env dan Modul Pyload  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • Software Komputasi Instalasi User → [ C ] - Python: Membuat Conda Environment  (https://wiki.efisonlt.com/wiki/Software_Komputasi_Instalasi_User)
+
+============================================================
+[Q47/69] Apakah tersedia modul aplikasi ANSYS Fluent di ALELEON?
+------------------------------------------------------------
+Saya tidak menemukan informasi mengenai ketersediaan modul aplikasi ANSYS Fluent di dalam dokumen referensi yang diberikan. Daftar software yang tersedia mencakup Python, library matematika (seperti AMD AOCL dan Intel oneAPI MKL), library NVIDIA, serta tools manajemen container seperti Apptainer, namun tidak disebutkan secara spesifik untuk ANSYS Fluent.
+
+    📚 Sumber (10 chunks):
+    • Spesifikasi ALELEON Supercomputer → Spesifikasi Software Sistem  (https://wiki.efisonlt.com/wiki/Spesifikasi_ALELEON_Supercomputer)
+    • Katalog Software ALELEON Supercomputer → 4.5. Python  (https://wiki.efisonlt.com/wiki/Katalog_Software_ALELEON_Supercomputer)
+    • SW-AJFT → EFIRO Web Service (EWS)  (https://wiki.efisonlt.com/wiki/SW-AJFT)
+    • SW-GXN → EFIRO Web Service (EWS)  (https://wiki.efisonlt.com/wiki/SW-GXN)
+    • SW-AMK → AI Compilation r0.1  (https://wiki.efisonlt.com/wiki/SW-AMK)
+    • Katalog Software ALELEON Supercomputer → 4.3. Library Matematika  (https://wiki.efisonlt.com/wiki/Katalog_Software_ALELEON_Supercomputer)
+    • Komputasi dengan Container User via Apptainer → 2. Kompatibilitas Komputasi  (https://wiki.efisonlt.com/wiki/Komputasi_dengan_Container_User_via_Apptainer)
+    • Tutorial Menggunakan ALELEON Supercomputer Mk.V → 2. Menggunakan ALELEON Supercomputer  (https://wiki.efisonlt.com/wiki/Tutorial_Menggunakan_ALELEON_Supercomputer_Mk.V)
+    • Katalog Software ALELEON Supercomputer → 4.4. Library NVIDIA  (https://wiki.efisonlt.com/wiki/Katalog_Software_ALELEON_Supercomputer)
+    • Pendaftaran dan Biaya ALELEON Supercomputer → 4.2. Golongan Institusi  (https://wiki.efisonlt.com/wiki/Pendaftaran_dan_Biaya_ALELEON_Supercomputer)
+
+============================================================
+[Q48/69] Bagaimana cara menyambungkan ekstensi Remote-SSH dari aplikasi Visual Studio Code (VSCode) ke compute node ALELEON?
+------------------------------------------------------------
+Saya tidak menemukan informasi mengenai cara menyambungkan ekstensi Remote-SSH dari aplikasi Visual Studio Code (VSCode) ke compute node ALELEON di dalam dokumen referensi yang tersedia.
+
+Dokumen hanya menyediakan panduan untuk login menggunakan terminal/shell standar, aplikasi MobaXTerm, atau akses melalui portal web EFIRO (EWS).
+
+    📚 Sumber (10 chunks):
+    • SW-AJFT → 4. Pilihan Menjalankan Komputasi  (https://wiki.efisonlt.com/wiki/SW-AJFT)
+    • SW-GXN → Menggunakan ALELEON via SSH / Terminal  (https://wiki.efisonlt.com/wiki/SW-GXN)
+    • SW-AJFT → Menggunakan ALELEON via SSH / Terminal  (https://wiki.efisonlt.com/wiki/SW-AJFT)
+    • Registrasi SSH Key ALELEON Supercomputer → 1. Membuat SSH Key di Komputer User  (https://wiki.efisonlt.com/wiki/Registrasi_SSH_Key_ALELEON_Supercomputer)
+    • Login SSH dan SFTP ALELEON Supercomputer → 3. Opsi Login SSH  (https://wiki.efisonlt.com/wiki/Login_SSH_dan_SFTP_ALELEON_Supercomputer)
+    • Tutorial Menggunakan ALELEON Supercomputer Mk.V → 2. Menggunakan ALELEON Supercomputer  (https://wiki.efisonlt.com/wiki/Tutorial_Menggunakan_ALELEON_Supercomputer_Mk.V)
+    • Registrasi SSH Key ALELEON Supercomputer  (https://wiki.efisonlt.com/wiki/Registrasi_SSH_Key_ALELEON_Supercomputer)
+    • TRIAL A6 → Login ALELEON Supercomputer  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • Login SSH dan SFTP ALELEON Supercomputer  (https://wiki.efisonlt.com/wiki/Login_SSH_dan_SFTP_ALELEON_Supercomputer)
+    • Migrasi Akun dan Data Mk.III ke Mk.V → 1A. Login Mk.III  (https://wiki.efisonlt.com/wiki/Migrasi_Akun_dan_Data_Mk.III_ke_Mk.V)
+
+============================================================
+[Q49/69] Saya adalah user dari Singapura (WNA). Berapa tarif konversi Core Hour ke dalam US Dollar (USD)?
+------------------------------------------------------------
+Saya tidak menemukan informasi mengenai tarif konversi Core Hour ke dalam mata uang US Dollar (USD) di dokumen sistem.
+
+Dokumen hanya menyebutkan bahwa harga layanan ALELEON Supercomputer dibayarkan dalam Rupiah (Rp) dan sudah termasuk PPN sesuai kebijakan Pemerintah Indonesia, tanpa menyediakan opsi atau nilai tukar untuk mata uang asing lainnya.
+
+    📚 Sumber (10 chunks):
+    • Sausage dan Aturan Metrik Penggunaan ALELEON → Contoh Penghitungan  (https://wiki.efisonlt.com/wiki/Sausage_dan_Aturan_Metrik_Penggunaan_ALELEON)
+    • Core Hour → Prabayar dan Kuota Core Hour  (https://wiki.efisonlt.com/wiki/Core_Hour)
+    • Core Hour → Rumus Slurm Menghitung Core Hour  (https://wiki.efisonlt.com/wiki/Core_Hour)
+    • Core Hour  (https://wiki.efisonlt.com/wiki/Core_Hour)
+    • Pendaftaran dan Biaya ALELEON Supercomputer → 5. Biaya Layanan Core Hour ALELEON  (https://wiki.efisonlt.com/wiki/Pendaftaran_dan_Biaya_ALELEON_Supercomputer)
+    • Core Hour → 4. Harga Core Hour  (https://wiki.efisonlt.com/wiki/Core_Hour)
+    • Pendaftaran dan Biaya ALELEON Supercomputer → 3. Core Hour: Metrik Penggunaan Berbayar ALELEON  (https://wiki.efisonlt.com/wiki/Pendaftaran_dan_Biaya_ALELEON_Supercomputer)
+    • Sausage dan Aturan Metrik Penggunaan ALELEON → Jenis Core Hour  (https://wiki.efisonlt.com/wiki/Sausage_dan_Aturan_Metrik_Penggunaan_ALELEON)
+    • Core Hour → Ketentuan  (https://wiki.efisonlt.com/wiki/Core_Hour)
+    • Core Hour → Pascabayar Bulanan  (https://wiki.efisonlt.com/wiki/Core_Hour)
+
+============================================================
+[Q50/69] Apa password standar/bawaan dari admin sebelum saya menggantinya di awal?
+------------------------------------------------------------
+Berdasarkan dokumen referensi yang tersedia, tidak ada informasi mengenai password standar atau bawaan yang ditetapkan oleh admin untuk akun user.
+
+Proses pembuatan password dilakukan secara manual oleh user sendiri pada saat login pertama kali, di mana user diminta mengisi ulang password OTP dan kemudian membuat password buatan sendiri melalui terminal.
+
+    📚 Sumber (10 chunks):
+    • EFIRO Account Manager → Mengganti Password dan Two-factor Authentication  (https://wiki.efisonlt.com/wiki/EFIRO_Account_Manager)
+    • Login SSH dan SFTP ALELEON Supercomputer → 1. Ketentuan Login SSH / SFTP  (https://wiki.efisonlt.com/wiki/Login_SSH_dan_SFTP_ALELEON_Supercomputer)
+    • EFIRO Account Manager → Manajemen Personal Info  (https://wiki.efisonlt.com/wiki/EFIRO_Account_Manager)
+    • Tutorial Menggunakan ALELEON Supercomputer Mk.V → 3. Manajemen Akun dengan EFIRO Account Manager  (https://wiki.efisonlt.com/wiki/Tutorial_Menggunakan_ALELEON_Supercomputer_Mk.V)
+    • Pengantar SSH Key → Private Key itu ...  (https://wiki.efisonlt.com/wiki/Pengantar_SSH_Key)
+    • EFIRO Account Manager  (https://wiki.efisonlt.com/wiki/EFIRO_Account_Manager)
+    • Login Pertama ALELEON Supercomputer  (https://wiki.efisonlt.com/wiki/Login_Pertama_ALELEON_Supercomputer)
+    • SW-GXN → EFIRO Account Manager  (https://wiki.efisonlt.com/wiki/SW-GXN)
+    • SW-AJFT → EFIRO Account Manager  (https://wiki.efisonlt.com/wiki/SW-AJFT)
+    • Registrasi SSH Key ALELEON Supercomputer → 2. Registrasi SSH Key User ke ALELEON  (https://wiki.efisonlt.com/wiki/Registrasi_SSH_Key_ALELEON_Supercomputer)
+
+============================================================
+[Q51/69] Siapa nama Chief Technology Officer (CTO) dari EFISON yang membangun ALELEON ini?
+------------------------------------------------------------
+Saya tidak menemukan informasi mengenai nama Chief Technology Officer (CTO) dari EFISON yang membangun ALELEON di dalam dokumen referensi yang tersedia.
+
+    📚 Sumber (10 chunks):
+    • Spesifikasi ALELEON Supercomputer  (https://wiki.efisonlt.com/wiki/Spesifikasi_ALELEON_Supercomputer)
+    • Pendaftaran dan Biaya ALELEON Supercomputer → 7. Hak Pengguna ALELEON  (https://wiki.efisonlt.com/wiki/Pendaftaran_dan_Biaya_ALELEON_Supercomputer)
+    • ALELEON Supercomputer  (https://wiki.efisonlt.com/wiki/ALELEON_Supercomputer)
+    • ALELEON Supercomputer → Kontak dan Support  (https://wiki.efisonlt.com/wiki/ALELEON_Supercomputer)
+    • Core Hour → Alur transaksi  (https://wiki.efisonlt.com/wiki/Core_Hour)
+    • Tutorial Menggunakan ALELEON Supercomputer Mk.V → 4. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/Tutorial_Menggunakan_ALELEON_Supercomputer_Mk.V)
+    • Login SSH dan SFTP ALELEON Supercomputer → 5. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/Login_SSH_dan_SFTP_ALELEON_Supercomputer)
+    • Registrasi SSH Key ALELEON Supercomputer → 3. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/Registrasi_SSH_Key_ALELEON_Supercomputer)
+    • Upload - Download File ALELEON → 3. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/Upload_-_Download_File_ALELEON)
+    • ALELEON Desktop → 2. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/ALELEON_Desktop)
+
+============================================================
+[Q52/69] Bagaimana cara menghapus halaman Wiki ALELEON jika saya menemukan typo?
+------------------------------------------------------------
+Saya tidak menemukan informasi mengenai prosedur atau cara menghapus halaman Wiki ALELEON di dalam dokumen referensi yang tersedia. Dokumen hanya memuat panduan penggunaan superkomputer, tutorial login, konfigurasi job, dan kontak dukungan teknis.
+
+Jika Anda mengalami masalah pada konten wiki atau perlu bantuan terkait sistem, Anda dapat menghubungi tim admin melalui email support@efisonlt.com atau membuka menu Help (?) > Submit Support Ticket setelah login ke EFIRO Web Service (EWS).
+
+    📚 Sumber (10 chunks):
+    • Pengenalan Menggunakan ALELEON Supercomputer → 3. Format Penulisan Wiki  (https://wiki.efisonlt.com/wiki/Pengenalan_Menggunakan_ALELEON_Supercomputer)
+    • Login Pertama ALELEON Supercomputer  (https://wiki.efisonlt.com/wiki/Login_Pertama_ALELEON_Supercomputer)
+    • Daftar Environment Python ALELEON  (https://wiki.efisonlt.com/wiki/Daftar_Environment_Python_ALELEON)
+    • Pengantar SSH Key → Private Key itu ...  (https://wiki.efisonlt.com/wiki/Pengantar_SSH_Key)
+    • SW-GXN → EFIRO Web Service (EWS)  (https://wiki.efisonlt.com/wiki/SW-GXN)
+    • GROMACS → 4. Pilihan Menjalankan Komputasi  (https://wiki.efisonlt.com/wiki/GROMACS)
+    • Pendaftaran dan Biaya ALELEON Supercomputer → 7. Hak Pengguna ALELEON  (https://wiki.efisonlt.com/wiki/Pendaftaran_dan_Biaya_ALELEON_Supercomputer)
+    • SW-AJFT → EFIRO Web Service (EWS)  (https://wiki.efisonlt.com/wiki/SW-AJFT)
+    • SW-AJFT → 5. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/SW-AJFT)
+    • TRIAL A6 → Batch Job  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+
+============================================================
+[Q53/69] Bagaimana cara membatalkan/mengakhiri perjanjian PKSPIAS untuk akun Institusi sebelum waktunya habis?
+------------------------------------------------------------
+Saya tidak menemukan informasi mengenai prosedur atau cara untuk membatalkan/mengakhiri perjanjian PKSPIAS (Perjanjian Kerja Sama Pengguna Institusi ALELEON Supercomputer) sebelum waktunya habis di dalam dokumen referensi yang tersedia.
+
+Dokumen hanya menjelaskan bahwa PKSPIAS adalah acuan penggunaan teknis dan bisnis yang ditandatangani atas nama institusi dengan kredensial resmi, serta menyebutkan bahwa akun institusi memiliki fleksibilitas biaya melalui kesepakatan bersama, namun tidak mencakup langkah-langkah terminasi dini.
+
+    📚 Sumber (10 chunks):
+    • Pendaftaran dan Biaya ALELEON Supercomputer → 4.2. Golongan Institusi  (https://wiki.efisonlt.com/wiki/Pendaftaran_dan_Biaya_ALELEON_Supercomputer)
+    • Limitasi Fair Usage ALELEON Supercomputer → Berlaku untuk Setiap Job Komputasi  (https://wiki.efisonlt.com/wiki/Limitasi_Fair_Usage_ALELEON_Supercomputer)
+    • Quantum ESPRESSO → 2B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/Quantum_ESPRESSO)
+    • GMX-MMPBSA → 2B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/GMX-MMPBSA)
+    • SIESTA → 2B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/SIESTA)
+    • Limitasi Fair Usage ALELEON Supercomputer → Berlaku untuk Akumulasi Semua Job Komputasi  (https://wiki.efisonlt.com/wiki/Limitasi_Fair_Usage_ALELEON_Supercomputer)
+    • ORCA → 3B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/ORCA)
+    • PHASE/0 → 2B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/PHASE/0)
+    • Migrasi Akun dan Data Mk.III ke Mk.V → Pengumuman  (https://wiki.efisonlt.com/wiki/Migrasi_Akun_dan_Data_Mk.III_ke_Mk.V)
+    • Phono3py dan Phonopy → 2B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/Phono3py_dan_Phonopy)
+
+============================================================
+[Q54/69] Jika server ALELEON mati lampu, berapa jam daya tahan baterai UPS yang dimiliki EFISON?
+------------------------------------------------------------
+Saya tidak menemukan informasi mengenai berapa jam daya tahan baterai UPS yang dimiliki EFISON di dokumen referensi.
+
+    📚 Sumber (10 chunks):
+    • Tutorial Menggunakan ALELEON Supercomputer Mk.V → 4. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/Tutorial_Menggunakan_ALELEON_Supercomputer_Mk.V)
+    • Pendaftaran dan Biaya ALELEON Supercomputer → 7. Hak Pengguna ALELEON  (https://wiki.efisonlt.com/wiki/Pendaftaran_dan_Biaya_ALELEON_Supercomputer)
+    • Registrasi SSH Key ALELEON Supercomputer → 3. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/Registrasi_SSH_Key_ALELEON_Supercomputer)
+    • Login SSH dan SFTP ALELEON Supercomputer → 5. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/Login_SSH_dan_SFTP_ALELEON_Supercomputer)
+    • ALELEON Desktop → 2. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/ALELEON_Desktop)
+    • Upload - Download File ALELEON → 3. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/Upload_-_Download_File_ALELEON)
+    • Core Hour → Alur transaksi  (https://wiki.efisonlt.com/wiki/Core_Hour)
+    • ALELEON Supercomputer → Kontak dan Support  (https://wiki.efisonlt.com/wiki/ALELEON_Supercomputer)
+    • ACPYPE → 3. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/ACPYPE)
+    • GROMACS → 5. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/GROMACS)
+
+============================================================
+[Q55/69] Bagaimana cara menggunakan AutoGluon untuk machine learning di sistem ini?
+------------------------------------------------------------
+Saya tidak menemukan informasi mengenai penggunaan AutoGluon di sistem ALELEON Supercomputer.
+
+Dokumen referensi yang tersedia hanya menyebutkan bahwa halaman "AutoGluon" saat ini kosong dan tidak memuat panduan atau instruksi untuk menjalankan software tersebut. Meskipun terdapat dokumentasi untuk lingkungan Python AI lainnya seperti PyTorch, TensorFlow, dan JAX pada modul AI Compilation r0.1, tidak ada spesifikasi khusus untuk AutoGluon.
+
+    📚 Sumber (10 chunks):
+    • GROMACS → 4. Pilihan Menjalankan Komputasi  (https://wiki.efisonlt.com/wiki/GROMACS)
+    • AutoGluon  (https://wiki.efisonlt.com/wiki/AutoGluon)
+    • Katalog Software ALELEON Supercomputer → 4.3. Library Matematika  (https://wiki.efisonlt.com/wiki/Katalog_Software_ALELEON_Supercomputer)
+    • SW-AMK → 2. Pengenalan Komputasi  (https://wiki.efisonlt.com/wiki/SW-AMK)
+    • SW-GXN → 4. Pilihan Menjalankan Komputasi  (https://wiki.efisonlt.com/wiki/SW-GXN)
+    • SW-AMK → AI Compilation r0.1  (https://wiki.efisonlt.com/wiki/SW-AMK)
+    • SW-GXN  (https://wiki.efisonlt.com/wiki/SW-GXN)
+    • SW-AJFT → 4. Pilihan Menjalankan Komputasi  (https://wiki.efisonlt.com/wiki/SW-AJFT)
+    • Limitasi Fair Usage ALELEON Supercomputer → Berlaku untuk Akumulasi Semua Job Komputasi  (https://wiki.efisonlt.com/wiki/Limitasi_Fair_Usage_ALELEON_Supercomputer)
+    • Spesifikasi ALELEON Supercomputer → Spesifikasi Software Sistem  (https://wiki.efisonlt.com/wiki/Spesifikasi_ALELEON_Supercomputer)
+
+============================================================
+[Q56/69] Bagaimana cara membuat conda environment di aleleon?
+------------------------------------------------------------
+Untuk membuat Conda Environment di ALELEON, Anda perlu membuka terminal melalui menu **Apps > Aleleon Shell Access** atau menggunakan login SSH. Berikut adalah langkah-langkahnya:
+
+1. Aktifkan modul Anaconda yang sesuai dengan kebutuhan Anda, misalnya versi terbaru 2025.06-1 atau versi stabil 2024.02-1 dengan perintah `$ ml Anaconda3/2025.06-1` atau `$ module load Anaconda3/2024.02-1`.
+2. Buat environment kosong dengan menentukan nama dan versi Python yang diinginkan menggunakan perintah `$ conda create -n [nama-env] python=[versi-python]`, contohnya `$ conda create -n tensor python=3.11`.
+3. Setelah environment dibuat, aktifkan environment tersebut menggunakan perintah `$ source activate [nama-env]` sebelum melakukan instalasi package lebih lanjut.
+
+    📚 Sumber (10 chunks):
+    • TRIAL A6 → Membuat Conda Environment  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • Komputasi Python dengan Conda Environment User  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • Komputasi Python dengan Conda Environment User → 3. Mengaktifkan Conda Env dan Instalasi Package  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • Komputasi Python dengan Conda Environment User → 2. Membuat Conda Env dan Modul Pyload  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • Software Komputasi Instalasi User → [ C ] - Python: Membuat Conda Environment  (https://wiki.efisonlt.com/wiki/Software_Komputasi_Instalasi_User)
+    • TRIAL A6 → Mengaktifkan Conda Env dan Instalasi Package  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • TRIAL A6 → Conda Environment 'tensor'  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • Komputasi Python dengan Conda Environment User → 0. Sudah Punya Conda Env Sebelum pyload?  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • TRIAL A6 → Daftar isi  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • TRIAL A6 → Batch Job  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+
+============================================================
+[Q57/69] bagaimana cara menjalankan jupyter dengan conda environment sendiri?
+------------------------------------------------------------
+Untuk menjalankan sesi Jupyter menggunakan Conda Environment milik Anda sendiri di ALELEON, berikut adalah langkah-langkah lengkap yang harus dilakukan:
+
+1.  **Persiapan dan Instalasi Package**
+    Sebelum memulai sesi, pastikan Anda telah mengaktifkan Conda Environment dan menginstal package yang diperlukan (seperti `jupyter` atau `jupyterlab`) melalui terminal agar tidak memakan waktu saat sesi berjalan.
+    *   Buka terminal via menu **Apps > Aleleon Shell Access**.
+    *   Muat modul Anaconda dengan perintah:
+        `$ module load Anaconda3/2024.02-1`
+    *   Aktifkan Conda Environment Anda menggunakan perintah `source activate` (sesuai nama lingkungan Anda):
+        `$ source activate [nama-conda-env]`
+        *(Jika lupa nama environment, jalankan `$ conda env list`)*.
+    *   Instal package Jupyter jika belum ada:
+        `(env) $ pip install jupyter jupyterlab`
+    *   Setelah selesai, Anda dapat menonaktifkan environment dengan `$ conda deactivate`.
+
+2.  **Login dan Persiapan File**
+    *   Login ke **EFIRO Web Service**.
+    *   Untuk efisiensi, upload file komputasi Anda terlebih dahulu ke direktori HOME melalui menu **Files > Home Directory** (limit 100MB per file) atau gunakan aplikasi SFTP untuk file lebih besar.
+
+3.  **Mengisi Formulir Sesi Jupyter**
+    *   Klik aplikasi **Jupyter** di homepage EFIRO atau buka menu **Interactive Apps > Jupyter**.
+    *   Isi formulir dengan detail berikut:
+        *   **Choose Jupyter version**: Pilih **Jupyter Lab** atau **Notebook** sesuai preferensi.
+        *   **Partition**: Pilih **torti** untuk CPU atau **tilla** untuk GPU.
+        *   **Number of CPU thread(s)**: Masukkan jumlah core (range 2 - 16).
+        *   **Amount of memory/RAM (GB)**: Masukkan jumlah RAM (range 1 - 55).
+        *   **Number of GPUs**: Isi angka **1** (hanya jika memilih partisi tilla).
+        *   **Number of hours**: Tentukan durasi sesi (range 1 - 24 jam).
+        *   **Choose how to launch Jupyter**: Pilih **Anaconda/Mamba**.
+        *   **Choose Anaconda/Mamba version**: Pilih **Anaconda 3 2024.02-1**.
+        *   **Conda/Mamba environment directory**: Isi dengan nama Conda Environment Anda (misalnya **tensor**), atau nama lingkungan lain yang telah Anda buat.
+        *   **Software Modules**: Kosongkan kecuali Anda memerlukan modul tambahan seperti CUDA (untuk partisi tilla), namun Conda env 'tensor' umumnya tidak perlu memuat modul CUDA secara terpisah.
+        *   **Environment setup** & **Additional Jupyter arguments**: Kosongkan jika tidak ada instruksi khusus.
+        *   **Email address**: Isi jika ingin menerima notifikasi status sesi.
+
+4.  **Peluncuran dan Koneksi**
+    *   Klik tombol **Launch**.
+    *   Tunggu hingga status berubah menjadi **Running** pada halaman **My Interactive Sessions**.
+    *   Jika status sudah **Running**, klik tombol **Connect to Jupyter**. Sistem akan mulai menghitung Core Hour.
+    *   Gunakan kernel **Python 3 (ipykernel)** untuk menjalankan notebook.
+
+Sesi Jupyter akan terus berjalan selama waktu sesi masih tersedia, bahkan jika koneksi internet terputus atau Anda keluar dari web EFIRO. Untuk menghentikan sesi sebelum waktu habis, cukup klik tombol **Cancel**.
+
+    📚 Sumber (10 chunks):
+    • TRIAL A6 → Mengaktifkan Conda Env dan Instalasi Package  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • Komputasi Python dengan Conda Environment User → 5C. Sesi Interaktif JupyterLab  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • TRIAL A6 → Sesi Jupyter  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • Komputasi Python dengan Conda Environment User → 0. Sudah Punya Conda Env Sebelum pyload?  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • Komputasi Python dengan Conda Environment User  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • R → Interactive Job Jupyter  (https://wiki.efisonlt.com/wiki/R)
+    • Software Komputasi Instalasi User → [ C ] - Python: Membuat Conda Environment  (https://wiki.efisonlt.com/wiki/Software_Komputasi_Instalasi_User)
+    • Komputasi Python dengan Conda Environment User → 3. Mengaktifkan Conda Env dan Instalasi Package  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • TRIAL A6 → Langkah Menjalankan Komputasi  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • TRIAL A6 → Pilihan Menjalankan Komputasi  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+
+============================================================
+[Q58/69] Versi Python default dari Anaconda3 2025.06-1 apa?
+------------------------------------------------------------
+Berdasarkan dokumen referensi, versi Python default yang disediakan oleh modul Anaconda3 2025.06-1 adalah 3.13.4.
+
+Untuk mengaktifkan modul ini, Anda dapat menggunakan perintah berikut di terminal:
+1. Jalankan perintah `$ ml Anaconda3/2025.06-1`.
+2. Pastikan untuk tidak menggunakan versi Anaconda3 2024.06-1 karena terdapat banyak laporan bug, dan disarankan beralih ke versi 2025.06-1 jika sebelumnya telah membuat conda env dengan versi tersebut.
+
+    📚 Sumber (10 chunks):
+    • Katalog Software ALELEON Supercomputer → 4.5. Python  (https://wiki.efisonlt.com/wiki/Katalog_Software_ALELEON_Supercomputer)
+    • Komputasi Python dengan Conda Environment User → 2. Membuat Conda Env dan Modul Pyload  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • TRIAL A6 → Membuat Conda Environment  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • TRIAL A6 → Conda Environment 'tensor'  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • Komputasi Python dengan Conda Environment User → 4. Manajemen Conda Env dan Modul Pyload  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • XUIN Temporary → 1. Daftar Instalasi Package AI  (https://wiki.efisonlt.com/wiki/XUIN_Temporary)
+    • Software Komputasi Instalasi User → [ C ] - Python: Membuat Conda Environment  (https://wiki.efisonlt.com/wiki/Software_Komputasi_Instalasi_User)
+    • SW-AMK → AI Compilation r0.1  (https://wiki.efisonlt.com/wiki/SW-AMK)
+    • TRIAL A6 → Batch Job  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • TRIAL A6 → Mengaktifkan Conda Env dan Instalasi Package  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+
+============================================================
+[Q59/69] Perintah apa untuk mengaktifkan Mamba 23.11.0-0?
+------------------------------------------------------------
+Untuk mengaktifkan modul Mamba versi 23.11.0-0, silakan jalankan perintah berikut di terminal ALELEON:
+
+$ ml Mamba/23.11.0-0
+
+Perintah ini akan memuat lingkungan Conda yang sesuai untuk membuat environment baru menggunakan package manager Mamba.
+
+    📚 Sumber (10 chunks):
+    • Komputasi Python dengan Conda Environment User → 2. Membuat Conda Env dan Modul Pyload  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • OpenMX → 3B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/OpenMX)
+    • MPI ALELEON Supercomputer → 3.3. Opsi Skenario Menjalankan MPI CPU  (https://wiki.efisonlt.com/wiki/MPI_ALELEON_Supercomputer)
+    • SW-AJFT → 3. Template Submit Script GROMACS  (https://wiki.efisonlt.com/wiki/SW-AJFT)
+    • GMX-MMPBSA → 2B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/GMX-MMPBSA)
+    • ORCA → 3B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/ORCA)
+    • BoltzTraP2 → 2C. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/BoltzTraP2)
+    • SW-AMK → 3A. Batch Job  (https://wiki.efisonlt.com/wiki/SW-AMK)
+    • ACPYPE → 2B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/ACPYPE)
+
+============================================================
+[Q60/69] Bagaimana cara membuat modul pyload setelah conda env aktif?
+------------------------------------------------------------
+Untuk membuat modul pyload setelah conda environment aktif, Anda harus menjalankan perintah `pyl mod` di dalam terminal yang sudah memiliki prefix `(env)`.
+
+Berikut adalah langkah-langkahnya sesuai dokumen:
+1. Pastikan Anda telah mengaktifkan conda env dengan perintah `$ source activate [nama-env]`.
+2. Jalankan perintah `$ pyl mod` untuk memulai pembuatan modul.
+3. Pilih menu nomor 1 pada alur script yang muncul dan ikuti instruksi selanjutnya hingga selesai.
+
+    📚 Sumber (10 chunks):
+    • Komputasi Python dengan Conda Environment User → 2. Membuat Conda Env dan Modul Pyload  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • Komputasi Python dengan Conda Environment User → 4. Manajemen Conda Env dan Modul Pyload  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • Komputasi Python dengan Conda Environment User → 0. Sudah Punya Conda Env Sebelum pyload?  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • Komputasi Python dengan Conda Environment User  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • Komputasi Python dengan Conda Environment User → 3. Mengaktifkan Conda Env dan Instalasi Package  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • TRIAL A6 → Mengaktifkan Conda Env dan Instalasi Package  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • TRIAL A6 → Membuat Conda Environment  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • Software Komputasi Instalasi User → [ C ] - Python: Membuat Conda Environment  (https://wiki.efisonlt.com/wiki/Software_Komputasi_Instalasi_User)
+    • TRIAL A6 → Batch Job  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+
+============================================================
+[Q61/69] Perintah apa untuk melihat daftar modul pyload yang tersedia?
+------------------------------------------------------------
+Untuk melihat daftar modul pyload yang tersedia, Anda dapat menggunakan perintah `pyl list` di terminal. Perintah ini akan menampilkan daftar modul yang aktif, termasuk bagian "USER-DEFINED" untuk modul yang dikelola pengguna.
+
+Berikut adalah langkah-langkahnya:
+1. Buka terminal ALELEON melalui Login SSH atau menu Clusters > Aleleon Shell Access pada EWS.
+2. Jalankan perintah berikut untuk melihat daftar modul pyload:
+   $ pyl list
+3. Perhatikan output yang muncul, khususnya pada bagian USER-DEFINED untuk melihat modul yang telah dibuat oleh user.
+
+    📚 Sumber (10 chunks):
+    • Komputasi dengan Container User via Apptainer → 4. Manajemen Image SIF dan Modul Pyload  (https://wiki.efisonlt.com/wiki/Komputasi_dengan_Container_User_via_Apptainer)
+    • XUIN Temporary → 1. Daftar Instalasi Package AI  (https://wiki.efisonlt.com/wiki/XUIN_Temporary)
+    • Katalog Software ALELEON Supercomputer → 3. Mengakses Modul Software dengan Lmod  (https://wiki.efisonlt.com/wiki/Katalog_Software_ALELEON_Supercomputer)
+    • EasyBuild → Sementara  (https://wiki.efisonlt.com/wiki/EasyBuild)
+    • Komputasi Python dengan Conda Environment User → 4. Manajemen Conda Env dan Modul Pyload  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • EasyBuild → Melihat Daftar Software yang Tersedia dari EasyConfig  (https://wiki.efisonlt.com/wiki/EasyBuild)
+    • Komputasi dengan Container User via Apptainer → 3. Pull Image dan Membuat Modul Pyload  (https://wiki.efisonlt.com/wiki/Komputasi_dengan_Container_User_via_Apptainer)
+    • GMX-MMPBSA → 1. Daftar Instalasi gmx-MMPBSA  (https://wiki.efisonlt.com/wiki/GMX-MMPBSA)
+    • Komputasi Python dengan Conda Environment User → 0. Sudah Punya Conda Env Sebelum pyload?  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • Komputasi dengan Container User via Apptainer → 0. Sudah Memakai Apptainer Sebelum pyload?  (https://wiki.efisonlt.com/wiki/Komputasi_dengan_Container_User_via_Apptainer)
+
+============================================================
+[Q62/69] Di partisi GPU mana batch job conda berjalan?
+------------------------------------------------------------
+Berdasarkan dokumen referensi, batch job Conda Environment versi GPU berjalan di partisi **ampere**.
+
+Berikut adalah rincian langkah dan konfigurasi yang tercantum dalam dokumen:
+1. Pada template submit script untuk GPU, terdapat perintah spesifik `#SBATCH --partition=ampere` yang harus diisi untuk menjalankan komputasi dengan akselerasi GPU.
+2. Dokumen juga menyebutkan bahwa akun uji coba memiliki limit alokasi maksimal 1 unit GPU pada partisi tersebut.
+3. Untuk menjalankan job ini, user harus menggunakan template "TRIAL [A]/6 - Conda Env (GPU)" atau menyesuaikan script manual dengan partisi ampere.
+
+    📚 Sumber (10 chunks):
+    • TRIAL A6 → Batch Job  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • Komputasi Python dengan Conda Environment User → 5A. Batch Job dengan Job Composer EWS  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • Komputasi Python dengan Conda Environment User → 5B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • TRIAL A6 → Pilihan Menjalankan Komputasi  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • GROMACS → 4. Pilihan Menjalankan Komputasi  (https://wiki.efisonlt.com/wiki/GROMACS)
+    • SW-AMK → 3A. Batch Job  (https://wiki.efisonlt.com/wiki/SW-AMK)
+
+============================================================
+[Q63/69] Apa email support admin ALELEON?
+------------------------------------------------------------
+Email untuk menghubungi tim admin support ALELEON adalah support@efisonlt.com. Anda dapat mengirimkan inkuiri atau tiket bantuan melalui alamat email tersebut jika mengalami kendala atau tidak dapat login ke EWS.
+
+    📚 Sumber (10 chunks):
+    • ALELEON Desktop → 2. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/ALELEON_Desktop)
+    • Upload - Download File ALELEON → 3. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/Upload_-_Download_File_ALELEON)
+    • SW-GXN → 5. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/SW-GXN)
+    • BoltzTraP2 → 3. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/BoltzTraP2)
+    • Registrasi SSH Key ALELEON Supercomputer → 3. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/Registrasi_SSH_Key_ALELEON_Supercomputer)
+    • ACPYPE → 3. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/ACPYPE)
+    • SW-AMK → 4. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/SW-AMK)
+    • GROMACS → 5. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/GROMACS)
+    • SW-AJFT → 5. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/SW-AJFT)
+    • Troubleshooting dan Support → S. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/Troubleshooting_dan_Support)
+
+============================================================
+[Q64/69] Jam kerja support EFISON kapan?
+------------------------------------------------------------
+Jam kerja support EFISON adalah Senin hingga Jumat pada pukul 09.00 - 17.30 WIB. Pada hari libur yang meliputi Sabtu, Minggu, Hari Libur Nasional, dan Cuti Bersama Pemerintah Indonesia, respon tim admin tidak secepat saat jam kerja namun tetap dapat membalas tiket atau email.
+
+    📚 Sumber (10 chunks):
+    • GMX-MMPBSA → 3. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/GMX-MMPBSA)
+    • ORCA → 4. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/ORCA)
+    • OpenMX → 4. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/OpenMX)
+    • LAMMPS → 3. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/LAMMPS)
+    • SIESTA → 3. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/SIESTA)
+    • PHASE/0 → 3. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/PHASE/0)
+    • CP2K → 3. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/CP2K)
+    • Komputasi dengan Container User via Apptainer → 6. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/Komputasi_dengan_Container_User_via_Apptainer)
+    • ALELEON Desktop → 2. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/ALELEON_Desktop)
+    • Quantum ESPRESSO → 4. Support dan Kontak Admin  (https://wiki.efisonlt.com/wiki/Quantum_ESPRESSO)
+
+============================================================
+[Q65/69] Apa saja pilihan cara menjalankan komputasi Python dengan conda env di ALELEON?
+------------------------------------------------------------
+Berdasarkan dokumen referensi, terdapat dua pilihan utama untuk menjalankan komputasi Python dengan conda environment di ALELEON, yaitu Batch Job dan Sesi Jupyter.
+
+1. **Batch Job**: Metode ini digunakan untuk menjalankan script Python yang sudah siap jalan tanpa memerlukan interaksi langsung dari user.
+   - Script harus dikonversi dari format `.ipynb` menjadi `.py`.
+   - Job dijalankan oleh Slurm dan user menunggu hingga selesai.
+   - Proses berjalan di Compute node pada partisi `epyc` atau `ampere`.
+   - Koneksi user tidak mempengaruhi jalannya job; job tidak akan berhenti meskipun koneksi terputus atau user keluar (log out).
+   - Job akan berhenti jika program selesai, menyentuh limit waktu yang ditentukan, atau mengalami error prematur.
+
+2. **Sesi Jupyter**: Metode ini digunakan untuk menjalankan sesi interaktif Jupyter Lab atau Notebook.
+   - Proses berjalan di Interactive node pada partisi `torti` atau `tilla`.
+   - Koneksi user tidak mempengaruhi sesi; sesi tidak akan berhenti saat koneksi terputus atau user keluar.
+   - Jika user keluar saat ada cell berjalan dan masuk kembali, cell tersebut mungkin tidak menampilkan proses jalannya komputasi secara langsung.
+   - Sesi akan berhenti jika waktu sesi habis, dihentikan manual oleh user, atau mengalami error prematur.
+
+    📚 Sumber (10 chunks):
+    • Komputasi Python dengan Conda Environment User → 3. Mengaktifkan Conda Env dan Instalasi Package  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • Komputasi Python dengan Conda Environment User  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • Komputasi Python dengan Conda Environment User → 0. Sudah Punya Conda Env Sebelum pyload?  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • TRIAL A6 → Membuat Conda Environment  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • TRIAL A6 → Pilihan Menjalankan Komputasi  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • TRIAL A6 → Mengaktifkan Conda Env dan Instalasi Package  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • Komputasi Python dengan Conda Environment User → 2. Membuat Conda Env dan Modul Pyload  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • TRIAL A6 → Daftar isi  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • TRIAL A6 → Spesifikasi Trial dan Reproduksi Langkah  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • TRIAL A6 → Menjalankan Package Python versi GPU?  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+
+============================================================
+[Q66/69] Apa perbedaan antara menjalankan batch job via Job Composer EWS dan via terminal Slurm?
+------------------------------------------------------------
+Berikut adalah perbedaan utama antara menjalankan batch job melalui **Job Composer EWS** dan **Terminal Slurm** berdasarkan dokumen referensi:
+
+1.  **Antarmuka dan Cara Akses**
+    *   **Job Composer EWS**: Dilakukan secara grafis melalui browser dengan login ke [EWS] atau [EFIRO Web Service], lalu membuka menu **Jobs > Job Composer**. User membuat ruang job menggunakan template yang tersedia (misalnya BoltzTraP2, ACPYPE, LAMMPS) dan mengisi formulir serta submit script melalui editor web ([Open Editor]).
+    *   **Terminal Slurm**: Dilakukan melalui terminal Linux setelah login via SSH atau menu **Clusters > Aleleon Shell Access** di [EFIRO Web Service]. User harus menyiapkan file komputasi di direktori HOME, membuat file submit script (.sh) secara manual dengan format `#!/bin/bash -l`, dan menjalankannya menggunakan perintah baris.
+
+2.  **Persiapan File dan Template**
+    *   **Job Composer EWS**: Menggunakan fitur **New Jobs > From Template** untuk memilih software spesifik (seperti "BoltzTraP2 25.3.1" atau "ACPYPE 2023.10.27"). Upload file dibatasi 100MB per file melalui menu [Edit Files], atau menggunakan [Aplikasi SFTP] jika lebih besar. Untuk file Python Notebook (.ipynb), user wajib mengonversinya menjadi .py menggunakan perintah `$ jupytext --to py` di dalam terminal Job Composer.
+    *   **Terminal Slurm**: User tidak menggunakan template otomatis dari menu, melainkan menulis struktur header SBATCH (`#SBATCH`) dan logika program secara manual dalam file `.sh`. Persiapan file dilakukan dengan upload ke HOME Directory (limit 100MB/file) atau via SFTP. Tidak ada langkah konversi notebook otomatis yang disebutkan dalam panduan terminal ini.
+
+3.  **Penulisan Submit Script**
+    *   **Job Composer EWS**: User mengklik tombol **[Open Editor]** di dalam antarmuka web untuk mengisi script sesuai petunjuk **NOTES** yang sudah disediakan di dalam editor tersebut.
+    *   **Terminal Slurm**: User membuat file script sendiri (contoh: `submit.sh`) dengan menyalin template yang diberikan dalam dokumen (termasuk bagian `ml load`, `pyl load`, dan `mpirun`), memastikan penggunaan shebang `#!/bin/bash -l`.
+
+4.  **Perintah Eksekusi dan Monitoring**
+    *   **Job Composer EWS**: Job dijalankan dengan klik tombol **[Submit]** di halaman web. Status dipantau dengan me-refresh halaman Job Composer (status: Not Submitted, Queue, Running, Completed, Failed). Output dilihat di kolom **Folder Contents** (file `result-jobID.txt` dan `error-jobID.txt`). Penghentian job dilakukan dengan klik tombol **[Stop]**.
+    *   **Terminal Slurm**: Job dijalankan dengan perintah `$ sbatch [nama-submit-script]`. Status dipantau menggunakan perintah `$ squeue -ul $USER` (kode status: PD untuk Pending, R untuk Run). Output dibaca menggunakan perintah standar Linux seperti `ls`, `cat`, `more`, atau `tail`. Penghentian job dilakukan dengan perintah `$ scancel [job-ID]`.
+
+5.  **Fitur Tambahan pada Terminal**
+    *   Pada panduan Terminal Slurm (khusus GMX-MMPBSA), terdapat instruksi eksplisit untuk memuat modul OpenMPI (`ml load openmpi/5.0.8...`) dan menjalankan program dengan `mpirun` secara manual di dalam script, sedangkan pada Job Composer EWS, instruksi pemanggilan modul seringkali sudah terintegrasi dalam template atau petunjuk NOTES editor web.
+
+    📚 Sumber (10 chunks):
+    • BoltzTraP2 → 2B. Batch Job dengan Job Composer EWS  (https://wiki.efisonlt.com/wiki/BoltzTraP2)
+    • ACPYPE → 2A. Batch Job dengan Job Composer EWS  (https://wiki.efisonlt.com/wiki/ACPYPE)
+    • Troubleshooting dan Support → 2. Job Gagal atau Tidak Berjalan Semestinya  (https://wiki.efisonlt.com/wiki/Troubleshooting_dan_Support)
+    • LAMMPS → 2A. Batch Job dengan Job Composer EWS  (https://wiki.efisonlt.com/wiki/LAMMPS)
+    • GMX-MMPBSA → 2A. Batch Job dengan Job Composer EWS  (https://wiki.efisonlt.com/wiki/GMX-MMPBSA)
+    • CP2K → 2A. Batch Job dengan Job Composer EWS  (https://wiki.efisonlt.com/wiki/CP2K)
+    • XUIN Temporary → 2A. Batch Job dengan Job Composer  (https://wiki.efisonlt.com/wiki/XUIN_Temporary)
+    • OpenMX → 3A. Batch Job dengan Job Composer EWS  (https://wiki.efisonlt.com/wiki/OpenMX)
+    • PHASE/0 → 2A. Batch Job dengan Job Composer EWS  (https://wiki.efisonlt.com/wiki/PHASE/0)
+    • GMX-MMPBSA → 2B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/GMX-MMPBSA)
+
+============================================================
+[Q67/69] Bagaimana langkah lengkap membuat conda env baru dan modul pyload dari awal?
+------------------------------------------------------------
+Berikut adalah langkah lengkap untuk membuat conda environment baru dan modul pyload di ALELEON berdasarkan panduan resmi:
+
+1.  Buka terminal ALELEON melalui opsi **Login SSH** atau masuk ke **[ EFIRO Web Service ]**, pilih menu **Clusters > Aleleon Shell Access**.
+2.  Aktifkan modul Lmod Conda yang diinginkan (misalnya versi terbaru Anaconda3) dengan perintah `$ ml Anaconda3/2025.06-1` atau `$ ml Mamba/23.11.0-0`. *Catatan: Hindari menggunakan versi Anaconda3 2024.06-1 karena adanya laporan bug.*
+3.  Buat conda environment baru dengan format perintah `$ conda create -n [nama-env] python=[versi-python]` (untuk Anaconda) atau `$ mamba create -n [nama-env] python=[versi-python]` (untuk Mamba). Pastikan Anda mendefinisikan versi Python secara spesifik untuk isolasi site-packages.
+4.  Aktifkan conda environment yang baru dibuat tersebut menggunakan perintah `$ source activate [nama-env]`.
+5.  Setelah lingkungan aktif, buat modul pyload untuk aktivasi otomatis di sesi berikutnya dengan menjalankan perintah `(env) $ pyl mod`, lalu ikuti alur script yang muncul dengan memilih menu nomor 1.
+
+    📚 Sumber (10 chunks):
+    • Komputasi Python dengan Conda Environment User → 2. Membuat Conda Env dan Modul Pyload  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • Komputasi Python dengan Conda Environment User → 4. Manajemen Conda Env dan Modul Pyload  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • Komputasi Python dengan Conda Environment User → 0. Sudah Punya Conda Env Sebelum pyload?  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • Komputasi Python dengan Conda Environment User  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • Komputasi Python dengan Conda Environment User → 3. Mengaktifkan Conda Env dan Instalasi Package  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • TRIAL A6 → Membuat Conda Environment  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • Software Komputasi Instalasi User → [ C ] - Python: Membuat Conda Environment  (https://wiki.efisonlt.com/wiki/Software_Komputasi_Instalasi_User)
+    • TRIAL A6 → Langkah Menjalankan Komputasi  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • TRIAL A6 → Conda Environment 'tensor'  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • TRIAL A6 → Batch Job  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+
+============================================================
+[Q68/69] Apa saja status job di squeue dan artinya masing-masing?
+------------------------------------------------------------
+Berikut adalah daftar status job (ST/STATE) yang ditampilkan oleh perintah `squeue` beserta artinya:
+
+1. PD (PENDING) - Job mengantri dan belum berjalan; jika tertahan dalam waktu lama, silakan lihat bagian Troubleshooting 1.
+2. R (RUN) - Job sedang berjalan; user dapat memantau output menggunakan perintah seperti ls, cat, more, atau tail.
+3. CG (COMPLETING) - Job telah selesai dan sedang dalam proses pembersihan (clean-up).
+4. CA (CANCELED) - Job dibatalkan secara manual oleh user.
+5. PR (PREEMPETED) - Job dibatalkan oleh tim admin, dengan notifikasi alasan dikirimkan melalui email support.
+6. S (SUSPENDED) - Job ditahan oleh tim admin, dengan notifikasi alasan dikirimkan melalui email support.
+
+    📚 Sumber (10 chunks):
+    • CP2K → 2B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/CP2K)
+    • Komputasi dengan Container User via Apptainer → 5B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/Komputasi_dengan_Container_User_via_Apptainer)
+    • TRIAL A6 → Batch Job  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • LAMMPS → 2B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/LAMMPS)
+    • Komputasi Python dengan Conda Environment User → 5B. Batch Job dengan Slurm di Terminal  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • GROMACS → 4. Pilihan Menjalankan Komputasi  (https://wiki.efisonlt.com/wiki/GROMACS)
+    • NAMD → Job Submission Terminal  (https://wiki.efisonlt.com/wiki/NAMD)
+    • SW-AJFT → 4. Pilihan Menjalankan Komputasi  (https://wiki.efisonlt.com/wiki/SW-AJFT)
+    • SW-GXN → 4. Pilihan Menjalankan Komputasi  (https://wiki.efisonlt.com/wiki/SW-GXN)
+    • R → Job Submission Terminal  (https://wiki.efisonlt.com/wiki/R)
+
+============================================================
+[Q69/69] Bagaimana cara mengisi formulir Jupyter di EWS untuk conda env user?
+------------------------------------------------------------
+Berikut adalah langkah-langkah mengisi formulir Jupyter di EWS untuk Conda Environment User berdasarkan dokumen referensi:
+
+1.  Login ke **EFIRO Web Service** dan buka menu **Interactive Apps > Jupyter**.
+2.  Isi kolom **Number of CPU threads** sesuai jumlah core CPU yang dibutuhkan.
+3.  Pilih opsi **Use GPU for the job**: pilih **no** jika tanpa GPU, atau **yes** (yang akan mengalokasikan 1x RTX 3090) jika membutuhkan akselerasi GPU.
+4.  Isi kolom **Number of hours** sebagai reservasi waktu maksimal sesi Jupyter, yang ditentukan berdasarkan pilihan jumlah CPU, GPU, dan sisa Core Hour yang tersedia.
+5.  Pada bagian **Choose package to run**, pilih opsi **User provided**.
+6.  Pada bagian **Choose how to launch Jupyter**, pilih **Anaconda / Mamba**.
+7.  Pada bagian **Choose Anaconda/Mamba version & User provided Conda/Mamba environment**, masukkan modul Lmod conda dan nama conda env user yang telah dibuat.
+    *   Untuk membantu pengisian, Anda dapat membuka menu **Clusters > Aleleon Shell Access**, lalu jalankan perintah `$ pyl info [nama-modul]` untuk melihat informasi modul pyload user Anda.
+8.  Klik tombol **[Launch]** untuk memulai sesi.
+
+    📚 Sumber (10 chunks):
+    • TRIAL A6 → Sesi Jupyter  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • Komputasi Python dengan Conda Environment User → 0. Sudah Punya Conda Env Sebelum pyload?  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • TRIAL A6 → Mengaktifkan Conda Env dan Instalasi Package  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • Komputasi Python dengan Conda Environment User → 5A. Batch Job dengan Job Composer EWS  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • Komputasi Python dengan Conda Environment User → 5C. Sesi Interaktif JupyterLab  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • Metode Komputasi di ALELEON → 4A. App EWS - Jupyter  (https://wiki.efisonlt.com/wiki/Metode_Komputasi_di_ALELEON)
+    • BoltzTraP2 → 2D. Sesi Interaktif JupyterLab  (https://wiki.efisonlt.com/wiki/BoltzTraP2)
+    • Komputasi Python dengan Conda Environment User → 3. Mengaktifkan Conda Env dan Instalasi Package  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • TRIAL A6 → Pilihan Menjalankan Komputasi  (https://wiki.efisonlt.com/wiki/TRIAL_A6)
+    • Komputasi Python dengan Conda Environment User  (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+
+============================================================
+Selesai — 69 pertanyaan dijawab.

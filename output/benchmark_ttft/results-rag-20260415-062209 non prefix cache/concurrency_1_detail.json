@@ -1,0 +1,639 @@
+{
+  "summary": {
+    "concurrency": 1,
+    "total_requests": 69,
+    "successful": 69,
+    "failed": 0,
+    "avg_latency_s": 17.7836,
+    "min_latency_s": 10.7784,
+    "max_latency_s": 35.8956,
+    "p50_latency_s": 16.1735,
+    "p99_latency_s": 33.3233,
+    "stdev_latency_s": 5.1237,
+    "throughput_rps": 0.0562,
+    "wall_clock_s": 1227.0722
+  },
+  "requests": [
+    {
+      "request_id": 1,
+      "question": "Berapa kapasitas RAM efektif per node di partisi epyc-jumbo?",
+      "status": 200,
+      "latency_s": 12.2119,
+      "answer_length": 355,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 2,
+      "question": "Berapa batas maksimal walltime (waktu komputasi) per job untuk golongan akun per",
+      "status": 200,
+      "latency_s": 13.7955,
+      "answer_length": 710,
+      "num_sources": 8,
+      "success": true
+    },
+    {
+      "request_id": 3,
+      "question": "Saya ingin pakai partisi GPU. GPU jenis apa yang terpasang di partisi ampere?",
+      "status": 200,
+      "latency_s": 15.761,
+      "answer_length": 712,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 4,
+      "question": "Apa alamat website portal EFIRO Web Service (EWS) untuk login?",
+      "status": 200,
+      "latency_s": 13.8804,
+      "answer_length": 495,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 5,
+      "question": "Perintah apa yang harus saya ketik di terminal untuk melihat daftar environment ",
+      "status": 200,
+      "latency_s": 16.1735,
+      "answer_length": 761,
+      "num_sources": 9,
+      "success": true
+    },
+    {
+      "request_id": 6,
+      "question": "Berapa harga 1 GPU Hour (GH) untuk pengguna golongan perseorangan non-akademia?",
+      "status": 200,
+      "latency_s": 15.3041,
+      "answer_length": 788,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 7,
+      "question": "Saya mau cek sisa kuota core hour saya. Perintah sausage apa yang harus diketik?",
+      "status": 200,
+      "latency_s": 17.3649,
+      "answer_length": 867,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 8,
+      "question": "Apa itu PKSPIAS dalam pendaftaran akun ALELEON?",
+      "status": 200,
+      "latency_s": 14.5236,
+      "answer_length": 771,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 9,
+      "question": "Jika saya pakai aplikasi SFTP seperti FileZilla, apakah ada limit ukuran file ya",
+      "status": 200,
+      "latency_s": 15.9318,
+      "answer_length": 820,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 10,
+      "question": "OS (Sistem Operasi) apa yang digunakan oleh ALELEON Mk.V?",
+      "status": 200,
+      "latency_s": 11.8718,
+      "answer_length": 419,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 11,
+      "question": "Versi SLURM berapa yang terpasang di sistem ALELEON saat ini?",
+      "status": 200,
+      "latency_s": 13.6167,
+      "answer_length": 547,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 12,
+      "question": "Bagaimana cara membatalkan/menghentikan job yang berstatus PENDING di terminal?",
+      "status": 200,
+      "latency_s": 17.0861,
+      "answer_length": 740,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 13,
+      "question": "Berapa kapasitas limit storage HOME untuk akun perseorangan?",
+      "status": 200,
+      "latency_s": 13.2705,
+      "answer_length": 720,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 14,
+      "question": "Apakah sistem ALELEON memiliki backup jika saya tidak sengaja menghapus data di ",
+      "status": 200,
+      "latency_s": 15.65,
+      "answer_length": 764,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 15,
+      "question": "Email resmi apa yang harus saya hubungi jika ingin submit support ticket?",
+      "status": 200,
+      "latency_s": 14.1784,
+      "answer_length": 741,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 16,
+      "question": "Saya mau menjalankan simulasi GROMACS, apa nama binary MPI yang dipakai? Apakah ",
+      "status": 200,
+      "latency_s": 14.1976,
+      "answer_length": 702,
+      "num_sources": 7,
+      "success": true
+    },
+    {
+      "request_id": 17,
+      "question": "Di EFIRO Account Manager, aplikasi authenticator apa saja yang didukung untuk fi",
+      "status": 200,
+      "latency_s": 11.386,
+      "answer_length": 613,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 18,
+      "question": "Apa perintah terminal untuk mengecek status antrian job saya di Slurm?",
+      "status": 200,
+      "latency_s": 18.8178,
+      "answer_length": 1033,
+      "num_sources": 9,
+      "success": true
+    },
+    {
+      "request_id": 19,
+      "question": "Apakah ALELEON mendukung instalasi package Python menggunakan pip?",
+      "status": 200,
+      "latency_s": 16.4895,
+      "answer_length": 860,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 20,
+      "question": "Modul Lmod apa yang harus saya load jika ingin menggunakan compiler GCC versi 15",
+      "status": 200,
+      "latency_s": 14.3417,
+      "answer_length": 595,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 21,
+      "question": "Saya ingin buka sesi interaktif JupyterLab menggunakan GPU. Apa bedanya partisi ",
+      "status": 200,
+      "latency_s": 22.3297,
+      "answer_length": 1365,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 22,
+      "question": "Saya punya file simulasi.ipynb. Bagaimana urutan langkah menjalankannya sebagai ",
+      "status": 200,
+      "latency_s": 27.4697,
+      "answer_length": 2085,
+      "num_sources": 8,
+      "success": true
+    },
+    {
+      "request_id": 23,
+      "question": "Jelaskan perbedaan arti status job 'PD' dan 'CG' saat saya mengecek squeue. Lalu",
+      "status": 200,
+      "latency_s": 17.6655,
+      "answer_length": 1204,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 24,
+      "question": "Sebagai pengguna dari Akun Institusi, apakah job saya dibatasi maksimal 128 core",
+      "status": 200,
+      "latency_s": 18.5718,
+      "answer_length": 1057,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 25,
+      "question": "Saya mau ganti password akun ALELEON saya. Di portal web mana saya harus login, ",
+      "status": 200,
+      "latency_s": 13.3885,
+      "answer_length": 673,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 26,
+      "question": "File upload saya ukurannya 500 MB. Kenapa saya selalu gagal upload lewat menu Fi",
+      "status": 200,
+      "latency_s": 22.5609,
+      "answer_length": 1334,
+      "num_sources": 9,
+      "success": true
+    },
+    {
+      "request_id": 27,
+      "question": "Saya ingin mengkompilasi code C++ menggunakan compiler AMD target Zen 2 dan Open",
+      "status": 200,
+      "latency_s": 29.931,
+      "answer_length": 1702,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 28,
+      "question": "Saya mau pre-processing data GROMACS menggunakan binary gmx_mpi. Boleh tidak say",
+      "status": 200,
+      "latency_s": 21.5924,
+      "answer_length": 1462,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 29,
+      "question": "Jika saya menjalankan batch job lalu tiba-tiba koneksi internet rumah saya mati ",
+      "status": 200,
+      "latency_s": 20.1559,
+      "answer_length": 1059,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 30,
+      "question": "Apa bedanya Effective Core Hour dengan Actual Core Hour di dalam sistem ALELEON?",
+      "status": 200,
+      "latency_s": 25.2356,
+      "answer_length": 2200,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 31,
+      "question": "Saya menjalankan simulasi FLACS-CFD dengan 192 proses MPI murni. Di partisi epyc",
+      "status": 200,
+      "latency_s": 19.9326,
+      "answer_length": 927,
+      "num_sources": 9,
+      "success": true
+    },
+    {
+      "request_id": 32,
+      "question": "(Troubleshooting) Saya submit job GROMACS tapi selalu gagal dengan pesan error I",
+      "status": 200,
+      "latency_s": 19.1813,
+      "answer_length": 1216,
+      "num_sources": 7,
+      "success": true
+    },
+    {
+      "request_id": 33,
+      "question": "Saya submit 3 batch job berturut-turut. Job 1 pakai 64 CPU. Job 2 pakai 32 CPU. ",
+      "status": 200,
+      "latency_s": 23.9793,
+      "answer_length": 1572,
+      "num_sources": 9,
+      "success": true
+    },
+    {
+      "request_id": 34,
+      "question": "(Troubleshooting) Job saya berstatus PD dengan alasan AssocMaxWallDurationPerJob",
+      "status": 200,
+      "latency_s": 19.4131,
+      "answer_length": 1066,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 35,
+      "question": "Saya mau menjalankan 10 simulasi FLACS-CFD sekaligus menggunakan fitur Slurm Arr",
+      "status": 200,
+      "latency_s": 20.0085,
+      "answer_length": 1103,
+      "num_sources": 8,
+      "success": true
+    },
+    {
+      "request_id": 36,
+      "question": "Saya menjalankan script dengan #SBATCH --ntasks=4 dan #SBATCH --cpus-per-task=8 ",
+      "status": 200,
+      "latency_s": 18.9819,
+      "answer_length": 770,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 37,
+      "question": "Saya butuh komputasi memori raksasa sebesar 350 GB untuk satu aplikasi yang non-",
+      "status": 200,
+      "latency_s": 25.4572,
+      "answer_length": 1487,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 38,
+      "question": "Saya mencoba mengisi form Sesi JupyterLab di EFIRO. Saya set waktu 3 hari (72 ja",
+      "status": 200,
+      "latency_s": 21.4529,
+      "answer_length": 1259,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 39,
+      "question": "Kenapa saat saya meminta alokasi #SBATCH --ntasks=7, sistem Slurm ALELEON akan m",
+      "status": 200,
+      "latency_s": 22.3517,
+      "answer_length": 1112,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 40,
+      "question": "Apakah ada gunanya saya upload file Slaster-Koster (SK) ke setiap ruang Job Comp",
+      "status": 200,
+      "latency_s": 19.428,
+      "answer_length": 1091,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 41,
+      "question": "Berapa kapasitas ukuran penyimpanan (storage) SSD untuk satu node Login di ALELE",
+      "status": 200,
+      "latency_s": 16.9182,
+      "answer_length": 931,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 42,
+      "question": "Bagaimana langkah-langkah submit job menggunakan aplikasi MATLAB di ALELEON?",
+      "status": 200,
+      "latency_s": 14.8266,
+      "answer_length": 537,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 43,
+      "question": "Berapa biaya denda yang harus dibayar jika file di HOME saya melebihi kuota 150G",
+      "status": 200,
+      "latency_s": 14.5153,
+      "answer_length": 688,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 44,
+      "question": "Apakah saya bisa menginstal package R menggunakan perintah conda install r-seura",
+      "status": 200,
+      "latency_s": 21.5138,
+      "answer_length": 1059,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 45,
+      "question": "Berapa kecepatan internet/bandwidth VPN jika saya akses dari luar pulau Jawa?",
+      "status": 200,
+      "latency_s": 11.3448,
+      "answer_length": 479,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 46,
+      "question": "Bagaimana cara mereset environment Python bawaan sistem (python 3.9) ke kondisi ",
+      "status": 200,
+      "latency_s": 12.5416,
+      "answer_length": 656,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 47,
+      "question": "Apakah tersedia modul aplikasi ANSYS Fluent di ALELEON?",
+      "status": 200,
+      "latency_s": 15.2838,
+      "answer_length": 561,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 48,
+      "question": "Bagaimana cara menyambungkan ekstensi Remote-SSH dari aplikasi Visual Studio Cod",
+      "status": 200,
+      "latency_s": 15.0756,
+      "answer_length": 628,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 49,
+      "question": "Saya adalah user dari Singapura (WNA). Berapa tarif konversi Core Hour ke dalam ",
+      "status": 200,
+      "latency_s": 18.2537,
+      "answer_length": 1117,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 50,
+      "question": "Apa password standar/bawaan dari admin sebelum saya menggantinya di awal?",
+      "status": 200,
+      "latency_s": 16.1641,
+      "answer_length": 722,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 51,
+      "question": "Siapa nama Chief Technology Officer (CTO) dari EFISON yang membangun ALELEON ini",
+      "status": 200,
+      "latency_s": 16.0756,
+      "answer_length": 773,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 52,
+      "question": "Bagaimana cara menghapus halaman Wiki ALELEON jika saya menemukan typo?",
+      "status": 200,
+      "latency_s": 12.8015,
+      "answer_length": 527,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 53,
+      "question": "Bagaimana cara membatalkan/mengakhiri perjanjian PKSPIAS untuk akun Institusi se",
+      "status": 200,
+      "latency_s": 15.7785,
+      "answer_length": 762,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 54,
+      "question": "Jika server ALELEON mati lampu, berapa jam daya tahan baterai UPS yang dimiliki ",
+      "status": 200,
+      "latency_s": 11.343,
+      "answer_length": 559,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 55,
+      "question": "Bagaimana cara menggunakan AutoGluon untuk machine learning di sistem ini?",
+      "status": 200,
+      "latency_s": 15.1719,
+      "answer_length": 443,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 56,
+      "question": "Bagaimana cara membuat conda environment di aleleon?",
+      "status": 200,
+      "latency_s": 23.3406,
+      "answer_length": 1565,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 57,
+      "question": "bagaimana cara menjalankan jupyter dengan conda environment sendiri?",
+      "status": 200,
+      "latency_s": 35.8956,
+      "answer_length": 3008,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 58,
+      "question": "Versi Python default dari Anaconda3 2025.06-1 apa?",
+      "status": 200,
+      "latency_s": 16.8055,
+      "answer_length": 540,
+      "num_sources": 9,
+      "success": true
+    },
+    {
+      "request_id": 59,
+      "question": "Perintah apa untuk mengaktifkan Mamba 23.11.0-0?",
+      "status": 200,
+      "latency_s": 14.5947,
+      "answer_length": 549,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 60,
+      "question": "Bagaimana cara membuat modul pyload setelah conda env aktif?",
+      "status": 200,
+      "latency_s": 14.9171,
+      "answer_length": 704,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 61,
+      "question": "Perintah apa untuk melihat daftar modul pyload yang tersedia?",
+      "status": 200,
+      "latency_s": 13.2311,
+      "answer_length": 544,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 62,
+      "question": "Di partisi GPU mana batch job conda berjalan?",
+      "status": 200,
+      "latency_s": 10.7784,
+      "answer_length": 627,
+      "num_sources": 5,
+      "success": true
+    },
+    {
+      "request_id": 63,
+      "question": "Apa email support admin ALELEON?",
+      "status": 200,
+      "latency_s": 13.8456,
+      "answer_length": 699,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 64,
+      "question": "Jam kerja support EFISON kapan?",
+      "status": 200,
+      "latency_s": 13.8268,
+      "answer_length": 710,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 65,
+      "question": "Apa saja pilihan cara menjalankan komputasi Python dengan conda env di ALELEON?",
+      "status": 200,
+      "latency_s": 16.2957,
+      "answer_length": 963,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 66,
+      "question": "Apa perbedaan antara menjalankan batch job via Job Composer EWS dan via terminal",
+      "status": 200,
+      "latency_s": 32.1128,
+      "answer_length": 2413,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 67,
+      "question": "Bagaimana langkah lengkap membuat conda env baru dan modul pyload dari awal?",
+      "status": 200,
+      "latency_s": 23.2401,
+      "answer_length": 1434,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 68,
+      "question": "Apa saja status job di squeue dan artinya masing-masing?",
+      "status": 200,
+      "latency_s": 18.366,
+      "answer_length": 1016,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 69,
+      "question": "Bagaimana cara mengisi formulir Jupyter di EWS untuk conda env user?",
+      "status": 200,
+      "latency_s": 27.2715,
+      "answer_length": 2089,
+      "num_sources": 9,
+      "success": true
+    }
+  ]
+}
