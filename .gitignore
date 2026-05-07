@@ -1,3 +1,9 @@
+#Ignore Qdrant directory
+qdrant_db/
+
+#Ignore legacy ChromaDB directory
+chroma_db/
+
 # Ignore Roo code directory
 .roo/
 

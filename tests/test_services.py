@@ -1,10 +1,10 @@
 """
-test_services.py — Test utilities for embedding, vLLM, and ChromaDB services
+test_services.py — Test utilities for embedding, vLLM, and Qdrant services
 
 Usage:
     python tests/test_services.py                    # Run all tests
     python tests/test_services.py --embedding        # Test only embedding service
-    python tests/test_services.py --chromadb         # Test only ChromaDB
+    python tests/test_services.py --qdrant          # Test only Qdrant
     python tests/test_services.py --llm              # Test only vLLM service
     python tests/test_services.py --all              # Test all services
 """
@@ -24,9 +24,8 @@ class ServiceConfig:
     """Service endpoint configuration."""
     EMBEDDING_URL = os.getenv("EMBEDDING_API_URL", "http://localhost:8001")
     LLM_URL = os.getenv("LLM_API_URL", "http://localhost:8000")
-    CHROMADB_URL = os.getenv("CHROMADB_URL", "http://localhost:8002")
-    # ChromaDB authentication credentials (from compose.yml)
-    CHROMADB_AUTH_TOKEN = os.getenv("CHROMADB_AUTH_TOKEN", "your-secret-key")
+    QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
+    QDRANT_API_KEY = os.getenv("QDRANT_API_KEY", "your-secret-key")
 
 
 # =============================================================================
@@ -91,81 +90,72 @@ def test_embedding_service() -> bool:
     return True
 
 
-def test_chromadb_service() -> bool:
-    """Test ChromaDB service health and functionality v2."""
+def test_qdrant_service() -> bool:
+    """Test Qdrant service health and functionality."""
     print("\n" + "=" * 60)
-    print("Testing ChromaDB Service v2")
+    print("Testing Qdrant Service")
     print("=" * 60)
     
     # Set up authentication header
-    headers = {"Authorization": f"Bearer {ServiceConfig.CHROMADB_AUTH_TOKEN}"}
+    headers = {"api-key": ServiceConfig.QDRANT_API_KEY}
 
-    # Test heartbeat endpoint (public endpoint, no auth required)
-    print("\n[1] Testing heartbeat endpoint...")
+    # Test healthz endpoint
+    print("\n[1] Testing healthz endpoint...")
     try:
         response = requests.get(
-            f"{ServiceConfig.CHROMADB_URL}/api/v2/heartbeat",
+            f"{ServiceConfig.QDRANT_URL}/healthz",
+            headers=headers,
             timeout=10
         )
         if response.status_code == 200:
-            print(f"    ✓ Heartbeat passed: {response.json()['nanosecond heartbeat']}")
+            print(f"    ✓ Healthz passed")
         else:
-            print(f"    ✗ Heartbeat failed: {response.status_code}")
+            print(f"    ✗ Healthz failed: {response.status_code}")
             return False
     except Exception as e:
         print(f"    ✗ Connection error: {e}")
         return False
     
-    # Test version endpoint
-    print("\n[2] Testing version endpoint...")
+    # Test collections endpoint
+    print("\n[2] Testing collections endpoint...")
     try:
         response = requests.get(
-            f"{ServiceConfig.CHROMADB_URL}/api/v2/version",
+            f"{ServiceConfig.QDRANT_URL}/collections",
+            headers=headers,
             timeout=10
         )
         if response.status_code == 200:
-            print(f"    ✓ Version passed: {response.json()}")
+            result = response.json()
+            collections = result.get("result", {}).get("collections", [])
+            print(f"    ✓ Collections passed: {len(collections)} collections found")
+            for col in collections:
+                print(f"       - {col['name']}")
         else:
-            print(f"    ✗ Version failed: {response.status_code}")
+            print(f"    ✗ Collections failed: {response.status_code}")
             return False
     except Exception as e:
         print(f"    ✗ Connection error: {e}")
         return False
     
-    # Test healthcheck endpoint
-    print("\n[3] Testing healthcheck endpoint...")
+    # Test cluster info
+    print("\n[3] Testing cluster info endpoint...")
     try:
         response = requests.get(
-            f"{ServiceConfig.CHROMADB_URL}/api/v2/healthcheck",
+            f"{ServiceConfig.QDRANT_URL}/cluster",
+            headers=headers,
             timeout=10
         )
         if response.status_code == 200:
-            print(f"    ✓ Healthcheck passed: {response.json()}")
+            print(f"    ✓ Cluster info passed: {response.json().get('result', {}).get('status', 'unknown')}")
         else:
-            print(f"    ✗ Healthcheck failed: {response.status_code}")
-            return False
-    except Exception as e:
-        print(f"    ✗ Connection error: {e}")
-        return False
-    
-    # Test pre-flight checks endpoint
-    print("\n[4] Testing pre-flight checks endpoint...")
-    try:
-        response = requests.get(
-            f"{ServiceConfig.CHROMADB_URL}/api/v2/pre-flight-checks",
-            timeout=10
-        )
-        if response.status_code == 200:
-            print(f"    ✓ Pre-flight checks passed: {response.json()}")
-        else:
-            print(f"    ✗ Pre-flight checks failed: {response.status_code}")
+            print(f"    ✗ Cluster info failed: {response.status_code}")
             return False
     except Exception as e:
         print(f"    ✗ Connection error: {e}")
         return False
     
     print("\n" + "=" * 60)
-    print("ChromaDB Service v2: ALL TESTS PASSED ✓")
+    print("Qdrant Service: ALL TESTS PASSED ✓")
     print("=" * 60)
     return True
 
@@ -199,13 +189,13 @@ def main():
     """Run all service tests."""
     parser = argparse.ArgumentParser(description="Test RAG services")
     parser.add_argument("--embedding", action="store_true", help="Test only embedding service")
-    parser.add_argument("--chromadb", action="store_true", help="Test only ChromaDB service")
+    parser.add_argument("--qdrant", action="store_true", help="Test only Qdrant service")
     parser.add_argument("--llm", action="store_true", help="Test only vLLM service")
     parser.add_argument("--all", action="store_true", help="Test all services")
     args = parser.parse_args()
     
     # Default to all tests if no specific flag is set
-    if not (args.embedding or args.chromadb or args.llm or args.all):
+    if not (args.embedding or args.qdrant or args.llm or args.all):
         args.all = True
     
     results = []
@@ -213,8 +203,8 @@ def main():
     if args.all or args.embedding:
         results.append(("Embedding", test_embedding_service()))
     
-    if args.all or args.chromadb:
-        results.append(("ChromaDB", test_chromadb_service()))
+    if args.all or args.qdrant:
+        results.append(("Qdrant", test_qdrant_service()))
     
     if args.all or args.llm:
         results.append(("vLLM", test_llm_service()))

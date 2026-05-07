@@ -1,51 +1,98 @@
-# =============================================================================
-# podman-compose.yml — RAG + vLLM + Embedding Service + ChromaDB for AMD GPU (ROCm)
-# =============================================================================
-# Usage:
-#   # Start all services with test profile
-#   podman-compose --profile test up
-#   
-#   # Start individual services
-#   podman-compose --profile embedding up embedding-service
-#   podman-compose --profile vllm-rocm up vllm-rocm
-#   podman-compose --profile chromadb up chromadb
-#   
-#   # Run RAG application
-#   podman-compose --profile test run rag-app
-# =============================================================================
+# =====================================================================
+# compose.yml - RAG + vLLM + Embedding + Qdrant (AMD ROCm)
+# =====================================================================
+#
+# QUICK START (jalankan semua dari awal):
+#
+#   podman-compose --profile infra up -d
+#   podman-compose --profile rag-app run rag-app
+#
+# FULL STACK (API + Telegram Bot):
+#
+#   podman-compose --profile infra --profile api --profile telegram up -d
+#
+# JALANKAN SERVICE SATU-SATU:
+#
+#   podman-compose --profile embedding up -d embedding-service
+#   podman-compose --profile vllm up -d vllm-rocm
+#   podman-compose --profile qdrant up -d qdrant
+#
+# BENCHMARK:
+#
+#   podman-compose --profile infra up -d
+#   podman-compose --profile benchmark run benchmark
+#   podman-compose --profile benchmark run benchmark --mode ingest
+#   podman-compose --profile benchmark run benchmark --mode query --no-llm
+#   podman-compose --profile benchmark run benchmark --mode query --questions 5
+#   podman-compose --profile benchmark run benchmark --mode cleanup
+#
+# BENCHMARK TTFT (latency):
+#
+#   podman-compose --profile infra --profile api up -d
+#   podman-compose --profile benchmark-ttft run benchmark-ttft
+#
+# STOP & CLEANUP:
+#
+#   podman-compose --profile infra --profile api --profile telegram down
+#   podman-compose --profile infra --profile api --profile telegram down -v
+#
+# REBUILD (setelah edit code):
+#
+#   podman-compose --profile infra --profile api --profile telegram up -d --build
+#
+# DAFTAR PROFILE:
+#   infra      = embedding-service + vllm-rocm + qdrant (backend lengkap)
+#   embedding  = embedding-service saja
+#   vllm       = vllm-rocm saja
+#   qdrant     = qdrant saja
+#   rag-app    = RAG interactive CLI
+#   api        = RAG REST API (port 8080)
+#   telegram   = Telegram Bot
+#   benchmark  = Retrieval benchmark
+#   benchmark-ttft = TTFT/Latency benchmark
+# =====================================================================
 
 services:
-  # ---- Embedding Service (intfloat/multilingual-e5-large) ----
-  # Menjalankan embedding model sebagai REST API (pasta networking)
+
+  # ------------------------------------
+  # Embedding Service (BAAI/bge-m3)
+  # REST API untuk text embedding
+  # ------------------------------------
   embedding-service:
     container_name: embedding-service
     build:
       context: .
       dockerfile: services/embedding/Dockerfile.embedding
     profiles:
-      - model
-      - backend
-      - embedding-service
+      - infra
+      - embedding
     ports:
       - "8001:8001"
     volumes:
       - ~/.cache/huggingface:/root/.cache/huggingface
     environment:
-      - MODEL_NAME=intfloat/multilingual-e5-large
+      - MODEL_NAME=BAAI/bge-m3
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
 
-  # ---- LLM Service (vLLM on ROCm) ----
-  # Menjalankan LLM inference di GPU AMD dengan OpenAI-compatible API (pasta networking)
+  # ------------------------------------
+  # LLM Service (vLLM on ROCm)
+  # OpenAI-compatible API di GPU AMD
+  # ------------------------------------
   vllm-rocm:
     image: docker.io/rocm/vllm-dev:nightly
     container_name: vllm-rocm
     profiles:
-      - model
-      - backend
-      - vllm-rocm
+      - infra
+      - vllm
     devices:
-      - /dev/kfd       # Kernel Fusion Driver (wajib ROCm)
-      - /dev/dri       # Direct Rendering Infrastructure
+      - /dev/kfd
+      - /dev/dri
     group_add:
       - keep-groups
     cap_add:
@@ -61,12 +108,15 @@ services:
       vllm serve
       --model Qwen/Qwen3.5-35B-A3B-GPTQ-Int4
       --dtype float16
-      --gpu-memory-utilization 0.80
-      --max-model-len 131072
+      --enforce-eager
+      --gpu-memory-utilization 0.99
+      --max-model-len 262144
+      --max-num-seqs 16
       --tensor-parallel-size 1
       --enable-auto-tool-choice
       --tool-call-parser qwen3_coder
       --reasoning-parser qwen3
+      --enable-prefix-caching
       --trust-remote-code
     restart: unless-stopped
     healthcheck:
@@ -74,36 +124,38 @@ services:
       interval: 30s
       timeout: 10s
       retries: 10
-      start_period: 300s  # Model loading bisa lama
+      start_period: 300s
 
-  # ---- ChromaDB Vector Store ----
-  # Persistent vector database untuk embeddings (ChromaDB v2 API) (pasta networking)
-  chromadb:
-    image: docker.io/chromadb/chroma:latest
-    container_name: chromadb
+  # ------------------------------------
+  # Qdrant Vector Store
+  # Persistent vector DB (REST + gRPC)
+  # ------------------------------------
+  qdrant:
+    image: docker.io/qdrant/qdrant:latest
+    container_name: qdrant
     profiles:
-      - backend
-      - chromadb
+      - infra
+      - qdrant
     ports:
-      - "8002:8000"
+      - "6333:6333"
+      - "6334:6334"
     volumes:
-      - chromadb-data:/chroma/data
+      - qdrant-data:/qdrant/storage
     environment:
-      - CHROMA_SERVER_AUTHN_PROVIDER=chromadb.auth.token_authn.TokenAuthenticationServerProvider
-      - CHROMA_SERVER_AUTHN_CREDENTIALS=your-secret-key
-      - CHROMA_ADMIN_USER=admin
-      - CHROMA_ADMIN_PASSWORD=admin-password
-    command: ["run", "--host", "0.0.0.0", "--port", "8000"]
+      - QDRANT__SERVICE__API_KEY=your-secret-key
+      - QDRANT__SERVICE__MAX_REQUEST_SIZE_MB=100
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "bash -c 'echo >/dev/tcp/localhost/8000 && exit 0 || exit 1'"]
+      test: ["CMD-SHELL", "bash -lc 'exec 3<>/dev/tcp/127.0.0.1/6333; printf \"GET /healthz HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n\" >&3; IFS= read -r line <&3; case \"$$line\" in *200*) exit 0;; *) exit 1;; esac'"]
       interval: 30s
       timeout: 10s
       retries: 5
       start_period: 60s
 
-  # ---- RAG Application ----
-  # Orkestrasi RAG chain menggunakan semua services (pasta networking)
+  # ------------------------------------
+  # RAG Application (Interactive CLI)
+  # Jalankan dengan: podman-compose --profile rag-app run rag-app
+  # ------------------------------------
   rag-app:
     build:
       context: .
@@ -114,21 +166,98 @@ services:
     environment:
       - EMBEDDING_API_URL=http://embedding-service:8001
       - LLM_API_URL=http://vllm-rocm:8000/v1
-      - CHROMADB_URL=http://chromadb:8000
-      - CHROMADB_AUTH_TOKEN=your-secret-key
-    # depends_on:
-    #   embedding-service:
-    #     condition: service_healthy
-    #   vllm-rocm:
-    #     condition: service_healthy
-    #   chromadb:
-    #     condition: service_healthy
+      - QDRANT_URL=http://qdrant:6333
+      - QDRANT_API_KEY=your-secret-key
     stdin_open: true
     tty: true
 
-networks:
-  rag-network:
-    driver: bridge
+  # ------------------------------------
+  # Benchmark Retrieval
+  # Dense vs Sparse vs Multi-Vector vs Hybrid
+  # ------------------------------------
+  benchmark:
+    build:
+      context: .
+      dockerfile: services/benchmark_retrieval/Dockerfile.benchmark
+    container_name: benchmark
+    profiles:
+      - benchmark
+    environment:
+      - EMBEDDING_API_URL=http://embedding-service:8001
+      - LLM_API_URL=http://vllm-rocm:8000/v1
+      - LLM_MODEL_NAME=Qwen/Qwen3.5-35B-A3B-GPTQ-Int4
+      - QDRANT_URL=http://qdrant:6333
+      - QDRANT_API_KEY=your-secret-key
+    volumes:
+      - ./output/benchmark:/app/output/benchmark
+    stdin_open: true
+    tty: true
+
+  # ------------------------------------
+  # RAG API Service (REST)
+  # Endpoint: POST /ask (port 8080)
+  # ------------------------------------
+  rag-api:
+    build:
+      context: .
+      dockerfile: services/rag-app/Dockerfile.rag-app
+    container_name: rag-api
+    profiles:
+      - api
+    ports:
+      - "8080:8080"
+    environment:
+      - EMBEDDING_API_URL=http://embedding-service:8001
+      - LLM_API_URL=http://vllm-rocm:8000/v1
+      - QDRANT_URL=http://qdrant:6333
+      - QDRANT_API_KEY=your-secret-key
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # ------------------------------------
+  # Benchmark TTFT / Latency
+  # Concurrency & latency test untuk /ask
+  # ------------------------------------
+  benchmark-ttft:
+    build:
+      context: .
+      dockerfile: services/benchmark_ttft/Dockerfile.rag-bench
+    container_name: benchmark-ttft
+    profiles:
+      - benchmark-ttft
+    environment:
+      - RAG_API_URL=http://rag-api:8080
+      - NUM_REQUESTS=49
+      - CONCURRENCY_LEVELS=1,2,4,8,16
+      - HEALTH_CHECK_RETRIES=30
+      - HEALTH_CHECK_INTERVAL=10
+      - RESULT_DIR=/app/output/benchmark_ttft
+    volumes:
+      - ./output/benchmark_ttft:/app/output/benchmark_ttft
+
+  # ------------------------------------
+  # Telegram Bot
+  # ------------------------------------
+  telegram-bot:
+    build:
+      context: .
+      dockerfile: services/telegram-bot/Dockerfile.telegram
+    container_name: telegram-bot
+    profiles:
+      - telegram
+    environment:
+      - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
+      - RAG_API_URL=http://rag-api:8080
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "pidof", "python"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 volumes:
-  chromadb-data:
+  qdrant-data:

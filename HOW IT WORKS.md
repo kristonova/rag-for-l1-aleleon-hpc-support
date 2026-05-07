@@ -1,25 +1,48 @@
-# Complete Explanation of the RAG Code Logic
+# Penjelasan Lengkap Logika Kode RAG
 
-## Overall Architecture
+## Arsitektur Keseluruhan
 
 ```
-┌──────────────────────────────────────────────────────────────────────┐
-│                          RAG Pipeline                                │
-│                                                                      │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────┐  ┌─────────────┐  │
-│  │  INGESTION   │→ │  EMBEDDING   │→ │ RETRIEVAL │→ │ GENERATION  │  │
-│  │  (Wiki HTML) │  │  + Store     │  │  (Search) │  │   (LLM)     │  │
-│  └──────────────┘  └──────────────┘  └──────────┘  └─────────────┘  │
-│                                                                      │
-│  Phase 1: Fetch & Split   Phase 2: Vectorize   Phase 3: Answer      │
-└──────────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────┐
+│                    Pipeline RAG (Kontainer Podman)                       │
+│                                                                          │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────┐  ┌─────────────┐      │
+│  │   INGESTI    │→ │  EMBEDDING   │→ │ RETRIEVAL │→ │  GENERASI   │      │
+│  │  (HTML Wiki) │  │ + Penyimpanan│  │  (Pencarian)│ │   (LLM)     │      │
+│  └──────────────┘  └──────────────┘  └──────────┘  └─────────────┘      │
+│                                                                          │
+│  Fase 1: Ambil & Split   Fase 2: Vektorisasi   Fase 3: Menjawab          │
+│                                                                          │
+│  Layanan:                                                                │
+│  ┌─────────────────┐ ┌─────────────┐ ┌──────────┐ ┌──────────────┐      │
+│  │ embedding-service│ │  vllm-rocm  │ │  qdrant  │ │   rag-app    │      │
+│  │ (BAAI/bge-m3)   │ │ (Qwen3.5)   │ │ (Vektor) │ │ (Orkestrator)│      │
+│  │ Port 8001       │ │ Port 8000   │ │ Port 6333│ │              │      │
+│  └─────────────────┘ └─────────────┘ └──────────┘ └──────────────┘      │
+└──────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## PHASE 1: Data Ingestion Pipeline
+## FASE 1: Pipeline Ingesti Data
 
-### Step 1 — Parse Sitemap XML
+### Pemeriksaan Persistensi — Lewati Scraping jika Koleksi Qdrant Sudah Ada
+
+```python
+if qdrant_collection_exists():
+    vectorstore = load_vectorstore(embeddings)
+else:
+    vectorstore = build_vectorstore(embeddings)
+```
+
+**Yang terjadi:**
+- Sebelum scraping, sistem memeriksa apakah koleksi Qdrant (`wiki_aleleon`) sudah ada di server Qdrant.
+- Jika ada dan berisi data → **scraping dilewati sepenuhnya** dan vektor dimuat dari Qdrant.
+- Jika belum ada → lanjutkan ke pipeline ingesti lengkap di bawah.
+- Qdrant dipersistenkan melalui named volume Podman (`qdrant-data:/qdrant/storage`), sehingga data tetap ada saat container restart.
+- Untuk memaksa scraping ulang (misalnya konten wiki berubah): hapus koleksi di Qdrant melalui dashboard (`http://localhost:6333/dashboard`) atau hapus volume dengan `podman volume rm rag-for-l1-aleleon-hpc-support_qdrant-data`.
+
+### Langkah 1 — Parse Sitemap XML
 
 ```python
 splits = load_wiki_documents(
@@ -28,10 +51,10 @@ splits = load_wiki_documents(
 )
 ```
 
-**What happens:**
-- The function fetches the wiki's **sitemap XML** file.
-- It parses the XML to extract all `<loc>` URLs — these are all the wiki page addresses.
-- Rate-limited to 2 requests per second to avoid overwhelming the wiki server.
+**Yang terjadi:**
+- Fungsi mengambil file **sitemap XML** wiki.
+- XML diparse untuk mengekstrak semua URL `<loc>` — ini adalah seluruh alamat halaman wiki.
+- Dibatasi 2 request per detik agar tidak membebani server wiki.
 
 ```python
 resp = requests.get(sitemap_url)
@@ -43,7 +66,7 @@ urls = [loc.text for loc in root.findall(".//ns:loc", ns)]
 ```
 Sitemap XML
     │
-    ▼  Parse <loc> tags
+    ▼  Parse tag <loc>
 ┌──────────────────────────────────────────────────┐
 │ URL 1: https://wiki.efisonlt.com/wiki/Spesifikasi│
 │ URL 2: https://wiki.efisonlt.com/wiki/Conda_Env  │
@@ -52,7 +75,7 @@ Sitemap XML
 └──────────────────────────────────────────────────┘
 ```
 
-### Step 2 — Fetch & Extract HTML Content
+### Langkah 2 — Ambil & Ekstrak Konten HTML
 
 ```python
 page_resp = requests.get(url, timeout=30)
@@ -61,28 +84,28 @@ content_div = soup.find("div", {"id": "mw-content-text"})
 content_html = str(content_div)
 ```
 
-**What happens:**
-- For each URL, the page is downloaded.
-- **BeautifulSoup** (with `lxml` parser) extracts only the `<div id="mw-content-text">` — this is the main content area of a MediaWiki page, excluding navigation, sidebar, footer, etc.
-- The content is kept as **raw HTML** (not plain text) — this is critical because the next step uses HTML heading tags for splitting.
+**Yang terjadi:**
+- Untuk setiap URL, halaman diunduh.
+- **BeautifulSoup** (dengan parser `lxml`) mengekstrak hanya `<div id="mw-content-text">` — ini adalah area konten utama halaman MediaWiki, tanpa navigasi, sidebar, footer, dll.
+- Konten dipertahankan sebagai **raw HTML** (bukan plain text) — ini penting karena langkah berikutnya menggunakan tag heading HTML untuk splitting.
 
 ```
-Full Wiki Page HTML
+HTML Halaman Wiki Penuh
         │
         ▼  BeautifulSoup → find("div", {"id": "mw-content-text"})
 ┌──────────────────────────────┐
 │ <div id="mw-content-text">   │
-│   <h2>Spesifikasi</h2>       │  ← Heading tags preserved
+│   <h2>Spesifikasi</h2>       │  ← Tag heading dipertahankan
 │   <p>ALELEON memiliki...</p> │
 │   <h3>Compute Node</h3>     │
-│   <table>...</table>         │  ← Tables preserved
+│   <table>...</table>         │  ← Tabel dipertahankan
 │   <h3>Interactive Node</h3>  │
 │   <p>...</p>                 │
 │ </div>                       │
 └──────────────────────────────┘
 ```
 
-### Step 3 — Structure-Based Splitting (HTMLSectionSplitter)
+### Langkah 3 — Pemotongan Berbasis Struktur (HTMLSectionSplitter)
 
 ```python
 headers_to_split_on = [
@@ -94,37 +117,37 @@ html_splitter = HTMLSectionSplitter(headers_to_split_on=headers_to_split_on)
 html_docs = html_splitter.split_text(content_html)
 ```
 
-**What happens:**
+**Yang terjadi:**
 
-Unlike the old approach (splitting by character count), the current code splits by **HTML document structure**. The `HTMLSectionSplitter` looks for `<h1>`, `<h2>`, and `<h3>` tags and creates one chunk per section.
+Berbeda dengan pendekatan lama (memotong berdasarkan jumlah karakter), kode saat ini memotong berdasarkan **struktur dokumen HTML**. `HTMLSectionSplitter` mencari tag `<h1>`, `<h2>`, dan `<h3>` lalu membuat satu chunk per section.
 
 ```
-Split strategy:
-  <h1> → New chunk (Header 1)
-  <h2> → New chunk (Header 2)
-  <h3> → New chunk (Header 3)
+Strategi pemotongan:
+    <h1> → Chunk baru (Header 1)
+    <h2> → Chunk baru (Header 2)
+    <h3> → Chunk baru (Header 3)
   
-  Content between headings → belongs to the chunk above it
+    Konten di antara heading → menjadi bagian dari chunk di atasnya
 ```
 
-**Why structure-based splitting is better than character-based:**
+**Mengapa pemotongan berbasis struktur lebih baik daripada berbasis karakter:**
 
 ```
-Character-based (OLD):
+Berbasis karakter (LAMA):
   "...cara membuat conda env:        ← Chunk 1 ends mid-instruction
    1. module load anaconda3          ← Chunk 2 starts here
    2. conda create -n myenv..."
 
-Structure-based (NEW):
+Berbasis struktur (BARU):
   <h3>Membuat Conda Environment</h3>  ← Chunk boundary = section boundary
   1. module load anaconda3
   2. conda create -n myenv
   3. source activate myenv            ← Entire section stays together
 ```
 
-**Metadata is automatically added:**
+**Metadata ditambahkan otomatis:**
 
-Each chunk gets metadata about which heading it came from:
+Setiap chunk mendapatkan metadata tentang heading asalnya:
 ```python
 doc.metadata["source"] = url         # e.g., "https://wiki.efisonlt.com/wiki/..."
 doc.metadata["title"] = page_title   # e.g., "Komputasi Python dengan Conda"
@@ -133,7 +156,7 @@ doc.metadata["Header 2"] = "..."     # The h2 heading text
 doc.metadata["Header 3"] = "..."     # The h3 heading text (if any)
 ```
 
-### Step 4 — Fallback Splitting (RecursiveCharacterTextSplitter)
+### Langkah 4 — Pemotongan Fallback (RecursiveCharacterTextSplitter)
 
 ```python
 text_splitter = RecursiveCharacterTextSplitter(
@@ -150,24 +173,24 @@ for doc in html_docs:
         all_splits.append(doc)
 ```
 
-**What happens:**
+**Yang terjadi:**
 
-Some wiki sections are very long (e.g., a single `<h2>` section with many subsections that don't have `<h3>` tags). If any chunk exceeds **4500 characters**, it falls back to `RecursiveCharacterTextSplitter`:
-
-```
-Split priority (fallback):
-  1. "\n---"   ← Split at horizontal rules
-  2. "\n\n"    ← Split at empty paragraphs
-  3. "\n"      ← Split at new lines
-  4. " "       ← Split at spaces (last resort)
-```
+Beberapa section wiki sangat panjang (misalnya satu section `<h2>` dengan banyak subseksi tanpa tag `<h3>`). Jika ada chunk melebihi **4500 karakter**, sistem menggunakan `RecursiveCharacterTextSplitter` sebagai fallback:
 
 ```
-chunk_size=4500     → Maximum 4500 characters per chunk
-chunk_overlap=900   → 900 characters repeated between consecutive chunks
+Prioritas pemotongan (fallback):
+    1. "\n---"   ← Potong pada horizontal rule
+    2. "\n\n"    ← Potong pada paragraf kosong
+    3. "\n"      ← Potong pada baris baru
+    4. " "       ← Potong pada spasi (opsi terakhir)
 ```
 
-**Why 900 overlap?** Chunks are much larger now (4500 vs old 1000), so the overlap must be proportionally larger to preserve context at boundaries.
+```
+chunk_size=4500     → Maksimum 4500 karakter per chunk
+chunk_overlap=900   → 900 karakter diulang antar chunk berurutan
+```
+
+**Mengapa overlap 900?** Chunk sekarang jauh lebih besar (4500 vs 1000 sebelumnya), jadi overlap harus proporsional agar konteks di batas chunk tetap terjaga.
 
 ```
 HTMLSectionSplitter output:
@@ -185,7 +208,7 @@ HTMLSectionSplitter output:
                           └───────────────┴──────────────┘
 ```
 
-### Step 5 — Metadata Enrichment (Source Labels)
+### Langkah 5 — Pengayaan Metadata (Label Sumber)
 
 ```python
 for s in splits:
@@ -197,109 +220,167 @@ for s in splits:
     s.page_content = f"{prefix}\n{s.page_content}"
 ```
 
-**What happens:**
+**Yang terjadi:**
 
-After all splitting is done, each chunk's `page_content` is **prefixed** with a source label. This means when the LLM reads the context, it knows **where** each piece of information came from.
+Setelah seluruh proses splitting selesai, `page_content` setiap chunk diberi **prefix** label sumber. Artinya saat LLM membaca konteks, model tahu **asal** setiap potongan informasi.
 
 ```
-Before:
+Sebelum:
   "Untuk membuat conda environment, jalankan perintah..."
 
-After:
+Sesudah:
   "[Sumber: Komputasi Python dengan Conda Environment User] [Section: Membuat Conda Environment]
    Untuk membuat conda environment, jalankan perintah..."
 ```
 
-This is important for:
-1. **LLM grounding** — The model can cite which wiki page it's referencing.
-2. **Source attribution** — Each answer can be traced back to its origin.
-3. **Debugging** — We can verify which chunks are being retrieved.
+Ini penting untuk:
+1. **LLM grounding** — Model dapat menyebut halaman wiki yang dijadikan referensi.
+2. **Pelacakan sumber** — Setiap jawaban dapat ditelusuri ke asalnya.
+3. **Debugging** — Kita bisa memverifikasi chunk mana yang diretrieval.
 
 ---
 
-## PHASE 2: Embedding + Vector Database
+## FASE 2: Embedding + Basis Data Vektor
 
-### Step 6 — Vector Embedding
+### Langkah 6 — Embedding Vektor via Layanan API
 
 ```python
-embeddings = HuggingFaceEmbeddings(model_name="intfloat/multilingual-e5-large")
+embeddings = EmbeddingServiceClient()
 ```
 
-**Model used: `intfloat/multilingual-e5-large`**
+Embedding tidak lagi dijalankan secara lokal. Sekarang menggunakan **embedding-service** — sebuah container Podman terpisah yang melayani model `BAAI/bge-m3` via REST API.
 
-| Property | Detail |
+```python
+class EmbeddingServiceClient(Embeddings):
+    def _call_api(self, texts: List[str]) -> List[List[float]]:
+        response = requests.post(
+            f"{self.api_url}/embed",
+            json={"texts": texts},
+            timeout=600,
+        )
+        response.raise_for_status()
+        return response.json()["embeddings"]
+
+    def embed_documents(self, texts: List[str], batch_size: int = 32) -> List[List[float]]:
+        all_embeddings = []
+        for i in range(0, len(texts), batch_size):
+            batch = texts[i : i + batch_size]
+            all_embeddings.extend(self._call_api(batch))
+        return all_embeddings
+
+    def embed_query(self, text: str) -> List[float]:
+        return self._call_api([text])[0]
+```
+
+**Arsitektur:**
+
+```
+rag-app container                    embedding-service container
+┌──────────────────┐                ┌──────────────────────────┐
+│ EmbeddingService │  HTTP POST     │ FastAPI + SentenceTransf.│
+│ Client           │ ──────────→    │ BAAI/bge-m3              │
+│ (LangChain       │  /embed       │ model.encode(texts)      │
+│  Embeddings)     │ ←──────────    │                          │
+│                  │  JSON response │ Port 8001                │
+└──────────────────┘                └──────────────────────────┘
+```
+
+**Batching:** Dokumen di-embed dalam batch @32 teks per request, bukan semua sekaligus. Ini mencegah timeout karena model besar.
+
+```
+450 chunks total:
+  Batch  1/15: texts[  0: 32] → POST /embed → 32 vectors
+  Batch  2/15: texts[ 32: 64] → POST /embed → 32 vectors
+  ...
+  Batch 14/15: texts[416:448] → POST /embed → 32 vectors
+  Batch 15/15: texts[448:450] → POST /embed →  2 vectors
+  ───────────────────────────────────────────────────
+  Total: 450 vectors returned
+```
+
+**Model yang digunakan: `BAAI/bge-m3`**
+
+| Properti | Detail |
 |---|---|
-| Architecture | XLM-RoBERTa (multilingual transformer) |
-| Parameters | ~560M |
-| Output Dimensions | **1024 dimensions** |
-| Max Sequence | 512 tokens |
-| Languages | 100+ languages including **Bahasa Indonesia** |
-| Runs on | CPU or GPU (~1.2GB model) |
+| Arsitektur | Berbasis XLM-RoBERTa (transformer multibahasa) |
+| Parameter | ~568M |
+| Dimensi Output | **1024 dimensi** |
+| Panjang Sekuens Maksimum | 8192 token |
+| Bahasa | 100+ bahasa termasuk **Bahasa Indonesia** |
+| Fitur | Dense + Sparse + ColBERT multi-vector retrieval |
+| Berjalan di | CPU atau GPU, disajikan via container embedding-service |
 
-**Why `multilingual-e5-large` instead of `all-MiniLM-L6-v2`?**
+**Mengapa `BAAI/bge-m3` dibanding `intfloat/multilingual-e5-large`?**
 
-| Feature | all-MiniLM-L6-v2 (old) | multilingual-e5-large (current) |
+| Fitur | multilingual-e5-large (lama) | BAAI/bge-m3 (saat ini) |
 |---|---|---|
-| Dimensions | 384 | **1024** (richer representation) |
-| Parameters | 22.7M | **~560M** (more capable) |
-| Indonesian | Weak | **Strong** (trained on 100+ languages) |
-| Semantic quality | Good for English | **Excellent for multilingual** |
+| Dimensi | 1024 | **1024** (sama) |
+| Token Maksimum | 512 | **8192** (konteks 16x lebih panjang) |
+| Perlu Prefix | Ya ("query: " / "passage: ") | **Tidak** (tanpa prefix) |
+| Mode Retrieval | Hanya dense | **Dense + Sparse + ColBERT** |
+| Skor MTEB | Kuat | **Lebih kuat** (state-of-the-art multibahasa) |
 
-Since the wiki documents are in **Bahasa Indonesia**, a multilingual model is essential for accurate semantic matching.
+BGE-M3 tidak memerlukan prefix "query: " atau "passage: " seperti E5, sehingga kode lebih sederhana — teks dikirim langsung tanpa modifikasi.
 
-**What is an embedding?**
+**Apa itu embedding?**
 
-An embedding converts text into a **vector of numbers** in a 1024-dimensional space. Texts with **similar meanings** will have vectors that are **close** to each other.
+Embedding mengubah teks menjadi **vektor angka** di ruang 1024 dimensi. Teks dengan **makna serupa** akan memiliki vektor yang **berdekatan**.
 
 ```
 "Cara membuat conda environment di ALELEON"
         │
-        ▼  multilingual-e5-large
-[0.032, -0.118, 0.245, ..., 0.067]    ← 1024 numbers
+        ▼  BAAI/bge-m3
+[0.032, -0.118, 0.245, ..., 0.067]    ← 1024 angka
 
 "Bagaimana membuat conda env baru?"
         │
-        ▼  multilingual-e5-large
-[0.029, -0.121, 0.238, ..., 0.071]    ← 1024 numbers (SIMILAR!)
+        ▼  BAAI/bge-m3
+[0.029, -0.121, 0.238, ..., 0.071]    ← 1024 angka (MIRIP!)
 
 "Berapa harga berlangganan ALELEON?"
         │
-        ▼  multilingual-e5-large
-[-0.156, 0.089, -0.034, ..., 0.193]   ← 1024 numbers (DISTANT!)
+        ▼  BAAI/bge-m3
+[-0.156, 0.089, -0.034, ..., 0.193]   ← 1024 angka (JAUH!)
 ```
 
-**This is NOT TF-IDF or BM25.**
+**Ini BUKAN TF-IDF atau BM25.**
 
-| Method | How it works | Used in this code? |
+| Metode | Cara kerja | Digunakan di kode ini? |
 |---|---|---|
-| **TF-IDF** | Counts word frequency. "conda" appearing 3x = relevant. Doesn't understand meaning. | ❌ |
-| **BM25** | Advanced TF-IDF with document length normalization. | ❌ |
-| **Sparse Retrieval** | Large vectors, mostly zeros. Matches keywords. | ❌ |
-| **Dense Retrieval** ✅ | Text → dense 1024D vector via neural network. Matches **meaning**. | ✅ **Used here** |
+| **TF-IDF** | Menghitung frekuensi kata. "conda" muncul 3x = relevan. Tidak memahami makna. | ❌ |
+| **BM25** | TF-IDF lanjutan dengan normalisasi panjang dokumen. | ❌ |
+| **Sparse Retrieval** | Vektor besar, sebagian besar nol. Mencocokkan kata kunci. | ❌ |
+| **Dense Retrieval** ✅ | Teks → vektor dense 1024D via neural network. Mencocokkan **makna**. | ✅ **Dipakai di sini** |
 
-**Advantages of Dense Retrieval:**
+**Kelebihan Dense Retrieval:**
 
 ```
-Query: "Saya butuh banyak memori untuk job saya"
+Kueri: "Saya butuh banyak memori untuk job saya"
   │
-  ├── TF-IDF/BM25: Search for word "memori" → NOT FOUND (document says "RAM")
+    ├── TF-IDF/BM25: Cari kata "memori" → TIDAK DITEMUKAN (dokumen memakai "RAM")
   │
-  └── Dense (E5-large): Understands "memori" ≈ "RAM" semantically → FOUND ✅
+    └── Dense (bge-m3): Memahami "memori" ≈ "RAM" secara semantik → DITEMUKAN ✅
 ```
 
-### Step 7 — Vector Database (Chroma)
+### Langkah 7 — Basis Data Vektor (Qdrant — Persisten)
 
 ```python
-vectorstore = Chroma.from_documents(documents=splits, embedding=embeddings)
+vectorstore = QdrantVectorStore.from_documents(
+    documents=splits,
+    embedding=embeddings,
+    url=QDRANT_URL,
+    api_key=QDRANT_API_KEY,
+    collection_name=QDRANT_COLLECTION_NAME,
+)
 ```
 
-**What happens:**
+**Yang terjadi:**
 
-1. Each chunk is embedded into a 1024D vector.
-2. The vector + original text + metadata is stored in the Chroma database (in-memory).
+1. Setiap chunk di-embed menjadi vektor 1024D (via embedding-service API, dalam batch @32).
+2. Vektor + teks asli + metadata disimpan ke database Qdrant **secara persisten** di server Qdrant.
 
 ```
-Chroma DB (in-memory)
+Qdrant (persistent — server di http://qdrant:6333)
 ┌─────────────────────────────────────────────────────────────────────┐
 │ ID │ Vector (1024D)             │ Original Text        │ Metadata  │
 ├────┼────────────────────────────┼──────────────────────┼───────────┤
@@ -313,32 +394,35 @@ Chroma DB (in-memory)
 └────┴────────────────────────────┴──────────────────────┴───────────┘
 ```
 
-**Chroma** is a vector database that is:
-- Lightweight, runs **in-memory** (no separate server needed).
-- Supports **cosine similarity search**.
-- Suitable for prototyping (production usually uses Pinecone, Weaviate, Milvus).
+**Qdrant** adalah database vektor yang:
+- Berjalan sebagai **server terpisah** dalam container Podman (port 6333 REST, port 6334 gRPC).
+- Data dipersistenkan melalui named volume Podman (`qdrant-data:/qdrant/storage`).
+- Mendukung **cosine similarity search**, filtering, dan HNSW indexing.
+- Dilindungi oleh API key (`QDRANT__SERVICE__API_KEY`).
+- Pada run pertama: scraping + embedding + penyimpanan (~450 chunk). Pada run berikutnya: langsung load dari Qdrant.
+- Memiliki dashboard web di `http://localhost:6333/dashboard` untuk inspeksi data.
 
 ---
 
-## PHASE 3: Retrieval + Generation
+## FASE 3: Retrieval + Generasi
 
-### Retrieval — Search Relevant Chunks
+### Retrieval — Cari Chunk yang Relevan
 
 ```python
-retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
+docs = vectorstore.similarity_search(question, k=10)
 ```
 
-**Retrieval type: Approximate Nearest Neighbor (ANN) with Cosine Similarity**
+**Tipe retrieval: Approximate Nearest Neighbor (ANN) dengan kesamaan kosinus**
 
-When a user asks a question, the process is:
+Ketika pengguna mengajukan pertanyaan, prosesnya adalah:
 
 ```
 User: "Bagaimana cara membuat conda environment?"
          │
-         ▼ multilingual-e5-large
+         ▼ BAAI/bge-m3 (via embedding-service API)
 Query Vector: [0.029, -0.121, 0.238, ..., 0.071]    (1024D)
          │
-         ▼ Cosine Similarity against ALL chunks
+         ▼ Cosine Similarity against ALL chunks in Qdrant
          │
 ┌────────┬──────────────────────────────────────────┬────────────┐
 │ Chunk  │ Content (with source label)              │ Similarity │
@@ -346,122 +430,148 @@ Query Vector: [0.029, -0.121, 0.238, ..., 0.071]    (1024D)
 │ 3      │ "[Sumber: Conda Env] Membuat Conda..."   │ 0.91 ← #1 │
 │ 7      │ "[Sumber: Conda Env] Module Pyload..."   │ 0.78 ← #2 │
 │ 1      │ "[Sumber: Spesifikasi] Compute Node..."  │ 0.65 ← #3 │
-│ 12     │ "[Sumber: MPI Guide] Running MPI..."     │ 0.32       │
+│ 12     │ "[Sumber: MPI Guide] Running MPI..."     │ 0.58 ← #4 │
 │ ...    │ ...                                      │ ...        │
+│ 22     │ "[Sumber: Job Script] GPU Slurm..."      │ 0.41 ← #10│
 └────────┴──────────────────────────────────────────┴────────────┘
          │
-         ▼ Get Top-K (k=3)
-    Chunks 3, 7, 1 → sent to LLM as context
+         ▼ Ambil Top-K (k=10)
+    Top 10 chunk → dikirim ke LLM sebagai konteks
 ```
 
-**Cosine Similarity Formula:**
+**Mengapa k=10?** Memberikan lebih banyak konteks ke LLM sehingga jawaban lebih lengkap. Qwen3.5-35B memiliki context window 131072 token, cukup untuk menampung 10 chunk.
+
+**Rumus Cosine Similarity:**
 
 ```
                     A · B           Σ(Aᵢ × Bᵢ)
 cos(θ) = ─────────────────── = ─────────────────────
               ||A|| × ||B||     √Σ(Aᵢ²) × √Σ(Bᵢ²)
 
-Result: -1 (opposite) to +1 (identical)
+Hasil: -1 (berlawanan) sampai +1 (identik)
 ```
 
-### Prompt Template — ChatML Format (Bahasa Indonesia)
+### Prompt — Format OpenAI Messages (Bahasa Indonesia)
+
+Prompt tidak lagi menggunakan string template ChatML. Sekarang menggunakan format **OpenAI messages** — array objek `{role, content}` yang dikirim ke vLLM melalui OpenAI-compatible API.
 
 ```python
-template_qwen = """<|im_start|>system
-Kamu adalah agen AI asisten admin HPC Slurm yang ahli...
+def generate_response(question: str, context: str) -> str:
+    messages = [
+        {
+            "role": "system",
+            "content": """Kamu adalah agen AI asisten admin HPC Slurm yang ahli. Tugasmu adalah membantu user berdasarkan dokumen referensi yang diberikan. Gunakan Bahasa Indonesia yang jelas.
 
 Aturan:
-1. Jawab HANYA berdasarkan dokumen referensi...
-2. Sertakan angka, nama, versi PERSIS seperti di dokumen...
-3. Jika informasi bisa DISIMPULKAN dari dokumen, berikan kesimpulan...
-4. Jika informasi TIDAK ADA, katakan "Saya tidak menemukan..."
-5. Jangan mengarang angka, rumus, perintah, URL...
-6. JANGAN mengganti perintah dari dokumen dengan alternatif...
-7. Bedakan "minimal" dan "maksimal"...<|im_end|>
+0. Tidak perlu bilang kalo berdasarkan dokumen referensi yang diberikan, langsung saja menyapa klien dengan sopan. Jangan outputkan chain of thought atau proses berpikirmu, langsung saja jawab dengan ringkas dan jelas.
+1. Jawab HANYA berdasarkan dokumen referensi. KUTIP langkah-langkah dan perintah PERSIS seperti di dokumen. Jangan menambahkan langkah atau perintah yang tidak ada di dokumen. Anda adalah L1 Support bot ALELEON. JANGAN PERNAH menyarankan solusi atau tool di luar dokumen yang diberikan. Jika di dokumen tidak ada, katakan Anda tidak tahu.
+2a. Sertakan angka, nama, versi, dan spesifikasi PERSIS seperti tertulis di dokumen. Jangan membulatkan atau menambah presisi. Contoh: jika dokumen bilang ">=11", jawab ">=11", BUKAN "11.0" atau "11.2".
+2b. Gunakan penomoran (1, 2, 3) untuk langkah-langkah, JANGAN gunakan bullet points/titik.
+3. Jika informasi bisa DISIMPULKAN dari dokumen, berikan kesimpulan tersebut.
+4. Jika informasi benar-benar TIDAK ADA di dokumen, katakan "Saya tidak menemukan informasi tersebut di sistem."
+5. Jangan mengarang angka, rumus, perintah, URL, nama partisi, atau prosedur yang tidak ada di dokumen. KHUSUSNYA jangan mengarang nama partisi seperti "bigmem" jika tidak disebutkan di dokumen.
+6. JANGAN mengganti perintah dari dokumen dengan perintah alternatif. Contoh: jika dokumen menulis "source activate", JANGAN ganti dengan "conda activate".
+7. Bedakan "minimal" dan "maksimal". Jika dokumen hanya menyebutkan "minimal X" TANPA batas maksimal, jawab bahwa informasi batas maksimal tidak tersedia di dokumen.
+8. Perhatikan label LEGACY. Jika halaman bertanda LEGACY untuk versi lama (misal Mk.III), JANGAN terapkan info tersebut untuk versi baru (Mk.V).
+9. Jawab dengan LENGKAP termasuk contoh perintah dan kode jika ada di dokumen. Jangan hanya menjawab kalimat pembuka lalu berhenti.
+10. WAJIB menjawab minimal 2 kalimat. Jangan mengeluarkan jawaban kosong.""",
+        },
+        {
+            "role": "user",
+            "content": f"Dokumen Referensi:\n{context}\n\nPertanyaan: {question}",
+        },
+    ]
 
+    response = client.chat.completions.create(
+        model=VLLM_MODEL_NAME,
+        messages=messages,
+        temperature=0.3,
+        top_p=0.9,
+        max_tokens=32768,
+        presence_penalty=1.5,
+        extra_body={"top_k": 20, "chat_template_kwargs": {"enable_thinking": False}},
+    )
+    return response.choices[0].message.content
+```
+
+**Format: OpenAI Messages (bukan string ChatML)**
+
+vLLM menyediakan OpenAI-compatible API. Kita menggunakan `openai.OpenAI` client untuk mengirim request — vLLM otomatis mengkonversi messages ke format ChatML yang dipahami Qwen.
+
+```
+client.chat.completions.create(
+    messages=[
+        {"role": "system", "content": "..."},    ← System prompt + rules
+        {"role": "user", "content": "..."},      ← Context + question
+    ]
+)
+        │
+        ▼ vLLM converts to ChatML internally
+        │
+<|im_start|>system
+...<|im_end|>
 <|im_start|>user
-Dokumen Referensi:
-{context}
-
-Pertanyaan: {input}<|im_end|>
+...<|im_end|>
 <|im_start|>assistant
-"""
 ```
 
-**Why the `<|im_start|>` / `<|im_end|>` format?**
+**11 Aturan Anti-Halusinasi (0-10):**
 
-This is the **ChatML format** — the format used during Qwen model training to distinguish roles:
-
-```
-<|im_start|>system     ← Instructions for the model (persona, rules)
-...<|im_end|>
-<|im_start|>user       ← User input (context + question)
-...<|im_end|>
-<|im_start|>assistant   ← Model starts generating from here
-```
-
-**The 7 Anti-Hallucination Rules:**
-
-The system prompt includes 7 strict rules to prevent the model from making things up:
-
-| Rule | Purpose |
+| Aturan | Tujuan |
 |---|---|
-| 1. Answer ONLY from documents | Prevents generating info from pre-training knowledge |
-| 2. Exact numbers/versions | Prevents rounding ">=11" to "11.0" |
-| 3. Allow deduction | Lets LLM infer logical conclusions from data |
-| 4. "Not found" response | Forces refusal when info doesn't exist |
-| 5. No fabrication | Blocks fake commands, URLs, procedures |
-| 6. No command substitution | Prevents replacing `source activate` with `conda activate` |
-| 7. Min vs Max distinction | Prevents confusing "at least X" with "at most X" |
+| 0. Langsung jawab, tanpa chain of thought | Menyapa klien dengan sopan, tidak menyebut "berdasarkan dokumen", jawab ringkas dan jelas |
+| 1. Jawab HANYA dari dokumen, KUTIP PERSIS | Mencegah generasi info dari pengetahuan pra-latih. L1 Support bot ALELEON |
+| 2a. Angka/versi harus presisi | Mencegah pembulatan ">=11" menjadi "11.0" |
+| 2b. Gunakan penomoran, bukan bullet | Langkah-langkah dalam format 1, 2, 3 |
+| 3. Deduksi diperbolehkan | Memungkinkan LLM menyimpulkan secara logis dari data |
+| 4. Respons "tidak ditemukan di sistem" | Memaksa model menolak saat info tidak tersedia |
+| 5. Dilarang mengarang, termasuk nama partisi | Memblokir perintah, URL, partisi palsu seperti "bigmem" |
+| 6. Jangan ganti perintah | Mencegah `source activate` diganti `conda activate` |
+| 7. Bedakan minimum vs maksimum | Mencegah salah tafsir "minimal X" dan "maksimal X" |
+| 8. Perhatikan label LEGACY | Jangan terapkan info Mk.III untuk Mk.V |
+| 9. Jawab LENGKAP dengan contoh | Jangan hanya kalimat pembuka lalu berhenti |
+| 10. Minimal 2 kalimat | Mencegah jawaban kosong |
 
-**Template variables:**
-- `{context}` → Automatically filled by LangChain with the 3 retrieved chunks.
-- `{input}` → Filled with the user's question.
-
-### Generation — vLLM + Qwen2.5
+### Generasi — vLLM + Qwen3.5 via OpenAI API
 
 ```python
-llm = VLLM(
-    model="Qwen/Qwen2.5-Coder-7B-Instruct",
-    trust_remote_code=True,
-    max_new_tokens=1024,
-    temperature=0.5,
-    top_p=0.9,
-    tensor_parallel_size=1,
-    vllm_kwargs={
-        "gpu_memory_utilization": 0.80,
-        "enforce_eager": True,
-        "max_model_len": 32768,
-    }
-)
+from openai import OpenAI
+
+client = OpenAI(base_url=VLLM_API_URL, api_key="not-needed")
 ```
 
-**Generation flow:**
+Model dijalankan di container **vllm-rocm** pada AMD GPU menggunakan vLLM dengan OpenAI-compatible API.
+
+**Perintah menjalankan vLLM (dari compose.yml):**
+
+```bash
+vllm serve Qwen/Qwen3.5-35B-A3B-GPTQ-Int4 \
+    --dtype float16 \
+    --enforce-eager \
+    --max-model-len 131072
+```
+
+**Alur generasi:**
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│ Prompt sent to LLM:                                          │
+│ Panggilan OpenAI API ke vLLM:                                │
 │                                                              │
-│ <|im_start|>system                                           │
-│ Kamu adalah agen AI asisten admin HPC Slurm yang ahli...     │
-│ Aturan: 1. Jawab HANYA berdasarkan dokumen... (7 rules)      │
-│ <|im_end|>                                                   │
-│ <|im_start|>user                                             │
-│ Dokumen Referensi:                                           │
-│ [Sumber: Conda Env] [Section: Membuat Conda Environment]    │
-│ Untuk membuat conda env, jalankan: module load anaconda3...  │
-│                                                              │
-│ [Sumber: Conda Env] [Section: Module Pyload]                 │
-│ Setelah conda env aktif, buat modul pyload...                │
-│                                                              │
-│ [Sumber: Spesifikasi] [Section: Compute Node]                │
-│ Partisi GPU: gpu-a100, gpu-rtx...                            │
-│                                                              │
-│ Pertanyaan: Bagaimana cara membuat conda environment?        │
-│ <|im_end|>                                                   │
-│ <|im_start|>assistant                                        │
-│                                                              │
-│         ▼ Model generates token by token                     │
+│ client.chat.completions.create(                              │
+│   model="Qwen/Qwen3.5-35B-A3B-GPTQ-Int4",                   │
+│   messages=[                                                 │
+│     {"role": "system", "content": "Kamu adalah agen AI...    │
+│      Aturan: 0-10 (11 aturan anti-halusinasi)"},             │
+│     {"role": "user", "content": "Dokumen Referensi:\n...     │
+│      Pertanyaan: Bagaimana cara membuat conda environment?"}│
+│   ],                                                         │
+│   temperature=0.3, top_p=0.9, max_tokens=32768,             │
+│   presence_penalty=1.5,                                      │
+│   extra_body={top_k=20,                                      │
+│     chat_template_kwargs={"enable_thinking": False}}         │
+│ )                                                            │
+│         │                                                    │
+│         ▼ vLLM mengonversi ke ChatML + menghasilkan jawaban  │
 │                                                              │
 │ "Untuk membuat conda environment di ALELEON,                 │
 │  jalankan perintah berikut:                                  │
@@ -470,29 +580,41 @@ llm = VLLM(
 └──────────────────────────────────────────────────────────────┘
 ```
 
-**Generation parameters:**
+**Parameter generasi:**
 
-| Parameter | Value | Meaning |
+| Parameter | Nilai | Makna |
 |---|---|---|
-| `temperature=0.5` | Moderate → balanced between factual and natural phrasing | Good for RAG with Indonesian text |
-| `top_p=0.9` | Nucleus sampling — only select tokens from the top 90% probability | Reduces random answers |
-| `max_new_tokens=1024` | Max 1024 output tokens | Allows longer, more detailed answers |
-| `max_model_len=32768` | Max 32K total tokens (prompt + output) | Full context window for large prompts |
-| `gpu_memory_utilization=0.80` | Use 80% VRAM | Save 20% for overhead and stability |
-| `enforce_eager=True` | Disable CUDAGraph | ROCm / RDNA4 compatibility |
-| `tensor_parallel_size=1` | Single GPU | No multi-GPU parallelism |
+| `temperature=0.3` | Rendah → lebih deterministik, faktual | Terbaik untuk RAG — mengurangi halusinasi |
+| `top_p=0.9` | Nucleus sampling — probabilitas 90% teratas | Mengurangi jawaban acak |
+| `top_k=20` | Hanya mempertimbangkan 20 token teratas tiap langkah | Semakin membatasi randomness |
+| `presence_penalty=1.5` | Penalti kuat untuk token berulang | Mencegah output repetitif |
+| `max_tokens=32768` | Maks 32K token output | Memungkinkan jawaban sangat detail |
+| `enable_thinking=False` | Menonaktifkan mode "thinking" Qwen3.5 (via `chat_template_kwargs`) | Jawaban langsung tanpa jejak reasoning |
+| `--max-model-len 131072` | Maks 128K token total (prompt + output) | Context window penuh untuk prompt besar |
+| `--dtype float16` | Presisi FP16 | Dibutuhkan model GPTQ di ROCm |
+| `--enforce-eager` | Menonaktifkan CUDAGraph | Kompatibilitas ROCm / GPU AMD |
 
-### Source Attribution — Showing Document Sources
+**Model: Qwen/Qwen3.5-35B-A3B-GPTQ-Int4**
+
+| Properti | Detail |
+|---|---|
+| Parameter | 35B total, ~3B aktif (arsitektur MoE) |
+| Kuantisasi | GPTQ 4-bit |
+| Context Window | 131072 token (128K) |
+| Arsitektur | Mixture of Experts (MoE) |
+| Disajikan via | vLLM pada GPU AMD ROCm |
+
+### Pelacakan Sumber — Menampilkan Sumber Dokumen
 
 ```python
-for i, inp in enumerate(inputs, 1):
-    hasil = rag_chain.invoke(inp)
-    print(hasil['answer'].strip())
+for i, pertanyaan in enumerate(pertanyaan_list, 1):
+    result = rag_chain(pertanyaan)
+    print(result['answer'].strip())
 
     # Tampilkan sumber dokumen yang digunakan
-    if 'context' in hasil and hasil['context']:
+    if result.get('context'):
         seen = []
-        for doc in hasil['context']:
+        for doc in result['context']:
             title = doc.metadata.get("title", "Unknown")
             source = doc.metadata.get("source", "")
             header = doc.metadata.get("Header 2", doc.metadata.get("Header 3", ""))
@@ -507,128 +629,176 @@ for i, inp in enumerate(inputs, 1):
                 print(label)
 ```
 
-**What happens:**
+**Yang terjadi:**
 
-After each answer, the system displays which wiki pages and sections were used to generate the response. **De-duplication** is applied so the same source/section pair is only shown once.
+Setelah setiap jawaban, sistem menampilkan halaman dan section wiki yang dipakai untuk menghasilkan respons. **De-duplication** diterapkan agar pasangan sumber/section yang sama hanya tampil sekali.
 
 ```
-Output example:
+Contoh output:
 ============================================================
 [Q1/23] Bagaimana cara membuat conda environment di aleleon?
 ------------------------------------------------------------
 Untuk membuat conda environment di ALELEON, jalankan...
 
-    📚 Sumber (3 chunks):
+    📚 Sumber (10 chunks):
     • Komputasi Python dengan Conda Environment User → Membuat Conda Environment
       (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
     • Komputasi Python dengan Conda Environment User → Module Pyload
       (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+    • ...
 ```
 
-### RAG Chain — Combining Everything
+### RAG Chain — Fungsi Python Kustom
+
+Tidak lagi menggunakan `create_stuff_documents_chain` atau `create_retrieval_chain` dari LangChain. Sekarang menggunakan fungsi Python sederhana dengan pola *closure*:
 
 ```python
-question_answer_chain = create_stuff_documents_chain(llm, prompt)
-rag_chain = create_retrieval_chain(retriever, question_answer_chain)
+def create_rag_chain(vectorstore, llm_api_url=None):
+    """Create RAG chain using embedding service and vLLM API."""
+
+    def retrieve_and_answer(question):
+        # Retrieve relevant documents from Qdrant
+        docs = vectorstore.similarity_search(question, k=10)
+        context = "\n\n".join([doc.page_content for doc in docs])
+
+        # Generate response using vLLM API
+        answer = generate_response(question, context, llm_api_url)
+
+        return {
+            "answer": answer,
+            "context": docs
+        }
+
+    return retrieve_and_answer
 ```
 
-**`create_stuff_documents_chain`** — Strategy: **"Stuff"**
+**Strategi: "Stuff" (manual)**
 
-"Stuff" means: **put ALL chunks into 1 prompt at once**.
-
-```
-Other strategies (not used in this code):
-┌─────────────────────────────────────────────────────────┐
-│ Stuff     : All chunks → 1 prompt → 1 answer      ✅   │
-│ Map-Reduce: Each chunk → answer → combine all          │
-│ Refine    : Chunk 1 → answer → + Chunk 2 → refine      │
-│ Map-Rerank: Each chunk → answer + score → pick best    │
-└─────────────────────────────────────────────────────────┘
-```
-
-**Note:** These chain functions come from `langchain_classic` (not `langchain`), because the LangChain 1.x API moved `create_retrieval_chain` and `create_stuff_documents_chain` to the `langchain-classic` package.
-
-**`create_retrieval_chain`** combines the retriever + stuff chain:
+Sama seperti sebelumnya — semua chunks digabung ke 1 prompt. Bedanya, sekarang dilakukan secara eksplisit dengan Python, bukan via LangChain chain abstraction. Fungsi `create_rag_chain()` mengembalikan *closure* `retrieve_and_answer` yang menggabungkan retrieval dan generation dalam satu panggilan.
 
 ```
-User Input
+Pertanyaan Pengguna
     │
     ▼
-┌──────────┐     ┌──────────────┐     ┌──────────────────┐
-│ Retriever│ ──→ │ Stuff Chain  │ ──→ │     Output       │
-│ (Top-3)  │     │ (Prompt+LLM) │     │ {answer, context}│
-└──────────┘     └──────────────┘     └──────────────────┘
-    │                    │                      │
-    │ 3 relevant         │ Prompt with          │ answer = LLM text
-    │ chunks             │ context + question   │ context = Document[]
-    ▼                    ▼                      ▼
- From Chroma        To vLLM/GPU          Source attribution
+┌──────────────────┐     ┌─────────────────────┐     ┌──────────────────┐
+│ similarity_search│ ──→ │ retrieve_and_answer()│ ──→ │ generate_response│
+│ (k=10)           │     │ join chunks          │     │ (OpenAI client)  │
+│                  │     │ → context            │     │ → answer text    │
+└──────────────────┘     └─────────────────────┘     └──────────────────┘
+    │                        │                          │
+    │ 10 relevant            │ context =                │ return {
+    │ Documents              │ chunk1\n\nchunk2\n\n...  │   "answer": ...,
+    ▼                        ▼                          ▼   "context": docs }
+ From Qdrant          To generate_response()       Return to caller
 ```
+
+**Mengapa fungsi kustom, bukan chain LangChain?**
+
+- Lebih transparan — bisa di-debug dengan print statement
+- Tidak perlu `langchain_classic` dependency
+- Mudah dikustomisasi (filter, reranking, etc.)
+- `generate_response()` menggunakan OpenAI client langsung
+
+### Menunggu vLLM — Pemeriksaan Kesehatan
+
+Sebelum memulai RAG, sistem menunggu vLLM siap:
+
+```python
+def wait_for_vllm(api_url, timeout=600, interval=10):
+    base_url = api_url.rstrip("/").removesuffix("/v1")
+    health_url = f"{base_url}/health"
+    start = time.time()
+    while time.time() - start < timeout:
+        try:
+            r = requests.get(health_url, timeout=5)
+            if r.status_code == 200:
+                return True
+        except requests.ConnectionError:
+            pass
+        time.sleep(interval)
+    raise RuntimeError(f"vLLM tidak ready setelah {timeout}s")
+```
+
+Model besar (35B params) memerlukan waktu loading ke VRAM. Fungsi ini polling `/health` setiap 10 detik, timeout setelah 10 menit.
 
 ---
 
-## Full End-to-End Diagram
+## Diagram End-to-End Lengkap
 
 ```
-Wiki Sitemap XML
-(https://wiki.efisonlt.com/sitemap/...)
-        │
-   [1] Parse XML → extract all wiki page URLs
-        │
-        ▼
-   [2] For each URL:
-       requests.get() → BeautifulSoup → extract <div id="mw-content-text">
-        │
-        ▼
-   [3] HTMLSectionSplitter (split by h1/h2/h3 headings)
-       → Fallback: RecursiveCharacterTextSplitter (4500 chars, 900 overlap)
-        │
-        ▼
-   [4] Add source labels: "[Sumber: title] [Section: header]"
-        │
-        ▼
-  N Chunks (variable, depends on wiki content)
-        │
-   [5] intfloat/multilingual-e5-large (~560M params)
-       Each chunk → 1024-dimensional vector
-        │
-        ▼
-   [6] Chroma DB (in-memory)
-       N vectors + N texts + metadata stored
-        │
-        │
-   [7] vLLM + Qwen2.5-Coder-7B-Instruct (GPU, 7B params)
-       Model loaded into VRAM
-        │
-        │
-  ══════╪══════════════════════════════════════
-  Per Question:
-        │
-  User: "Bagaimana cara membuat conda env?"
-        │
-        ▼
-  [a] Embed question → 1024D vector (multilingual-e5-large)
-        │
-  [b] Cosine similarity vs N chunks in Chroma
-        │
-  [c] Retrieve top-3 most relevant chunks
-        │
-  [d] Insert into ChatML prompt template (Bahasa Indonesia)
-      with 7 anti-hallucination rules
-        │
-  [e] Send prompt to Qwen2.5 via vLLM (GPU)
-        │
-  [f] Model generates answer token-by-token
-        │
-  [g] Display answer + source attribution
-      (de-duplicated title/section/URL)
-        │
-        ▼
-  "Untuk membuat conda environment di ALELEON:
-   1. module load anaconda3/2025.06-1
-   2. conda create -n myenv python=3.12..."
-
-    📚 Sumber (3 chunks):
-    • Conda Environment User → Membuat Conda Environment
-      (https://wiki.efisonlt.com/wiki/...)
+┌─────────────────────────────────────────────────────────────┐
+│                     FASE STARTUP                              │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  [0] wait_for_vllm() — polling /health tiap 10 dtk (maks 10 mnt) │
+│         │                                                   │
+│         ▼                                                   │
+│  [1] qdrant_collection_exists()? ── YA ──→ load_vectorstore()│
+│         │                                   (skip to [7])  │
+│         TIDAK                                               │
+│         │                                                   │
+│  Wiki Sitemap XML                                           │
+│  (https://wiki.efisonlt.com/sitemap/...)                    │
+│         │                                                   │
+│  [2] Parse XML → ekstrak semua URL halaman wiki            │
+│         │                                                   │
+│  [3] Untuk setiap URL:                                      │
+│      requests.get() → BeautifulSoup                         │
+│      → extract <div id="mw-content-text">                  │
+│         │                                                   │
+│  [4] HTMLSectionSplitter (split berdasarkan heading h1/h2/h3) │
+│      → Fallback: RecursiveCharacterTextSplitter             │
+│        (4500 chars, 900 overlap)                            │
+│         │                                                   │
+│  [5] Add source labels:                                     │
+│      "[Sumber: title] [Section: header]"                   │
+│         │                                                   │
+│  ~450 Chunks                                                │
+│         │                                                   │
+│  [6] BAAI/bge-m3 via API embedding-service                  │
+│      Dibatch @32 chunk per request                          │
+│      Each chunk → 1024-dimensional vector                  │
+│         │                                                   │
+│      build_vectorstore() →                                  │
+│  [7] Qdrant (persistent — http://qdrant:6333)              │
+│      ~450 vectors + texts + metadata stored                │
+│      Podman volume: qdrant-data:/qdrant/storage            │
+│                                                             │
+├─────────────────────────────────────────────────────────────┤
+│                  FASE PER PERTANYAAN                         │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  User: "Bagaimana cara membuat conda env?"                  │
+│         │                                                   │
+│  [a] Embed question → 1024D vector                         │
+│      (BAAI/bge-m3 via embedding-service API)               │
+│         │                                                   │
+│  [b] Cosine similarity vs ~450 chunk di Qdrant            │
+│         │                                                   │
+│  [c] Ambil 10 chunk paling relevan                          │
+│         │                                                   │
+│  [d] rag_chain() → similarity_search + join chunks         │
+│         │                                                   │
+│  [e] generate_response() → OpenAI messages format          │
+│      with 11 anti-hallucination rules (0-10)               │
+│         │                                                   │
+│  [f] Send to Qwen3.5-35B-A3B-GPTQ-Int4 via vLLM           │
+│      (OpenAI-compatible API, AMD ROCm GPU)                 │
+│      temperature=0.3, presence_penalty=1.5                 │
+│         │                                                   │
+│  [g] Model menghasilkan jawaban                              │
+│         │                                                   │
+│  [h] Display answer + source attribution                   │
+│      (de-duplicated title/section/URL)                     │
+│         │                                                   │
+│         ▼                                                   │
+│  "Untuk membuat conda environment di ALELEON:               │
+│   1. module load anaconda3/2025.06-1                        │
+│   2. conda create -n myenv python=3.12..."                  │
+│                                                             │
+│      📚 Sumber (10 chunks):                                 │
+│      • Conda Environment User → Membuat Conda Environment  │
+│        (https://wiki.efisonlt.com/wiki/...)                 │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
 ```

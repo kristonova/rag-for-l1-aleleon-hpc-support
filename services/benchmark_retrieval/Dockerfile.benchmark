@@ -1,0 +1,44 @@
+# =============================================================================
+# Dockerfile.benchmark — Benchmark Retrieval Service
+# =============================================================================
+# Purpose: Run benchmark comparing Dense vs Sparse vs Multi-Vector vs Hybrid
+#          retrieval methods in Qdrant using BAAI/bge-m3 embeddings
+#
+# Usage:
+#   podman-compose --profile benchmark run benchmark
+# =============================================================================
+
+FROM docker.io/library/python:3.12-slim
+
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Install Python dependencies
+RUN --mount=type=cache,target=/root/.cache/pip,Z \
+    pip install \
+    requests \
+    openai \
+    qdrant-client \
+    langchain-text-splitters \
+    langchain-core \
+    beautifulsoup4 \
+    lxml
+
+# Copy application code
+COPY services/benchmark_retrieval/benchmark_retrieval.py .
+
+# Create output directory
+RUN mkdir -p /app/output/benchmark
+
+# Default: run full benchmark
+ENTRYPOINT ["python", "benchmark_retrieval.py"]
+CMD ["--mode", "all"]

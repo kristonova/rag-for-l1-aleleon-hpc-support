@@ -1,0 +1,35 @@
+{
+  "total_questions": 69,
+  "retrieval_avg_ms": {
+    "dense": 2.1,
+    "sparse": 0.8,
+    "multi": 69.9,
+    "hybrid": 2.5
+  },
+  "e2e_avg_ms": {
+    "dense": 8674.7,
+    "sparse": 8753.1,
+    "multi": 8727.9,
+    "hybrid": 8897.9
+  },
+  "overlap_avg": {
+    "dense_vs_sparse": 0.397,
+    "dense_vs_multi": 0.599,
+    "dense_vs_hybrid": 0.625,
+    "sparse_vs_multi": 0.426,
+    "sparse_vs_hybrid": 0.63,
+    "multi_vs_hybrid": 0.579
+  },
+  "ingest": {
+    "num_documents": 411,
+    "embedding_time_s": 326.5,
+    "dense_ingest_s": 0.2,
+    "sparse_ingest_s": 0.0,
+    "multivec_ingest_s": 13.5,
+    "hybrid_ingest_s": 0.2,
+    "bench_dense_points": 411,
+    "bench_sparse_points": 411,
+    "bench_multivec_points": 411,
+    "bench_hybrid_points": 411
+  }
+}
