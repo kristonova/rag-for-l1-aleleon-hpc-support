@@ -133,13 +133,28 @@ def load_wiki_documents(sitemap_url, requests_per_second=2):
     5. Fallback ke RecursiveCharacterTextSplitter jika chunk masih terlalu besar
     """
 
-    # --- Step 1: Parse sitemap ---
+    # --- Step 1: Parse sitemap & filter hanya webpage ---
     print("    Mengambil sitemap...")
     resp = requests.get(sitemap_url)
     root = ElementTree.fromstring(resp.content)
     ns = {"ns": "http://www.sitemaps.org/schemas/sitemap/0.9"}
-    urls = [loc.text for loc in root.findall(".//ns:loc", ns)]
-    print(f"    → {len(urls)} URL ditemukan")
+    all_urls = [loc.text for loc in root.findall(".//ns:loc", ns)]
+    print(f"    → {len(all_urls)} URL ditemukan di sitemap")
+
+    # Filter: buang URL halaman file (Berkas:) yang bukan webpage
+    # Pattern MediaWiki file pages: /wiki/Berkas:*.png, *.jpg, *.jpeg, *.gif, *.svg, *.webp, *.pdf, etc.
+    NON_WEBPAGE_PATTERNS = [
+        "/wiki/Berkas:",   # MediaWiki file description pages (gambar, dokumen, dll)
+        "/wiki/File:",     # English alias for file pages
+        "/wiki/Istimewa:", # Special pages
+        "/wiki/Special:",  # Special pages (English)
+    ]
+    urls = [
+        u for u in all_urls
+        if u and not any(pattern in u for pattern in NON_WEBPAGE_PATTERNS)
+    ]
+    skipped = len(all_urls) - len(urls)
+    print(f"    → {len(urls)} webpage URL (di-skip {skipped} non-webpage: Berkas/file pages)")
 
     # --- Step 2-3: Fetch & extract HTML content ---
     headers_to_split_on = [
@@ -214,7 +229,7 @@ def build_vectorstore(embeddings: EmbeddingServiceClient) -> QdrantClient:
     """
     print("[1] Membaca & splitting halaman wiki berdasarkan struktur HTML...")
     splits = load_wiki_documents(
-        sitemap_url="https://wiki.efisonlt.com/sitemap/sitemap-wiki.efisonlt.com-NS_0-0.xml",
+        sitemap_url="https://wiki.efisonlt.com/sitemap/sitemap-wiki.efisonlt.com-0.xml",
         requests_per_second=2,
     )
 
@@ -700,9 +715,11 @@ def review_script_hybrid(script_content, api_url=None, qdrant_client=None, embed
 
 Periksa hal-hal berikut:
 1. **Syntax Bash**: Shebang (#!/bin/bash), quoting, variable expansion, typo perintah.
-2. **Parameter #SBATCH**: Format yang salah (misal spasi setelah `=`, satuan tidak menyatu seperti `--mem= 64 GB` seharusnya `--mem=64G`), parameter yang tidak ada/tidak valid.
+2. **Parameter #SBATCH**: Format yang salah (misal spasi setelah `=`, satuan tidak menyatu seperti `--mem= 64 GB` seharusnya `--mem=64GB`), parameter yang tidak ada/tidak valid.
 3. **Best Practice Slurm**:
-   - Apakah --mem menggunakan format yang benar (contoh: 64G, bukan "64 GB").
+   - Apakah --mem menggunakan format yang benar (contoh: 64GB, bukan "64 G").
+   - Apakah sudah menggunakan double dash (--) untuk setiap parameter (contoh: --mem=64GB, bukan -mem=64GB).
+   - Apakah tanda pagar (#) sudah ada (contoh: #SBATCH, bukan SBATCH)
    - Apakah --time dalam format yang benar (D-HH:MM:SS atau HH:MM:SS).
    - Apakah --ntasks dan --cpus-per-task digunakan dengan benar.
    - Apakah ada potensi pemborosan resource.

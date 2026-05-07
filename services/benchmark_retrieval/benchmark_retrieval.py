@@ -170,8 +170,22 @@ def load_wiki_documents(sitemap_url: str, requests_per_second: int = 2):
     resp = requests.get(sitemap_url)
     root = ElementTree.fromstring(resp.content)
     ns = {"ns": "http://www.sitemaps.org/schemas/sitemap/0.9"}
-    urls = [loc.text for loc in root.findall(".//ns:loc", ns)]
-    print(f"    → {len(urls)} URL ditemukan")
+    all_urls = [loc.text for loc in root.findall(".//ns:loc", ns)]
+    print(f"    → {len(all_urls)} URL ditemukan di sitemap")
+
+    # Filter: buang URL halaman file (Berkas:) yang bukan webpage
+    NON_WEBPAGE_PATTERNS = [
+        "/wiki/Berkas:",   # MediaWiki file description pages (gambar, dokumen, dll)
+        "/wiki/File:",     # English alias for file pages
+        "/wiki/Istimewa:", # Special pages
+        "/wiki/Special:",  # Special pages (English)
+    ]
+    urls = [
+        u for u in all_urls
+        if u and not any(pattern in u for pattern in NON_WEBPAGE_PATTERNS)
+    ]
+    skipped = len(all_urls) - len(urls)
+    print(f"    → {len(urls)} webpage URL (di-skip {skipped} non-webpage: Berkas/file pages)")
 
     headers_to_split_on = [("h1", "Header 1"), ("h2", "Header 2"), ("h3", "Header 3")]
     html_splitter = HTMLSectionSplitter(headers_to_split_on=headers_to_split_on)
