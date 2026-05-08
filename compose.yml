@@ -286,5 +286,28 @@ services:
       retries: 3
       start_period: 5s
 
+  # ------------------------------------
+  # ROCm device exporter
+  # ------------------------------------
+
+  rocm-device-exporter:
+    image: docker.io/rocm/device-metrics-exporter:v1.5.0
+    container_name: rocm-device-exporter
+    restart: always
+    profiles:
+      - monitoring
+    devices:
+      - /dev/kfd
+      - /dev/dri
+    group_add:
+      - keep-groups
+    cap_add:
+      - SYS_PTRACE
+    restart: always
+    volumes:
+      - /sys:/sys:ro
+    ports:
+      - "5000:5000"
+
 volumes:
   qdrant-data:
