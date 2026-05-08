@@ -19,6 +19,7 @@ from rag_app import (
     wait_for_vllm,
     create_rag_chain,
     review_script_hybrid,
+    is_question_relevant,
 )
 
 # ── FastAPI App ──────────────────────────────────────────────
@@ -155,6 +156,15 @@ async def review_script_endpoint(req: ReviewScriptRequest):
     """
     if llm_api_url is None:
         raise HTTPException(status_code=503, detail="LLM belum siap, coba lagi nanti.")
+
+    # Cek relevansi skrip sebelum proses review (sama seperti /ask)
+    if not is_question_relevant(req.script, llm_api_url):
+        return ReviewScriptResponse(
+            review="Skrip yang Anda kirim tidak relevan dengan layanan ALELEON HPC. "
+                   "Silakan kirim skrip Bash/Slurm yang berkaitan dengan komputasi HPC.",
+            issues_found=0,
+            policy_sources=None,
+        )
 
     try:
         result = review_script_hybrid(
