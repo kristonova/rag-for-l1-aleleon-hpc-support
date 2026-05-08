@@ -2,7 +2,7 @@
 
 ## Setup rootless Podman socket
 1. Stop all containers
-3. Remove Podman socket's XDG dir: `rm /run/user/1000/podman/podman.sock -rf`
+3. Remove Podman socket's XDG dir: `rm $XDG_RUNTIME_DIR/podman/podman.sock -rf`
 4. Enable and start rootless Podman socket: `systemctl --user enable --now podman.socket`
 
 
