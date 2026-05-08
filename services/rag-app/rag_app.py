@@ -742,7 +742,7 @@ Dokumen Kebijakan HPC ALELEON (gunakan untuk validasi resource parameters):
 Format output:
 1. Berikan penjelasan singkat mengenai perbaikan atau kesalahan yang dibuat.
 2. Jika tidak ada masalah, katakan "✅ Skrip terlihat baik! Tidak ditemukan masalah."
-3. WAJIB berikan skrip akhir (koreksi) dengan format template standar ALELEON berikut. Gunakan "////" untuk nilai yang tidak diketahui atau perlu diisi user. Sesuaikan isinya dengan konteks program user.
+3. WAJIB berikan skrip akhir (koreksi) dengan format template standar ALELEON berikut. Ganti "////" dengan nilai yang isinya sesuai dengan konteks program user. Untuk nilai yang tidak diketahui atau perlu diisi user, tetap isi dengan "////".
 
 ```bash
 #!/bin/bash
@@ -861,6 +861,29 @@ Gunakan Bahasa Indonesia. Jangan outputkan chain of thought."""
                     "source_url": source_url,
                     "section": header or None,
                 })
+
+        # Generate justifikasi relevansi untuk setiap policy source
+        MAX_POLICY_SOURCES = 10
+        if policy_docs and policy_sources:
+            print(f"    🔍 Generating justifications for {len(policy_sources)} policy sources...")
+            justifications = generate_source_justifications(
+                f"Script Slurm:\n{script_content[:500]}",
+                raw,
+                policy_docs,
+                api_url,
+            )
+
+            # Filter: buang sumber yang TIDAK RELEVAN, tambahkan justifikasi
+            filtered_sources = []
+            for i, src in enumerate(policy_sources):
+                just = justifications[i] if i < len(justifications) else ""
+                if "TIDAK RELEVAN" not in just.upper():
+                    src["justification"] = just
+                    filtered_sources.append(src)
+
+            # Limit ke MAX_POLICY_SOURCES
+            policy_sources = filtered_sources[:MAX_POLICY_SOURCES]
+            print(f"    ✅ {len(policy_sources)} relevant policy sources (filtered from {len(seen_keys)})")
 
         return {"review": raw, "issues_found": issues, "policy_sources": policy_sources}
 

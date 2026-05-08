@@ -11,6 +11,8 @@ Sebutkan nama modul Lmod yang tepat untuk memuat NVIDIA HPC SDK Compilers versi 
 Berapa megabyte (MB) batas maksimal ukuran file yang dizinkan untuk diunggah langsung melalui menu "Edit Files" di dalam aplikasi Job Composer?
 Tombol menu apa yang harus saya klik secara presisi pada antarmuka aplikasi Job Composer di EFIRO Web Service jika saya ingin menghentikan job yang sedang berjalan?
 Apa kepanjangan dan arti dari kode status "CG" ketika saya mengecek antrian job komputasi saya menggunakan perintah squeue?
+
+
 LEVEL 2: Gabungan Info (Multi-Chunk)
 Saya ingin menjalankan simulasi NAMD versi 2.14 khusus CPU murni menggunakan metode threading OpenMP. Modul Lmod apa yang harus saya muat, dan parameter SBATCH apa di dalam script yang harus saya set angkanya menjadi 1?
 Saya ingin membuka sesi JupyterLab dengan container PyTorch 2.3.0 berbasis ROCm 6.2 di partisi GPU trial. File .sif apa yang harus saya pilih di formulir, dan pada jenis GPU apa sesi saya akan berjalan?
@@ -24,6 +26,8 @@ Apa perbedaan mendasar cara kerja dan metode pencatatan antara 'Total Core Hour 
 Saya ingin melakukan kompilasi software mandiri menggunakan CMake versi 3.31.8 yang didasari oleh compiler C/C++ GCC versi 14.2.0. Tuliskan dua perintah module load secara berurutan untuk memuat environment tersebut!
 Saya mensubmit job menggunakan modul openmpi/5.0.8-gcc-15.2.0-cuda-12.9.0-neq. Berapa kapasitas dan kecepatan maksimal interkoneksi jaringan (dalam Gbps) yang akan mendukung job saya jika ini dijalankan di partisi komputasi node GPU?
 Saya adalah pengguna akun golongan Perseorangan. Apa yang akan terjadi secara teknis pada akun saya jika masa aktif 1 tahun saya telah habis, dan berapa lama masa tenggang yang akan diberikan sistem sebelum akun saya sepenuhnya dinonaktifkan?
+
+
 LEVEL 3: Reasoning / Deduksi
 Saya memiliki saldo 100 CCH. Saya mensubmit job dengan alokasi 16 core CPU dan menulis parameter #SBATCH --time=10:00:00. Mengapa Slurm langsung menahan job saya dengan alasan AssocGrpCPUMinutesLimit padahal kondisi server (node) sedang kosong sama sekali dan jobnya belum berjalan satu detik pun?
 Saya mensubmit script simulasi dengan alokasi #SBATCH --nodes=2, #SBATCH --ntasks-per-node=4, dan #SBATCH --cpus-per-task=8. Jika job hibrida ini berhasil berjalan selama persis 2 jam, berapa total tagihan Actual Core Hour (CCH) yang secara matematis akan ditarik dari saldo saya?

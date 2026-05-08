@@ -3,6 +3,10 @@
 telegram_bot.py — Telegram Bot untuk RAG ALELEON HPC
 Menerima pertanyaan dari user Telegram, kirim ke RAG API, lalu balas jawabannya.
 Mendukung review skrip Bash/Slurm via paste teks atau file upload.
+
+Perintah:
+  /ask <pertanyaan>   — Tanya jawab RAG (standard question)
+  /askscript          — Review skrip Bash/Slurm (kirim skrip setelah command)
 """
 
 import os
@@ -11,7 +15,7 @@ import logging
 import re
 import html
 import requests
-from telegram import Update
+from telegram import BotCommand, Update
 from telegram.ext import (
     Application,
     CommandHandler,
@@ -48,29 +52,6 @@ PROGRESS_FRAMES_REVIEW = [
     "🤖 Memeriksa parameter SBATCH...",
     "💡 Menyusun review...",
 ]
-
-
-def is_shell_script(text: str) -> bool:
-    """Deteksi apakah teks yang di-paste adalah skrip Bash/Slurm.
-    
-    Hanya menganggap teks sebagai skrip jika:
-    1. Dimulai dengan shebang bash/sh
-    2. ATAU terdapat baris yang diawali dengan #SBATCH
-    Ini mencegah salah deteksi jika user hanya menyebut '#SBATCH' di tengah kalimat.
-    """
-    text_stripped = text.strip()
-    
-    if text_stripped.startswith("#!/bin/bash") or \
-       text_stripped.startswith("#!/bin/sh") or \
-       text_stripped.startswith("#!/usr/bin/env bash") or \
-       text_stripped.startswith("#!/usr/bin/env sh"):
-        return True
-        
-    # Cek apakah ada baris yang diawali dengan #SBATCH (mengabaikan spasi di awal)
-    if re.search(r'^\s*#SBATCH', text_stripped, flags=re.MULTILINE):
-        return True
-        
-    return False
 
 
 # ── Helper: convert Markdown ke HTML aman untuk Telegram ─────────
@@ -195,6 +176,10 @@ def format_review(review: str, issues_found: int, filename: str = None, policy_s
             else:
                 result += f"{i}. {label}\n"
 
+            justification = src.get("justification") or ""
+            if justification:
+                result += f"   💡 <i>{html.escape(justification, quote=False)}</i>\n"
+
     return result
 
 
@@ -273,36 +258,48 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     welcome = (
         "👋 Halo! Saya bot asisten HPC ALELEON.\n\n"
         "Saya bisa membantu dengan:\n"
-        "📖 Pertanyaan — Kirim pertanyaan tentang ALELEON/Slurm/HPC\n"
-        "📝 Review Skrip — Kirim/paste skrip .sh untuk saya review\n\n"
-        "Contoh pertanyaan:\n"
-        "• Bagaimana cara membuat conda environment?\n"
-        "• Berapa kuota storage HOME untuk akun perseorangan?\n\n"
-        "Review skrip:\n"
-        "• Paste langsung skrip yang mengandung #!/bin/bash atau #SBATCH\n"
+        "📖 <b>/ask</b> — Tanya jawab tentang ALELEON/Slurm/HPC\n"
+        "📝 <b>/askscript</b> — Review skrip Bash/Slurm\n\n"
+        "<b>Contoh penggunaan:</b>\n"
+        "• <code>/ask Bagaimana cara membuat conda environment?</code>\n"
+        "• <code>/ask Berapa kuota storage HOME untuk akun perseorangan?</code>\n\n"
+        "<b>Review skrip:</b>\n"
+        "• <code>/askscript</code> lalu paste skrip di baris berikutnya\n"
         "• Upload file .sh / .slurm / .sbatch\n\n"
-        "Ketik pertanyaan atau kirim skrip! 🚀"
+        "Gunakan perintah di atas untuk memulai! 🚀"
     )
-    await update.message.reply_text(welcome)
+    await update.message.reply_text(welcome, parse_mode="HTML")
 
 
 # ── Handler: /help ───────────────────────────────────────────
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Tampilkan bantuan."""
     help_text = (
-        "📖 Cara pakai bot ini:\n\n"
-        "1. Pertanyaan:\n"
-        "Ketik pertanyaan langsung di chat. Bot akan mencari jawaban dari wiki ALELEON.\n\n"
-        "2. Review Skrip:\n"
-        "• Paste skrip Bash/Slurm langsung di chat (harus mengandung #!/bin/bash atau #SBATCH)\n"
-        "• Upload file .sh, .slurm, .sbatch, atau .bash\n"
+        "📖 <b>Cara pakai bot ini:</b>\n\n"
+        "<b>1. Pertanyaan (Standard Question):</b>\n"
+        "Gunakan <code>/ask</code> diikuti pertanyaan Anda.\n"
+        "Bot akan mencari jawaban dari wiki ALELEON.\n\n"
+        "Contoh:\n"
+        "  <code>/ask Bagaimana cara membuat conda environment?</code>\n"
+        "  <code>/ask Berapa kapasitas RAM partisi epyc?</code>\n\n"
+        "<b>2. Review Skrip (Shell Script Question):</b>\n"
+        "Gunakan <code>/askscript</code> diikuti skrip Bash/Slurm Anda.\n"
         "Bot akan mengecek syntax, parameter SBATCH, dan best practice.\n\n"
-        "Perintah:\n"
+        "Contoh:\n"
+        "  <code>/askscript\n"
+        "#!/bin/bash\n"
+        "#SBATCH --partition=ampere\n"
+        "#SBATCH --mem=64GB\n"
+        "srun gmx_mpi mdrun</code>\n\n"
+        "Atau upload file .sh, .slurm, .sbatch, atau .bash.\n\n"
+        "<b>Perintah:</b>\n"
         "/start — Pesan selamat datang\n"
         "/help — Bantuan ini\n"
-        "/status — Cek status RAG API"
+        "/status — Cek status RAG API\n"
+        "/ask — Pertanyaan standar (RAG)\n"
+        "/askscript — Review skrip Bash/Slurm"
     )
-    await update.message.reply_text(help_text)
+    await update.message.reply_text(help_text, parse_mode="HTML")
 
 
 # ── Handler: /status ─────────────────────────────────────────
@@ -346,21 +343,55 @@ async def _keep_alive_indicator(chat, placeholder_msg, stop_event: asyncio.Event
             continue
 
 
-
-# ── Handler: Pesan teks biasa (pertanyaan atau skrip) ────────
-async def handle_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Kirim pertanyaan ke RAG API atau review skrip jika terdeteksi."""
-    text = update.message.text
+# ── Handler: /ask <pertanyaan> ───────────────────────────────
+async def ask_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handler untuk /ask — Kirim pertanyaan ke RAG API (standard question)."""
     user = update.effective_user
     chat = update.message.chat
 
-    # Deteksi: skrip atau pertanyaan biasa?
-    if is_shell_script(text):
-        logger.info(f"Skrip terdeteksi dari {user.first_name} (@{user.username}), routing ke /review-script")
-        await _handle_script_review(update, chat, text)
-    else:
-        logger.info(f"Pertanyaan dari {user.first_name} (@{user.username}): {text[:80]}")
-        await _handle_rag_question(update, chat, text)
+    # Ambil teks setelah /ask
+    question = " ".join(context.args) if context.args else ""
+
+    if not question.strip():
+        await update.message.reply_text(
+            "⚠️ Silakan ketik pertanyaan setelah <code>/ask</code>.\n\n"
+            "Contoh: <code>/ask Bagaimana cara membuat conda environment?</code>",
+            parse_mode="HTML",
+        )
+        return
+
+    logger.info(f"[/ask] Pertanyaan dari {user.first_name} (@{user.username}): {question[:80]}")
+    await _handle_rag_question(update, chat, question)
+
+
+# ── Handler: /askscript <skrip> ──────────────────────────────
+async def askscript_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handler untuk /askscript — Review skrip Bash/Slurm (shell-script question)."""
+    user = update.effective_user
+    chat = update.message.chat
+
+    # Ambil teks setelah /askscript
+    # Karena skrip biasanya multi-line, ambil semua teks setelah "/askscript"
+    full_text = update.message.text or ""
+    # Hapus command "/askscript" dari awal (case-insensitive, dengan atau tanpa @botname)
+    script_content = re.sub(r'^/askscript(@\S+)?\s*', '', full_text, count=1, flags=re.IGNORECASE)
+
+    if not script_content.strip():
+        await update.message.reply_text(
+            "⚠️ Silakan kirim skrip setelah <code>/askscript</code>.\n\n"
+            "Contoh:\n"
+            "<code>/askscript\n"
+            "#!/bin/bash\n"
+            "#SBATCH --partition=ampere\n"
+            "#SBATCH --mem=64GB\n"
+            "srun gmx_mpi mdrun</code>\n\n"
+            "Atau upload file .sh / .slurm / .sbatch.",
+            parse_mode="HTML",
+        )
+        return
+
+    logger.info(f"[/askscript] Skrip dari {user.first_name} (@{user.username}), panjang={len(script_content)}")
+    await _handle_script_review(update, chat, script_content)
 
 
 async def _handle_rag_question(update, chat, question):
@@ -462,6 +493,18 @@ async def _handle_script_review(update, chat, script_content, filename=None):
         await placeholder_msg.edit_text(f"⚠️ Terjadi error: {str(e)[:200]}")
 
 
+# ── Handler: Pesan teks biasa (tanpa command) ────────────────
+async def handle_plain_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Pesan teks biasa tanpa command — arahkan user untuk menggunakan /ask atau /askscript."""
+    await update.message.reply_text(
+        "💡 Gunakan perintah berikut:\n\n"
+        "📖 <code>/ask &lt;pertanyaan&gt;</code> — untuk bertanya tentang HPC/ALELEON\n"
+        "📝 <code>/askscript &lt;skrip&gt;</code> — untuk review skrip Bash/Slurm\n\n"
+        "Contoh: <code>/ask Bagaimana cara membuat conda environment?</code>",
+        parse_mode="HTML",
+    )
+
+
 # ── Handler: File upload (dokumen) ───────────────────────────
 async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle file upload — review skrip jika ekstensi sesuai."""
@@ -477,7 +520,7 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(
             f"⚠️ File *{filename}* tidak didukung untuk review.\n\n"
             f"Ekstensi yang didukung: `{supported}`\n\n"
-            "Atau paste isinya langsung di chat!",
+            "Atau paste isinya langsung di chat dengan /askscript!",
             parse_mode="Markdown",
         )
         return
@@ -498,6 +541,20 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await _handle_script_review(update, chat, script_content, filename=filename)
 
 
+# ── Post-init: Daftarkan command menu di Telegram ───────────
+async def post_init(application):
+    """Daftarkan daftar command ke Telegram agar muncul di menu bot."""
+    commands = [
+        BotCommand("start", "Pesan selamat datang"),
+        BotCommand("ask", "Tanya jawab HPC/ALELEON (standard question)"),
+        BotCommand("askscript", "Review skrip Bash/Slurm"),
+        BotCommand("help", "Bantuan penggunaan bot"),
+        BotCommand("status", "Cek status RAG API"),
+    ]
+    await application.bot.set_my_commands(commands)
+    logger.info("✅ Bot commands registered with Telegram")
+
+
 # ── Main ─────────────────────────────────────────────────────
 def main():
     if not TELEGRAM_TOKEN:
@@ -508,14 +565,16 @@ def main():
     print(f"🤖 Memulai Telegram Bot...")
     print(f"   RAG API URL: {RAG_API_URL}")
 
-    app = Application.builder().token(TELEGRAM_TOKEN).build()
+    app = Application.builder().token(TELEGRAM_TOKEN).post_init(post_init).build()
 
     # Daftarkan handler
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(CommandHandler("status", status))
+    app.add_handler(CommandHandler("ask", ask_command))
+    app.add_handler(CommandHandler("askscript", askscript_command))
     app.add_handler(MessageHandler(filters.Document.ALL, handle_document))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_question))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_plain_text))
 
     # Jalankan bot (long polling)
     print("✅ Bot berjalan! Tekan Ctrl+C untuk berhenti.")

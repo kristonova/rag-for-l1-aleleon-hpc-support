@@ -174,6 +174,7 @@ async def review_script_endpoint(req: ReviewScriptRequest):
                 title=s["title"],
                 source_url=s["source_url"],
                 section=s.get("section"),
+                justification=s.get("justification"),
             )
             for s in result["policy_sources"]
         ]
