@@ -162,6 +162,30 @@ sequenceDiagram
 - ColBERT output berupa 2D array (tokens × 1024-dim) untuk late interaction
 - Monkey-patch `is_torch_fx_available` untuk kompatibilitas transformers ≥4.47
 
+**Alur Kerja Embedding Service:**
+```mermaid
+graph TD
+    A[Client Request<br/>POST /embed/multi] --> B[Parse Payload JSON]
+    B --> C{Extract Components}
+    C -->|List of Strings| D[Text Inputs]
+    C -->|Booleans| E[Config: dense, sparse, colbert]
+    
+    D --> F[BGEM3FlagModel Inference<br/>batch processing]
+    E -.-> F
+    
+    F --> G{Formatting Output}
+    
+    G -->|if return_dense| H[Dense Vectors<br/>1024-dim float arrays]
+    G -->|if return_sparse| I[Sparse Vectors<br/>indices & weight values]
+    G -->|if return_colbert| J[ColBERT Vectors<br/>tokens x 1024-dim arrays]
+    
+    H --> K[Construct Response JSON]
+    I --> K
+    J --> K
+    
+    K --> L[Return Response to Caller]
+```
+
 ---
 
 ### 3.2 LLM Service (`vllm-rocm`)

@@ -5,23 +5,32 @@ A Retrieval-Augmented Generation (RAG) system that serves as an AI assistant for
 ## Architecture
 
 ```
-┌──────────────────────────────────────────────────────────────────────────┐
-│                    Pipeline RAG (Podman Container)                       │
-│                                                                          │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────┐  ┌─────────────┐       │
-│  │   INGESTION  │→ │  EMBEDDING   │→ │ RETRIEVAL│→ │  GENERASI   │       │
-│  │  (HTML Wiki) │  │ + Penyimpanan│  (Pencarian)│  │   (LLM)     │       │
-│  └──────────────┘  └──────────────┘  └──────────┘  └─────────────┘       │
-│                                                                          │
-│  Fase 1: Ambil & Split   Fase 2: Vektorisasi   Fase 3: Menjawab          │
-│                                                                          │
-│  Layanan:                                                                │
-│  ┌─────────────────┐ ┌─────────────┐ ┌──────────┐ ┌──────────────┐       │
-│  │embedding-service│ │  vllm-rocm  │ │  qdrant  │ │   rag-app    │       │
-│  │ (BAAI/bge-m3)   │ │ (Qwen3.5)   │ │ (Vektor) │ │ (Orkestrator)│       │
-│  │ Port 8001       │ │ Port 8000   │ │ Port 6333│ │              │       │
-│  └─────────────────┘ └─────────────┘ └──────────┘ └──────────────┘       │
-└──────────────────────────────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────────────────────────────────┐
+│                       Pipeline RAG (Podman Container)                        │
+│                                                                               │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────┐  ┌─────────────┐            │
+│  │   INGESTION  │→ │  EMBEDDING   │→ │ RETRIEVAL│→ │  GENERASI   │            │
+│  │  (HTML Wiki) │  │ + Penyimpanan│  (Pencarian)│  │   (LLM)     │            │
+│  └──────────────┘  └──────────────┘  └──────────┘  └─────────────┘            │
+│                                                                               │
+│  Fase 1: Ambil & Split   Fase 2: Vektorisasi   Fase 3: Menjawab               │
+│                                                                               │
+│  Layanan Infra:                                                               │
+│  ┌─────────────────┐ ┌──────────────────────┐ ┌──────────┐                    │
+│  │embedding-service│ │      vllm-rocm       │ │  qdrant  │                    │
+│  │ (BAAI/bge-m3)   │ │ (Qwen3.5-35B-A3B     │ │ (Vektor) │                    │
+│  │ Port 8001       │ │  GPTQ-Int4)          │ │ Port 6333│                    │
+│  └─────────────────┘ │ Port 8000            │ └──────────┘                    │
+│                       └──────────────────────┘                                │
+│  Layanan Aplikasi:                                                            │
+│  ┌──────────────┐ ┌──────────────┐ ┌───────────────┐                          │
+│  │   rag-app    │ │   rag-api    │ │ telegram-bot  │                          │
+│  │ (CLI Interak)│ │ (REST API)   │ │ (/ask,        │                          │
+│  │              │ │ Port 8080    │ │  /askscript)  │                          │
+│  │              │ │ /ask         │ │               │                          │
+│  │              │ │ /review-script│ │              │                          │
+│  └──────────────┘ └──────────────┘ └───────────────┘                          │
+└───────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ## Project Structure
@@ -32,15 +41,29 @@ rag-for-l1-aleleon-hpc-support/
 │   ├── embedding/
 │   │   ├── Dockerfile.embedding
 │   │   └── embedding_api.py
-│   └── rag-app/
-│       ├── Dockerfile.rag-app
-│       └── rag_app.py
+│   ├── rag-app/
+│   │   ├── Dockerfile.rag-app
+│   │   ├── rag_app.py           # Core RAG logic (ingestion, retrieval, generation)
+│   │   └── rag_api.py           # FastAPI REST API (/ask, /review-script)
+│   ├── telegram-bot/
+│   │   ├── Dockerfile.telegram
+│   │   └── telegram_bot.py      # Telegram Bot (/ask, /askscript commands)
+│   ├── benchmark_retrieval/
+│   │   ├── Dockerfile.benchmark
+│   │   └── benchmark_retrieval.py
+│   ├── benchmark_ttft/
+│   │   └── Dockerfile.rag-bench
+│   └── promtail/
+│       └── config.yml           # Promtail log scraping config
 ├── compose.yml                  # Podman multi-container orchestration
 ├── Dockerfile.rocm              # Container image for AMD ROCm GPUs (legacy)
 ├── rag_slurm_vllm.py            # Standalone script (legacy)
 ├── HOW IT WORKS.md              # Detailed explanation document
+├── MICROSERVICES_ARCHITECTURE.md # Microservices architecture doc
 ├── inspect_chroma.py            # Inspect Qdrant vector store contents
 ├── debug_parse_sitemap.py       # Debug sitemap parsing
+├── benchmark_chart_generator.py # Generate charts from benchmark results
+├── embedding_chart_generator.py # Generate charts for embedding benchmarks
 ├── pyproject.toml               # Python project metadata & dependencies
 ├── tests/
 │   └── test_services.py
@@ -65,15 +88,48 @@ The application runs in three phases:
 
 8. **Model Loading** — Loads `Qwen/Qwen3.5-35B-A3B-GPTQ-Int4` onto the AMD GPU using vLLM with these settings:
 
+   #### vLLM Server Configuration (compose.yml)
+
    | Parameter | Value | Reason |
    |---|---|---|
-   | `gpu_memory_utilization` | 0.99 | Use 99% of available VRAM |
-   | `enforce_eager` | True | Avoids CUDAGraph issues on ROCm/RDNA4 |
-    | `max_model_len` | 131072 | Full 128K context window for large prompts |
-    | `temperature` | 0.3 | Lower randomness for RAG |
-    | `top_p` | 0.9 | Nucleus sampling |
-    | `top_k` | 20 | Top-k sampling constraint |
-    | `max_tokens` | 32768 | Max response length |
+   | `--dtype` | `float16` | Inference precision for quantized model |
+   | `--enforce-eager` | True | Avoids CUDAGraph issues on ROCm/RDNA4 |
+   | `--gpu-memory-utilization` | 0.99 | Use 99% of available VRAM |
+   | `--max-model-len` | 262144 | Full 256K context window for large prompts |
+   | `--max-num-seqs` | 16 | Max concurrent sequences |
+   | `--tensor-parallel-size` | 1 | Single GPU inference |
+   | `--enable-auto-tool-choice` | True | Enable tool/function calling support |
+   | `--tool-call-parser` | `qwen3_coder` | Tool call parser for Qwen3 Coder |
+   | `--reasoning-parser` | `qwen3` | Reasoning parser for Qwen3 |
+   | `--enable-prefix-caching` | True | Cache common prefixes for faster inference |
+
+   #### `/ask` — RAG Question Answering (`generate_response`)
+
+   | Parameter | Value | Reason |
+   |---|---|---|
+   | `max_tokens` | 8192 | Max response length for RAG answers |
+   | `temperature` | 0.3 | Lower randomness for factual RAG answers |
+   | `top_p` | 0.9 | Nucleus sampling |
+   | `top_k` | 20 | Top-k sampling constraint |
+   | `presence_penalty` | 1.5 | Discourage repetition |
+   | `enable_thinking` | False | Non-thinking mode for direct answers |
+
+   #### `/askscript` — Script Review (`review_script_hybrid`)
+
+   | Parameter | Value | Reason |
+   |---|---|---|
+   | `max_tokens` | 4096 | Max response length for script reviews |
+   | `temperature` | 0.2 | Very low randomness for precise analysis |
+   | `top_p` | 0.9 | Nucleus sampling |
+   | `enable_thinking` | False | Non-thinking mode for direct output |
+
+   #### Supporting LLM Calls
+
+   | Function | `max_tokens` | `temperature` | Purpose |
+   |---|---|---|---|
+   | `is_question_relevant` | 10 | 0.0 | Relevance filter (YA/TIDAK) before embedding |
+   | `generate_source_justifications` | 1024 | 0.1 | "Why This Source" justification per document |
+   | `extract_resource_params` | 512 | 0.0 | Parse #SBATCH params from scripts as JSON |
 
 ### Phase 3 — Question Answering (RAG Chain)
 
