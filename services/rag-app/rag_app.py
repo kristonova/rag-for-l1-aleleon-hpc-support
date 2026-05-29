@@ -5,6 +5,8 @@ rag_app.py — RAG Application for Podman
 This application orchestrates the RAG chain using embedding-service, vllm-rocm,
 and qdrant services. It replaces the local embedding computation with API
 calls and uses OpenAI-compatible API for vLLM inference.
+
+To run on terminal: podman-compose --profile rag-app run rag-app python rag_app.py
 =============================================================================
 """
 
@@ -39,6 +41,7 @@ QDRANT_COLLECTION_NAME = "wiki_aleleon_qdrant"
 EMBEDDING_API_URL = os.getenv("EMBEDDING_API_URL", "http://embedding-service:8001")
 DENSE_DIM = 1024
 TOP_K = 10
+RERANK_FETCH_MULTIPLIER = 2  # Fetch 2× TOP_K dari Qdrant, rerank ke TOP_K
 
 
 class EmbeddingServiceClient(Embeddings):
@@ -121,6 +124,19 @@ class EmbeddingServiceClient(Embeddings):
         if data.get("sparse"):
             result["sparse"] = data["sparse"][0]
         return result
+
+    def rerank(self, query: str, passages: List[str]) -> List[float]:
+        """
+        Rerank passages using ColBERT late-interaction scoring via /rerank endpoint.
+        Return: list of ColBERT scores (one per passage, higher = more relevant).
+        """
+        resp = requests.post(
+            f"{self.api_url}/rerank",
+            json={"query": query, "passages": passages},
+            timeout=120,
+        )
+        resp.raise_for_status()
+        return resp.json()["scores"]
 
 
 def load_wiki_documents(sitemap_url, requests_per_second=2):
@@ -335,7 +351,7 @@ def generate_response(question, context, api_url=None):
     # Configure OpenAI client to use vLLM endpoint
     client = OpenAI(
         base_url=api_url,
-        api_key=os.getenv("LLM_API_KEY", "")  # If authentication is required
+        api_key=os.getenv("LLM_API_KEY", "EMPTY")  # If authentication is required
     )
     
     messages = [
@@ -413,7 +429,7 @@ def generate_source_justifications(question, answer, docs, api_url=None):
 
     client = OpenAI(
         base_url=api_url,
-        api_key=os.getenv("LLM_API_KEY", "")
+        api_key=os.getenv("LLM_API_KEY", "EMPTY")
     )
 
     messages = [
@@ -495,7 +511,7 @@ def extract_resource_params(script_content, api_url=None):
 
     client = OpenAI(
         base_url=api_url,
-        api_key=os.getenv("LLM_API_KEY", "")
+        api_key=os.getenv("LLM_API_KEY", "EMPTY")
     )
 
     messages = [
@@ -707,7 +723,7 @@ def review_script_hybrid(script_content, api_url=None, qdrant_client=None, embed
     # === STEP 3: LLM Review (teknis + policy) ===
     client = OpenAI(
         base_url=api_url,
-        api_key=os.getenv("LLM_API_KEY", "")
+        api_key=os.getenv("LLM_API_KEY", "EMPTY")
     )
 
     # System prompt — diperluas dengan section kebijakan jika ada
@@ -903,7 +919,7 @@ def is_question_relevant(question, api_url=None) -> bool:
 
     client = OpenAI(
         base_url=api_url,
-        api_key=os.getenv("LLM_API_KEY", "")
+        api_key=os.getenv("LLM_API_KEY", "EMPTY")
     )
 
     messages = [
@@ -978,14 +994,15 @@ def create_rag_chain(client: QdrantClient, embeddings: EmbeddingServiceClient, l
         # 1. Embed query → dense + sparse
         query_multi = embeddings.embed_query_multi(question)
 
-        # 2. Hybrid search: dense + sparse → RRF fusion
+        # 2. Hybrid search: dense + sparse → RRF fusion (over-fetch for reranking)
+        fetch_limit = TOP_K * RERANK_FETCH_MULTIPLIER
         results = client.query_points(
             QDRANT_COLLECTION_NAME,
             prefetch=[
                 Prefetch(
                     query=query_multi["dense"],
                     using="dense",
-                    limit=TOP_K * 2,
+                    limit=fetch_limit * 2,
                 ),
                 Prefetch(
                     query=SparseVector(
@@ -993,15 +1010,15 @@ def create_rag_chain(client: QdrantClient, embeddings: EmbeddingServiceClient, l
                         values=query_multi["sparse"]["values"],
                     ),
                     using="text-sparse",
-                    limit=TOP_K * 2,
+                    limit=fetch_limit * 2,
                 ),
             ],
             query=FusionQuery(fusion=Fusion.RRF),
-            limit=TOP_K,
+            limit=fetch_limit,
         )
 
         # 3. Convert results → Document objects (kompatibel dengan sisa kode)
-        docs = []
+        candidate_docs = []
         for point in results.points:
             payload = point.payload or {}
             doc = Document(
@@ -1010,7 +1027,25 @@ def create_rag_chain(client: QdrantClient, embeddings: EmbeddingServiceClient, l
                     k: v for k, v in payload.items() if k != "text"
                 },
             )
-            docs.append(doc)
+            candidate_docs.append(doc)
+
+        # 4. ColBERT reranking: rerank candidates → take top TOP_K
+        if len(candidate_docs) > TOP_K:
+            passages = [doc.page_content for doc in candidate_docs]
+            try:
+                scores = embeddings.rerank(question, passages)
+                scored_docs = sorted(
+                    zip(candidate_docs, scores),
+                    key=lambda x: x[1],
+                    reverse=True,
+                )
+                docs = [doc for doc, _ in scored_docs[:TOP_K]]
+                print(f"    🔀 ColBERT rerank: {len(candidate_docs)} candidates → top {len(docs)} (scores: {[f'{s:.3f}' for _, s in scored_docs[:3]]}...)")
+            except Exception as e:
+                print(f"    ⚠️  ColBERT rerank failed, using RRF order: {e}")
+                docs = candidate_docs[:TOP_K]
+        else:
+            docs = candidate_docs
 
         context = "\n\n".join([doc.page_content for doc in docs])
 

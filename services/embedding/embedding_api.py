@@ -80,6 +80,19 @@ class HealthResponse(BaseModel):
     model: str
 
 
+class RerankRequest(BaseModel):
+    """Request model for ColBERT reranking endpoint."""
+    query: str
+    passages: List[str]
+
+
+class RerankResponse(BaseModel):
+    """Response model for ColBERT reranking endpoint."""
+    scores: List[float]
+    model: str
+    count: int
+
+
 # ── Endpoints ──────────────────────────────────────────────────────────
 
 @app.post("/embed", response_model=EmbedResponse)
@@ -165,6 +178,51 @@ async def embed_multi(request: EmbedMultiRequest):
         raise HTTPException(status_code=500, detail=f"Embedding error: {str(e)}")
 
 
+@app.post("/rerank", response_model=RerankResponse)
+async def rerank(request: RerankRequest):
+    """
+    Rerank passages against a query using ColBERT late-interaction scoring.
+
+    Uses BGE-M3's compute_score() with ColBERT-only weights to compute
+    fine-grained token-level relevance scores.
+
+    Example:
+        curl -X POST http://localhost:8001/rerank \\
+          -H "Content-Type: application/json" \\
+          -d '{"query": "kapasitas RAM partisi epyc", "passages": ["Partisi epyc 256GB RAM", "GPU A100 di ampere"]}'
+    """
+    if not request.passages:
+        return RerankResponse(scores=[], model=MODEL_NAME, count=0)
+
+    try:
+        # Build sentence pairs: [[query, passage1], [query, passage2], ...]
+        sentence_pairs = [[request.query, p] for p in request.passages]
+
+        # compute_score with ColBERT-only weights: [dense, sparse, colbert]
+        result = embedding_model.compute_score(
+            sentence_pairs,
+            weights_for_different_modes=[0.0, 0.0, 1.0],
+        )
+
+        # compute_score returns a dict with 'colbert', 'sparse', 'dense' keys
+        # Each value is a list of scores (one per pair)
+        scores = result["colbert"]
+
+        # Handle single-pair edge case: compute_score may return a scalar
+        if isinstance(scores, (int, float)):
+            scores = [float(scores)]
+        else:
+            scores = [float(s) for s in scores]
+
+        return RerankResponse(
+            scores=scores,
+            model=MODEL_NAME,
+            count=len(request.passages),
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Rerank error: {str(e)}")
+
+
 @app.get("/health", response_model=HealthResponse)
 async def health():
     """Health check endpoint."""
@@ -181,6 +239,7 @@ async def root():
         "endpoints": {
             "POST /embed": "Generate dense embeddings (backward compatible)",
             "POST /embed/multi": "Generate dense + sparse + colbert embeddings",
+            "POST /rerank": "Rerank passages using ColBERT late-interaction scoring",
             "GET /health": "Health check",
         },
     }
