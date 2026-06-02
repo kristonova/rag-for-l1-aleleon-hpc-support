@@ -60,6 +60,10 @@ def markdown_to_telegram_html(text: str) -> str:
     
     Escape semua karakter khusus HTML (<, >, &) lebih dulu, lalu
     mengubah blok kode, bold, dan italic ke tag HTML yang diizinkan.
+    
+    Code blocks (fenced dan inline) diekstrak ke placeholder terlebih dahulu
+    agar kontennya tidak terkena transformasi Markdown — penting untuk menjaga
+    karakter '#' pada skrip Slurm (#SBATCH, komentar, shebang).
     """
     if not text:
         return ""
@@ -67,18 +71,32 @@ def markdown_to_telegram_html(text: str) -> str:
     # Escape HTML entities dasar (seperti <, >, &) agar tidak merusak parser Telegram
     text = html.escape(text, quote=False)
 
-    # Fenced code blocks: ```lang\ncode\n```
-    def replace_code_block(m):
+    # === STEP 1: Ekstrak fenced code blocks ke placeholder ===
+    # Ini HARUS dilakukan sebelum transformasi Markdown lainnya agar konten
+    # di dalam code block (termasuk '#' untuk komentar/SBATCH) tidak berubah.
+    code_blocks = []
+    def _save_code_block(m):
         lang = m.group(1).strip()
         code = m.group(2)
+        idx = len(code_blocks)
         if lang:
-            return f'<pre><code class="language-{lang}">{code}</code></pre>'
-        return f'<pre><code>{code}</code></pre>'
-    
-    text = re.sub(r'```(\w*)\n?(.*?)```', replace_code_block, text, flags=re.DOTALL)
+            code_blocks.append(f'<pre><code class="language-{lang}">{code}</code></pre>')
+        else:
+            code_blocks.append(f'<pre><code>{code}</code></pre>')
+        return f'\x00CODEBLOCK{idx}\x00'
 
-    # Inline code: `code`
-    text = re.sub(r'`([^`\n]+)`', r'<code>\1</code>', text)
+    text = re.sub(r'```(\w*)\n?(.*?)```', _save_code_block, text, flags=re.DOTALL)
+
+    # === STEP 2: Ekstrak inline code ke placeholder ===
+    inline_codes = []
+    def _save_inline_code(m):
+        idx = len(inline_codes)
+        inline_codes.append(f'<code>{m.group(1)}</code>')
+        return f'\x00INLINECODE{idx}\x00'
+
+    text = re.sub(r'`([^`\n]+)`', _save_inline_code, text)
+
+    # === STEP 3: Transformasi Markdown (aman — tidak ada konten code block) ===
 
     # Bold: **bold** or __bold__
     text = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', text, flags=re.DOTALL)
@@ -96,6 +114,14 @@ def markdown_to_telegram_html(text: str) -> str:
 
     # Links: [text](url) → <a href="url">text</a>
     text = re.sub(r'\[([^\]]+)\]\(([^)]+)\)', r'<a href="\2">\1</a>', text)
+
+    # === STEP 4: Kembalikan inline code placeholders ===
+    for idx, code_html in enumerate(inline_codes):
+        text = text.replace(f'\x00INLINECODE{idx}\x00', code_html)
+
+    # === STEP 5: Kembalikan fenced code block placeholders ===
+    for idx, block_html in enumerate(code_blocks):
+        text = text.replace(f'\x00CODEBLOCK{idx}\x00', block_html)
 
     return text
 
