@@ -1,1 +1,2 @@
 [2026-06-03T07:33:26Z] Job saya berstatus PD dengan alasan AssocMaxWallDurationPerJobLimit. Di script saya menulis #SBATCH --time=4-00:00:00. Akun saya adalah akun perseorangan biasa. Mengapa tertahan?
+[2026-06-03T08:07:09Z] cari info atau dokumentasi tentang Wannier90, lalu buatkan slurm batch script jika saya ingin menggunakan sumber daya berikut: CPU, RAM 64 GB, durasi 1 hari. anda harus pake module Wannier90 yang terbaru.

@@ -6,6 +6,7 @@ Endpoint: POST /review-script  →  { "script": "..." }  →  { "review": "...",
 """
 
 import os
+import threading
 from datetime import datetime, timezone
 from pathlib import Path
 from fastapi import FastAPI, HTTPException
@@ -22,13 +23,14 @@ from rag_app import (
     create_rag_chain,
     review_script_hybrid,
     is_question_relevant,
+    sync_vectorstore,
 )
 
 # ── FastAPI App ──────────────────────────────────────────────
 app = FastAPI(
     title="ALELEON HPC RAG API",
     description="REST API untuk RAG L1 Support ALELEON HPC",
-    version="1.2.0",
+    version="1.3.0",
 )
 
 # ── Global variables (diisi saat startup) ────────────────────
@@ -36,6 +38,10 @@ rag_chain = None
 llm_api_url = None
 qdrant_client_global = None
 embeddings_global = None
+
+# ── Sync State ─────────────────────────────────────────────
+_sync_lock = threading.Lock()
+_sync_status = {"running": False, "last_result": None, "last_sync_time": None}
 
 
 # ── Pydantic Models ──────────────────────────────────────────
@@ -63,6 +69,12 @@ class ReviewScriptResponse(BaseModel):
     review: str
     issues_found: int
     policy_sources: Optional[List[SourceInfo]] = None
+
+
+class RefreshResponse(BaseModel):
+    status: str
+    result: Optional[dict] = None
+    message: Optional[str] = None
 
 
 # ── Startup Event ────────────────────────────────────────────
@@ -96,6 +108,13 @@ async def startup():
 
     # 4. RAG chain
     rag_chain = create_rag_chain(vectorstore, embeddings, llm_api_url=llm_api_url)
+
+    # 5. Startup sync — cek perubahan sitemap
+    print("[API] Checking sitemap for changes on startup...")
+    sync_result = sync_vectorstore(vectorstore, embeddings)
+    _sync_status["last_result"] = sync_result
+    _sync_status["last_sync_time"] = datetime.now(timezone.utc).isoformat()
+    print(f"[API] Startup sync: {sync_result}")
 
     print("[API] ✅ RAG chain siap menerima pertanyaan!")
 
@@ -229,12 +248,64 @@ async def health():
 async def root():
     return {
         "service": "ALELEON HPC RAG API",
-        "version": "1.2.0",
+        "version": "1.3.0",
         "endpoints": {
             "POST /ask": "Kirim pertanyaan ke RAG (retrieval + LLM)",
             "POST /review-script": "Review skrip Bash/Slurm (hybrid: LLM teknis + RAG kebijakan HPC)",
+            "POST /refresh": "Trigger incremental sync sitemap → Qdrant",
+            "GET /refresh/status": "Cek status sync terakhir",
             "GET /health": "Health check",
         },
+    }
+
+
+# ── Sync Endpoints ───────────────────────────────────────────
+@app.post("/refresh", response_model=RefreshResponse)
+async def refresh():
+    """
+    Trigger incremental sync sitemap → Qdrant.
+    Sync berjalan di background thread, tidak blocking API.
+
+    Contoh request:
+        curl -X POST http://localhost:8080/refresh
+    """
+    if qdrant_client_global is None or embeddings_global is None:
+        raise HTTPException(status_code=503, detail="Service belum siap.")
+
+    if _sync_status["running"]:
+        return RefreshResponse(
+            status="already_running",
+            message="Sync sedang berjalan. Cek GET /refresh/status untuk progress."
+        )
+
+    def _run_sync():
+        if not _sync_lock.acquire(blocking=False):
+            return
+        try:
+            _sync_status["running"] = True
+            result = sync_vectorstore(qdrant_client_global, embeddings_global)
+            _sync_status["last_result"] = result
+            _sync_status["last_sync_time"] = datetime.now(timezone.utc).isoformat()
+        finally:
+            _sync_status["running"] = False
+            _sync_lock.release()
+
+    thread = threading.Thread(target=_run_sync, daemon=True)
+    thread.start()
+
+    return RefreshResponse(
+        status="started",
+        message="Sync dimulai di background. Cek GET /refresh/status untuk progress."
+    )
+
+
+@app.get("/refresh/status")
+async def refresh_status():
+    """Cek status sync terakhir."""
+    return {
+        "running": _sync_status["running"],
+        "last_result": _sync_status["last_result"],
+        "last_sync_time": _sync_status["last_sync_time"],
     }
 
 

@@ -13,6 +13,7 @@ To run on terminal: podman-compose --profile rag-app run rag-app python rag_app.
 import os
 import requests
 import re
+import uuid
 from xml.etree import ElementTree
 from typing import List, Dict, Any
 from langchain_text_splitters import HTMLSectionSplitter, RecursiveCharacterTextSplitter
@@ -27,6 +28,9 @@ from qdrant_client.models import (
     Prefetch,
     FusionQuery,
     Fusion,
+    Filter,
+    FieldCondition,
+    MatchValue,
 )
 from openai import OpenAI
 from langchain_core.documents import Document
@@ -42,6 +46,7 @@ EMBEDDING_API_URL = os.getenv("EMBEDDING_API_URL", "http://embedding-service:800
 DENSE_DIM = 1024
 TOP_K = 10
 RERANK_FETCH_MULTIPLIER = 2  # Fetch 2× TOP_K dari Qdrant, rerank ke TOP_K
+SITEMAP_URL = "https://wiki.efisonlt.com/sitemap/sitemap-wiki.efisonlt.com-0.xml"
 
 
 class EmbeddingServiceClient(Embeddings):
@@ -137,6 +142,97 @@ class EmbeddingServiceClient(Embeddings):
         )
         resp.raise_for_status()
         return resp.json()["scores"]
+
+
+def parse_sitemap(sitemap_url):
+    """
+    Parse sitemap XML → dict {url: lastmod_str}.
+    Filters out non-webpage URLs (Berkas, File, Special pages).
+    """
+    print("    Mengambil sitemap...")
+    resp = requests.get(sitemap_url, timeout=30)
+    resp.raise_for_status()
+    root = ElementTree.fromstring(resp.content)
+    ns = {"ns": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+
+    sitemap_data = {}
+    for url_elem in root.findall(".//ns:url", ns):
+        loc = url_elem.find("ns:loc", ns)
+        lastmod = url_elem.find("ns:lastmod", ns)
+        if loc is not None and loc.text:
+            sitemap_data[loc.text] = lastmod.text if lastmod is not None else ""
+
+    print(f"    → {len(sitemap_data)} URL ditemukan di sitemap")
+
+    NON_WEBPAGE_PATTERNS = [
+        "/wiki/Berkas:",
+        "/wiki/File:",
+        "/wiki/Istimewa:",
+        "/wiki/Special:",
+    ]
+    filtered = {
+        url: lm for url, lm in sitemap_data.items()
+        if not any(pattern in url for pattern in NON_WEBPAGE_PATTERNS)
+    }
+    skipped = len(sitemap_data) - len(filtered)
+    print(f"    → {len(filtered)} webpage URL (di-skip {skipped} non-webpage)")
+    return filtered
+
+
+def scrape_wiki_pages(urls, url_lastmod_map=None, requests_per_second=2):
+    """
+    Scrape list of wiki URLs → list of Document splits.
+    Each Document gets 'lastmod' metadata if url_lastmod_map is provided.
+    """
+    headers_to_split_on = [
+        ("h1", "Header 1"),
+        ("h2", "Header 2"),
+        ("h3", "Header 3"),
+    ]
+    html_splitter = HTMLSectionSplitter(headers_to_split_on=headers_to_split_on)
+
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=4500,
+        chunk_overlap=900,
+        separators=["\n---", "\n\n", "\n", " "],
+    )
+
+    all_splits = []
+
+    for i, url in enumerate(urls):
+        try:
+            time.sleep(1.0 / requests_per_second)
+            page_resp = requests.get(url, timeout=30)
+            soup = BeautifulSoup(page_resp.content, "lxml")
+
+            content_div = soup.find("div", {"id": "mw-content-text"})
+            if not content_div:
+                continue
+
+            content_html = str(content_div)
+            page_title = url.split("/wiki/")[-1].replace("_", " ") if "/wiki/" in url else url
+
+            html_docs = html_splitter.split_text(content_html)
+
+            for doc in html_docs:
+                doc.metadata["source"] = url
+                doc.metadata["title"] = page_title
+                if url_lastmod_map and url in url_lastmod_map:
+                    doc.metadata["lastmod"] = url_lastmod_map[url]
+
+                if len(doc.page_content) > 4500:
+                    sub_splits = text_splitter.split_documents([doc])
+                    all_splits.extend(sub_splits)
+                else:
+                    all_splits.append(doc)
+
+            print(f"    [{i+1}/{len(urls)}] {page_title}: {len(html_docs)} sections")
+
+        except Exception as e:
+            print(f"    [{i+1}/{len(urls)}] ERROR {url}: {e}")
+            continue
+
+    return all_splits
 
 
 def load_wiki_documents(sitemap_url, requests_per_second=2):
@@ -245,7 +341,7 @@ def build_vectorstore(embeddings: EmbeddingServiceClient) -> QdrantClient:
     """
     print("[1] Membaca & splitting halaman wiki berdasarkan struktur HTML...")
     splits = load_wiki_documents(
-        sitemap_url="https://wiki.efisonlt.com/sitemap/sitemap-wiki.efisonlt.com-0.xml",
+        sitemap_url=SITEMAP_URL,
         requests_per_second=2,
     )
 
@@ -290,7 +386,7 @@ def build_vectorstore(embeddings: EmbeddingServiceClient) -> QdrantClient:
             sp = multi["sparse"][j]
             points.append(
                 PointStruct(
-                    id=j,
+                    id=str(uuid.uuid4()),
                     vector={
                         "dense": multi["dense"][j],
                         "text-sparse": SparseVector(
@@ -321,6 +417,210 @@ def load_vectorstore(embeddings: EmbeddingServiceClient) -> QdrantClient:
     print(f"    ✅ Berhasil memuat collection '{QDRANT_COLLECTION_NAME}' ({count} points)")
 
     return client
+
+
+def get_stored_sitemap_state(client):
+    """
+    Scroll through Qdrant collection → {source_url: lastmod} for all unique source URLs.
+    """
+    stored = {}
+    offset = None
+    while True:
+        points, next_offset = client.scroll(
+            collection_name=QDRANT_COLLECTION_NAME,
+            limit=100,
+            offset=offset,
+            with_payload=["source", "lastmod"],
+            with_vectors=False,
+        )
+        for point in points:
+            source = point.payload.get("source", "")
+            if source and source not in stored:
+                stored[source] = point.payload.get("lastmod", "")
+        if next_offset is None or len(points) == 0:
+            break
+        offset = next_offset
+    return stored
+
+
+def _migrate_add_lastmod(client, sitemap_data):
+    """
+    One-time migration: add lastmod to existing points that don't have it.
+    Handles collections built before the sync feature was added.
+    """
+    points, _ = client.scroll(
+        collection_name=QDRANT_COLLECTION_NAME,
+        limit=1,
+        with_payload=["lastmod"],
+        with_vectors=False,
+    )
+    if not points:
+        return
+    if points[0].payload.get("lastmod"):
+        return  # Already has lastmod
+
+    print("[MIGRATE] Menambahkan metadata lastmod ke points yang sudah ada...")
+
+    url_to_point_ids = {}
+    offset = None
+    total_points = 0
+    while True:
+        batch, next_offset = client.scroll(
+            collection_name=QDRANT_COLLECTION_NAME,
+            limit=100,
+            offset=offset,
+            with_payload=["source"],
+            with_vectors=False,
+        )
+        for point in batch:
+            source = point.payload.get("source", "")
+            if source:
+                url_to_point_ids.setdefault(source, []).append(point.id)
+                total_points += 1
+        if next_offset is None or len(batch) == 0:
+            break
+        offset = next_offset
+
+    updated = 0
+    for url, point_ids in url_to_point_ids.items():
+        lastmod = sitemap_data.get(url, "")
+        if lastmod:
+            client.set_payload(
+                collection_name=QDRANT_COLLECTION_NAME,
+                payload={"lastmod": lastmod},
+                points=point_ids,
+            )
+            updated += len(point_ids)
+
+    print(f"[MIGRATE] ✅ {updated}/{total_points} points diperbarui dengan lastmod")
+
+
+def sync_vectorstore(client, embeddings):
+    """
+    Incremental sync: bandingkan sitemap terkini dengan data di Qdrant,
+    scrape + embed + upsert hanya halaman yang berubah/baru.
+    Hapus halaman yang sudah tidak ada di sitemap.
+
+    Return: dict {new, updated, deleted, unchanged, error}
+    """
+    print("\n[SYNC] Memulai incremental sync sitemap → Qdrant...")
+
+    try:
+        # 1. Parse sitemap terkini
+        sitemap_data = parse_sitemap(SITEMAP_URL)
+        if not sitemap_data:
+            return {"new": 0, "updated": 0, "deleted": 0, "unchanged": 0,
+                    "error": "Sitemap kosong atau tidak bisa diakses"}
+
+        # 2. Migrate: tambahkan lastmod jika belum ada (one-time)
+        _migrate_add_lastmod(client, sitemap_data)
+
+        # 3. Get stored state dari Qdrant
+        stored_data = get_stored_sitemap_state(client)
+        print(f"    📊 Sitemap: {len(sitemap_data)} URLs | Qdrant: {len(stored_data)} URLs")
+
+        # 4. Bandingkan
+        sitemap_urls = set(sitemap_data.keys())
+        stored_urls = set(stored_data.keys())
+
+        new_urls = sitemap_urls - stored_urls
+        deleted_urls = stored_urls - sitemap_urls
+        common_urls = sitemap_urls & stored_urls
+        changed_urls = {
+            url for url in common_urls
+            if sitemap_data[url] != stored_data[url]
+        }
+        unchanged_count = len(common_urls) - len(changed_urls)
+
+        print(f"    📊 New: {len(new_urls)} | Updated: {len(changed_urls)} | "
+              f"Deleted: {len(deleted_urls)} | Unchanged: {unchanged_count}")
+
+        if not new_urls and not changed_urls and not deleted_urls:
+            print("[SYNC] ✅ Tidak ada perubahan di sitemap. Semua up-to-date!")
+            return {"new": 0, "updated": 0, "deleted": 0,
+                    "unchanged": unchanged_count, "error": None}
+
+        # 5. Hapus points untuk URL yang berubah atau dihapus
+        urls_to_delete = changed_urls | deleted_urls
+        for url in urls_to_delete:
+            try:
+                client.delete(
+                    collection_name=QDRANT_COLLECTION_NAME,
+                    points_selector=Filter(
+                        must=[FieldCondition(
+                            key="source", match=MatchValue(value=url)
+                        )]
+                    ),
+                )
+            except Exception as e:
+                print(f"    ⚠️  Gagal hapus points untuk {url}: {e}")
+        if urls_to_delete:
+            print(f"    🗑️  Dihapus points dari {len(urls_to_delete)} URL")
+
+        # 6. Scrape + embed + upsert URL baru dan yang berubah
+        urls_to_scrape = list(new_urls | changed_urls)
+        if urls_to_scrape:
+            print(f"    🔄 Scraping {len(urls_to_scrape)} halaman...")
+            splits = scrape_wiki_pages(
+                urls_to_scrape,
+                url_lastmod_map=sitemap_data,
+                requests_per_second=2,
+            )
+
+            # Tambahkan label sumber
+            for s in splits:
+                title = s.metadata.get("title", "Unknown")
+                header = s.metadata.get("Header 2", s.metadata.get("Header 3", ""))
+                prefix = f"[Sumber: {title}]"
+                if header:
+                    prefix += f" [Section: {header}]"
+                s.page_content = f"{prefix}\n{s.page_content}"
+
+            if splits:
+                texts = [s.page_content for s in splits]
+                metadatas = [s.metadata for s in splits]
+
+                print(f"    🧮 Generating embeddings untuk {len(texts)} chunks...")
+                multi = embeddings.embed_multi(texts, batch_size=16)
+
+                batch_size = 32
+                for i in range(0, len(texts), batch_size):
+                    points = []
+                    for j in range(i, min(i + batch_size, len(texts))):
+                        sp = multi["sparse"][j]
+                        points.append(
+                            PointStruct(
+                                id=str(uuid.uuid4()),
+                                vector={
+                                    "dense": multi["dense"][j],
+                                    "text-sparse": SparseVector(
+                                        indices=sp["indices"], values=sp["values"]
+                                    ),
+                                },
+                                payload={"text": texts[j], **metadatas[j]},
+                            )
+                        )
+                    client.upsert(QDRANT_COLLECTION_NAME, points)
+
+                print(f"    ✅ {len(texts)} chunks di-upsert ke Qdrant")
+            else:
+                print(f"    ⚠️  Tidak ada konten dari {len(urls_to_scrape)} URL")
+
+        total_count = client.get_collection(QDRANT_COLLECTION_NAME).points_count
+        print(f"[SYNC] ✅ Selesai! Total points di Qdrant: {total_count}")
+
+        return {
+            "new": len(new_urls),
+            "updated": len(changed_urls),
+            "deleted": len(deleted_urls),
+            "unchanged": unchanged_count,
+            "error": None,
+        }
+
+    except Exception as e:
+        error_msg = f"Sync error: {str(e)[:300]}"
+        print(f"[SYNC] ❌ {error_msg}")
+        return {"new": 0, "updated": 0, "deleted": 0, "unchanged": 0, "error": error_msg}
 
 
 def wait_for_vllm(api_url, timeout=600, interval=10):

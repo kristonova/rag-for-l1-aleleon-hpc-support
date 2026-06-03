@@ -23,13 +23,15 @@ A Retrieval-Augmented Generation (RAG) system that serves as an AI assistant for
 │  └─────────────────┘ │ Port 8000            │ └──────────┘                    │
 │                       └──────────────────────┘                                │
 │  Layanan Aplikasi:                                                            │
-│  ┌──────────────┐ ┌──────────────┐ ┌───────────────┐                          │
-│  │   rag-app    │ │   rag-api    │ │ telegram-bot  │                          │
-│  │ (CLI Interak)│ │ (REST API)   │ │ (/ask,        │                          │
-│  │              │ │ Port 8080    │ │  /askscript)  │                          │
-│  │              │ │ /ask         │ │               │                          │
-│  │              │ │ /review-script│ │              │                          │
-│  └──────────────┘ └──────────────┘ └───────────────┘                          │
+│  ┌──────────────┐ ┌────────────────────┐ ┌───────────────┐                    │
+│  │   rag-app    │ │      rag-api       │ │ telegram-bot  │                    │
+│  │ (CLI Interak)│ │ (REST API)         │ │ (/ask,        │                    │
+│  │              │ │ Port 8080          │ │  /askscript)  │                    │
+│  │              │ │ /ask               │ │               │                    │
+│  │              │ │ /review-script     │ │               │                    │
+│  │              │ │ /refresh           │ │               │                    │
+│  │              │ │ (Mount: ./logs)    │ │               │                    │
+│  └──────────────┘ └────────────────────┘ └───────────────┘                    │
 └───────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -74,10 +76,10 @@ rag-for-l1-aleleon-hpc-support/
 
 The application runs in three phases:
 
-### Phase 1 — Data Ingestion (Wiki Sitemap → HTML Structural Splitting)
+### Phase 1 — Data Ingestion (Incremental Sync)
 
-1. **Sitemap Parsing** — Fetches the wiki sitemap XML from `https://wiki.efisonlt.com/sitemap/sitemap-wiki.efisonlt.com-NS_0-0.xml` and extracts all page URLs.
-2. **HTML Fetching** — Downloads each wiki page and extracts the main content from `<div id="mw-content-text">` using BeautifulSoup (preserving raw HTML).
+1. **Sitemap Parsing & Incremental Sync** — Fetches the wiki sitemap XML and extracts all page URLs along with their `<lastmod>` (last modified) timestamp. The system compares this with metadata in the Qdrant database to perform an **incremental update** (only scraping new or updated pages, and deleting removed pages) instead of a full rebuild.
+2. **HTML Fetching** — Downloads the required wiki pages and extracts the main content from `<div id="mw-content-text">` using BeautifulSoup (preserving raw HTML).
 3. **Structure-Based Splitting** — Uses `HTMLSectionSplitter` to split content by heading tags (`h1`, `h2`, `h3`), preserving document structure.
 4. **Fallback Splitting** — Chunks larger than 4500 characters are further split using `RecursiveCharacterTextSplitter` (chunk size: 4500, overlap: 900).
 5. **Metadata Enrichment** — Each chunk gets labeled with `[Sumber: <page_title>] [Section: <heading>]` prefix for source attribution.
@@ -277,6 +279,24 @@ Managed via Poetry (`pyproject.toml`):
 - **requests** — HTTP calls to embedding-service and health checks
 - **beautifulsoup4** / **lxml** — HTML parsing for wiki page extraction
 - **vLLM** — High-performance LLM inference engine (inside the vllm-rocm container)
+
+## New Features
+
+### 1. Persistent Question Logging
+Every user question sent to the `/ask` endpoint is automatically logged with a UTC timestamp. These logs are saved persistently to a mounted volume (`./output/logs` on the host mapped to `/app/logs` in the container) in the `user_questions.logs` file. This is useful for auditing and understanding user behavior.
+
+### 2. Incremental Sitemap Sync
+The `rag-api` service automatically detects changes to the wiki source by reading the `<lastmod>` tags in the `sitemap.xml`.
+- **Startup Sync:** When the container starts, it automatically syncs with the wiki, making sure Qdrant is up-to-date.
+- **Manual Sync via API:** You can manually trigger a background sync without restarting the container:
+  ```bash
+  # Start the sync in the background
+  curl -X POST http://localhost:8080/refresh
+  
+  # Check the status of the sync
+  curl -X GET http://localhost:8080/refresh/status
+  ```
+The sync process is smart: it skips unchanged pages, deletes pages removed from the sitemap, and only scrapes/embeds newly added or recently modified pages.
 
 ## License
 
