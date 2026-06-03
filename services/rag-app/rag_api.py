@@ -101,11 +101,13 @@ async def startup():
 
 
 # ── Question Logger ──────────────────────────────────────────
-_LOG_FILE = Path(__file__).resolve().parent / "user_questions.logs"
+_LOG_DIR = Path(__file__).resolve().parent / "logs"
+_LOG_DIR.mkdir(parents=True, exist_ok=True)
+_LOG_FILE = _LOG_DIR / "user_questions.logs"
 
 
 def _log_question(question: str) -> None:
-    """Append timestamped question to user_questions.logs."""
+    """Append timestamped question to logs/user_questions.logs."""
     try:
         timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         with open(_LOG_FILE, "a", encoding="utf-8") as f:

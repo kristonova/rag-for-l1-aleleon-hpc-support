@@ -207,6 +207,8 @@ services:
       - api
     ports:
       - "8080:8080"
+    volumes:
+      - ./output/logs:/app/logs
     environment:
       - EMBEDDING_API_URL=http://embedding-service:8001
       - LLM_API_URL=http://vllm-rocm:8000/v1
