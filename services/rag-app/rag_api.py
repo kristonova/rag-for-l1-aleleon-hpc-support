@@ -6,6 +6,8 @@ Endpoint: POST /review-script  →  { "script": "..." }  →  { "review": "...",
 """
 
 import os
+from datetime import datetime, timezone
+from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional
@@ -98,6 +100,20 @@ async def startup():
     print("[API] ✅ RAG chain siap menerima pertanyaan!")
 
 
+# ── Question Logger ──────────────────────────────────────────
+_LOG_FILE = Path(__file__).resolve().parent / "user_questions.logs"
+
+
+def _log_question(question: str) -> None:
+    """Append timestamped question to user_questions.logs."""
+    try:
+        timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        with open(_LOG_FILE, "a", encoding="utf-8") as f:
+            f.write(f"[{timestamp}] {question}\n")
+    except Exception as e:
+        print(f"[API] ⚠️  Gagal menulis log pertanyaan: {e}")
+
+
 # ── Endpoints ────────────────────────────────────────────────
 @app.post("/ask", response_model=AskResponse)
 async def ask(req: AskRequest):
@@ -111,6 +127,9 @@ async def ask(req: AskRequest):
     """
     if rag_chain is None:
         raise HTTPException(status_code=503, detail="RAG chain belum siap, coba lagi nanti.")
+
+    # Log pertanyaan user ke file .logs
+    _log_question(req.question)
 
     try:
         result = rag_chain(req.question)
