@@ -1,2 +1,18 @@
 [2026-06-03T07:33:26Z] Job saya berstatus PD dengan alasan AssocMaxWallDurationPerJobLimit. Di script saya menulis #SBATCH --time=4-00:00:00. Akun saya adalah akun perseorangan biasa. Mengapa tertahan?
 [2026-06-03T08:07:09Z] cari info atau dokumentasi tentang Wannier90, lalu buatkan slurm batch script jika saya ingin menggunakan sumber daya berikut: CPU, RAM 64 GB, durasi 1 hari. anda harus pake module Wannier90 yang terbaru.
+[2026-06-03T08:12:41Z] Perintah apa yang harus saya ketik di terminal untuk melihat daftar environment python/pyload yang saya buat?
+[2026-06-03T08:15:27Z] Saya ingin buka sesi interaktif JupyterLab menggunakan GPU. Apa bedanya partisi torti dan tilla, dan mana yang harus saya pilih?
+[2026-06-03T08:20:33Z] File upload saya ukurannya 500 MB. Kenapa saya selalu gagal upload lewat menu Files di EWS, dan apa solusi spesifik serta alamat host yang harus saya gunakan?
+[2026-06-03T08:22:43Z] Jika saya menjalankan batch job lalu tiba-tiba koneksi internet rumah saya mati dan laptop saya disconnect dari VPN ALELEON, apakah job saya di Slurm ikut berhenti?
+[2026-06-03T09:18:52Z] Bagaimana langkah-langkah submit job menggunakan aplikasi MATLAB di ALELEON?
+[2026-06-03T09:21:27Z] Apakah saya bisa menginstal package R menggunakan perintah conda install r-seurat di ALELEON?
+[2026-06-03T09:23:16Z] Berapa kapasitas ukuran penyimpanan (storage) SSD untuk satu node Login di ALELEON?
+[2026-06-03T09:24:38Z] Siapa nama Chief Technology Officer (CTO) dari EFISON yang membangun ALELEON ini?
+[2026-06-03T09:24:54Z] Siapa nama Chief Technology Officer (CTO) dari EFISON
+[2026-06-03T09:25:09Z] Apa password standar/bawaan dari admin sebelum saya menggantinya di awal?
+[2026-06-03T09:55:13Z] Saya mencoba mengisi form Sesi JupyterLab di EFIRO. Saya set waktu 3 hari (72 jam) dan minta 1 GPU. Namun tombol Launch ditolak karena saldo kurang. Jika sisa kuota GPU Hour (GH) saya tinggal 50 GH, berapa maksimal hari/jam yang bisa saya ajukan?
+[2026-06-04T07:36:08Z] list semua software pre dan post processing dari quantum espresso
+[2026-06-04T08:04:22Z] Siapa nama Chief Technology Officer (CTO) dari EFISON
+[2026-06-05T06:31:57Z] Siapa nama Chief Technology Officer (CTO) dari EFISON
+[2026-06-05T06:34:28Z] cari info atau dokumentasi tentang Wannier90, lalu buatkan slurm batch script jika saya ingin menggunakan sumber daya berikut: CPU, RAM 64 GB, durasi 1 hari. anda harus pake module Wannier90 yang terbaru.
+[2026-06-05T06:51:32Z] cari info atau dokumentasi tentang scikit-learn, lalu buatkan slurm batch script jika saya ingin menggunakan sumber daya berikut: CPU, RAM 64 GB, durasi 1 hari. anda harus pake module AI compilation yang terbaru.

@@ -3,24 +3,47 @@
 ## Arsitektur Keseluruhan
 
 ```
-┌──────────────────────────────────────────────────────────────────────────┐
-│                    Pipeline RAG (Kontainer Podman)                       │
-│                                                                          │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────┐  ┌─────────────┐      │
-│  │   INGESTI    │→ │  EMBEDDING   │→ │ RETRIEVAL │→ │  GENERASI   │      │
-│  │  (HTML Wiki) │  │ + Penyimpanan│  │  (Pencarian)│ │   (LLM)     │      │
-│  └──────────────┘  └──────────────┘  └──────────┘  └─────────────┘      │
-│                                                                          │
-│  Fase 1: Ambil & Split   Fase 2: Vektorisasi   Fase 3: Menjawab          │
-│                                                                          │
-│  Layanan:                                                                │
-│  ┌─────────────────┐ ┌─────────────┐ ┌──────────┐ ┌──────────────┐      │
-│  │ embedding-service│ │  vllm-rocm  │ │  qdrant  │ │   rag-app    │      │
-│  │ (BAAI/bge-m3)   │ │ (Qwen3.5)   │ │ (Vektor) │ │ (Orkestrator)│      │
-│  │ Port 8001       │ │ Port 8000   │ │ Port 6333│ │              │      │
-│  └─────────────────┘ └─────────────┘ └──────────┘ └──────────────┘      │
-└──────────────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                Pipeline RAG — Microservices (Kontainer Podman)                │
+│                                                                              │
+│  ┌──────────────┐  ┌──────────────────┐  ┌───────────────┐  ┌───────────┐   │
+│  │   INGESTI    │→ │    EMBEDDING     │→ │   RETRIEVAL   │→ │  GENERASI │   │
+│  │  (HTML Wiki) │  │ Dense+Sparse+    │  │ Hybrid Search │  │   (LLM)   │   │
+│  │              │  │ ColBERT Rerank   │  │ + RRF Fusion  │  │           │   │
+│  └──────────────┘  └──────────────────┘  └───────────────┘  └───────────┘   │
+│                                                                              │
+│  Fase 1: Ambil & Split   Fase 2: Vektorisasi   Fase 3: Menjawab             │
+│                                                                              │
+│  Layanan:                                                                    │
+│  ┌─────────────────┐ ┌─────────────┐ ┌──────────┐ ┌──────────────┐          │
+│  │ embedding-service│ │  vllm-rocm  │ │  qdrant  │ │   rag-api    │          │
+│  │ (BAAI/bge-m3)   │ │ (Qwen3.5)   │ │ (Vektor) │ │ (REST API)   │          │
+│  │ Port 8001       │ │ Port 8000   │ │ Port 6333│ │ Port 8080    │          │
+│  │ Dense+Sparse+   │ │ OpenAI API  │ │ REST+gRPC│ │ /ask         │          │
+│  │ ColBERT Rerank  │ │             │ │          │ │ /review-script│          │
+│  └─────────────────┘ └─────────────┘ └──────────┘ │ /refresh     │          │
+│                                                    └──────┬───────┘          │
+│                                                           │                  │
+│                                                    ┌──────┴───────┐          │
+│                                                    │ telegram-bot │          │
+│                                                    │ /ask         │          │
+│                                                    │ /askscript   │          │
+│                                                    └──────────────┘          │
+└──────────────────────────────────────────────────────────────────────────────┘
 ```
+
+### Komponen Microservices
+
+| Service | Deskripsi | Port | Profile |
+|---|---|---|---|
+| `embedding-service` | REST API embedding BAAI/bge-m3 (dense + sparse + ColBERT reranking) | 8001 | infra |
+| `vllm-rocm` | LLM inference Qwen3.5-35B via OpenAI-compatible API (AMD ROCm) | 8000 | infra |
+| `qdrant` | Database vektor persisten (dense + sparse hybrid collection) | 6333, 6334 | infra |
+| `rag-api` | FastAPI REST API — orkestrator RAG (`/ask`, `/review-script`, `/refresh`) | 8080 | api |
+| `telegram-bot` | Bot Telegram — `/ask` dan `/askscript` via RAG API | — | telegram |
+| `benchmark` | Benchmark retrieval (Dense vs Sparse vs Hybrid) | — | benchmark |
+| `benchmark-ttft` | Benchmark TTFT/latency concurrency test | — | benchmark-ttft |
+| `promtail` | Log scraping ke Grafana Loki | — | monitoring |
 
 ---
 
@@ -30,23 +53,34 @@
 
 ```python
 if qdrant_collection_exists():
-    vectorstore = load_vectorstore(embeddings)
+    qdrant_client = load_vectorstore(embeddings)
 else:
-    vectorstore = build_vectorstore(embeddings)
+    qdrant_client = build_vectorstore(embeddings)
 ```
 
 **Yang terjadi:**
-- Sebelum scraping, sistem memeriksa apakah koleksi Qdrant (`wiki_aleleon`) sudah ada di server Qdrant.
-- Jika ada dan berisi data → **scraping dilewati sepenuhnya** dan vektor dimuat dari Qdrant.
+- Sebelum scraping, sistem memeriksa apakah koleksi Qdrant (`wiki_aleleon_qdrant`) sudah ada di **server Qdrant** (`http://qdrant:6333`).
+- Jika ada dan berisi data → **scraping dilewati sepenuhnya** dan koneksi ke Qdrant dimuat langsung.
 - Jika belum ada → lanjutkan ke pipeline ingesti lengkap di bawah.
 - Qdrant dipersistenkan melalui named volume Podman (`qdrant-data:/qdrant/storage`), sehingga data tetap ada saat container restart.
-- Untuk memaksa scraping ulang (misalnya konten wiki berubah): hapus koleksi di Qdrant melalui dashboard (`http://localhost:6333/dashboard`) atau hapus volume dengan `podman volume rm rag-for-l1-aleleon-hpc-support_qdrant-data`.
+- Untuk memaksa scraping ulang (misalnya konten wiki berubah): hapus koleksi di Qdrant melalui dashboard (`http://localhost:6333/dashboard`), gunakan endpoint `POST /refresh` untuk incremental sync, atau hapus volume dengan `podman volume rm rag-for-l1-aleleon-hpc-support_qdrant-data`.
 
-### Langkah 1 — Parse Sitemap XML
+```python
+def qdrant_collection_exists() -> bool:
+    """Cek apakah collection Qdrant sudah ada dan berisi data."""
+    try:
+        client = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY)
+        collections = client.get_collections().collections
+        return any(c.name == QDRANT_COLLECTION_NAME for c in collections)
+    except Exception:
+        return False
+```
+
+### Langkah 1 — Parse Sitemap XML + Filter Non-Webpage
 
 ```python
 splits = load_wiki_documents(
-    sitemap_url="https://wiki.efisonlt.com/sitemap/sitemap-wiki.efisonlt.com-NS_0-0.xml",
+    sitemap_url="https://wiki.efisonlt.com/sitemap/sitemap-wiki.efisonlt.com-0.xml",
     requests_per_second=2,
 )
 ```
@@ -54,23 +88,37 @@ splits = load_wiki_documents(
 **Yang terjadi:**
 - Fungsi mengambil file **sitemap XML** wiki.
 - XML diparse untuk mengekstrak semua URL `<loc>` — ini adalah seluruh alamat halaman wiki.
+- **URL non-webpage difilter** — halaman file/gambar (Berkas:, File:) dan halaman spesial (Istimewa:, Special:) dibuang.
 - Dibatasi 2 request per detik agar tidak membebani server wiki.
 
 ```python
 resp = requests.get(sitemap_url)
 root = ElementTree.fromstring(resp.content)
 ns = {"ns": "http://www.sitemaps.org/schemas/sitemap/0.9"}
-urls = [loc.text for loc in root.findall(".//ns:loc", ns)]
+all_urls = [loc.text for loc in root.findall(".//ns:loc", ns)]
+
+# Filter: buang URL halaman file (Berkas:) yang bukan webpage
+NON_WEBPAGE_PATTERNS = [
+    "/wiki/Berkas:",   # MediaWiki file description pages
+    "/wiki/File:",     # English alias for file pages
+    "/wiki/Istimewa:", # Special pages
+    "/wiki/Special:",  # Special pages (English)
+]
+urls = [
+    u for u in all_urls
+    if u and not any(pattern in u for pattern in NON_WEBPAGE_PATTERNS)
+]
 ```
 
 ```
 Sitemap XML
     │
-    ▼  Parse tag <loc>
+    ▼  Parse tag <loc> + filter non-webpage
 ┌──────────────────────────────────────────────────┐
-│ URL 1: https://wiki.efisonlt.com/wiki/Spesifikasi│
-│ URL 2: https://wiki.efisonlt.com/wiki/Conda_Env  │
-│ URL 3: https://wiki.efisonlt.com/wiki/MPI_Guide  │
+│ URL 1: https://wiki.efisonlt.com/wiki/Spesifikasi│ ✅ webpage
+│ URL 2: https://wiki.efisonlt.com/wiki/Conda_Env  │ ✅ webpage
+│ URL 3: https://wiki.efisonlt.com/wiki/Berkas:x.png│ ❌ di-skip
+│ URL 4: https://wiki.efisonlt.com/wiki/MPI_Guide  │ ✅ webpage
 │ ...                                              │
 └──────────────────────────────────────────────────┘
 ```
@@ -240,19 +288,20 @@ Ini penting untuk:
 
 ---
 
-## FASE 2: Embedding + Basis Data Vektor
+## FASE 2: Embedding + Basis Data Vektor (Hybrid: Dense + Sparse)
 
-### Langkah 6 — Embedding Vektor via Layanan API
+### Langkah 6 — Embedding Vektor Multi-Mode via API
 
 ```python
 embeddings = EmbeddingServiceClient()
 ```
 
-Embedding tidak lagi dijalankan secara lokal. Sekarang menggunakan **embedding-service** — sebuah container Podman terpisah yang melayani model `BAAI/bge-m3` via REST API.
+Embedding menggunakan **embedding-service** — sebuah container Podman terpisah yang melayani model `BAAI/bge-m3` via REST API. Service ini mendukung **tiga mode embedding**:
 
 ```python
 class EmbeddingServiceClient(Embeddings):
     def _call_api(self, texts: List[str]) -> List[List[float]]:
+        """Dense-only embedding via /embed."""
         response = requests.post(
             f"{self.api_url}/embed",
             json={"texts": texts},
@@ -261,220 +310,373 @@ class EmbeddingServiceClient(Embeddings):
         response.raise_for_status()
         return response.json()["embeddings"]
 
-    def embed_documents(self, texts: List[str], batch_size: int = 32) -> List[List[float]]:
-        all_embeddings = []
+    def embed_multi(self, texts: List[str], batch_size: int = 16) -> Dict[str, Any]:
+        """Multi-mode embedding (dense + sparse) via /embed/multi."""
+        all_dense, all_sparse = [], []
         for i in range(0, len(texts), batch_size):
             batch = texts[i : i + batch_size]
-            all_embeddings.extend(self._call_api(batch))
-        return all_embeddings
+            resp = requests.post(
+                f"{self.api_url}/embed/multi",
+                json={
+                    "texts": batch,
+                    "return_dense": True,
+                    "return_sparse": True,
+                    "return_colbert": False,
+                },
+                timeout=600,
+            )
+            resp.raise_for_status()
+            data = resp.json()
+            if data.get("dense"):
+                all_dense.extend(data["dense"])
+            if data.get("sparse"):
+                all_sparse.extend(data["sparse"])
+        return {"dense": all_dense, "sparse": all_sparse}
 
-    def embed_query(self, text: str) -> List[float]:
-        return self._call_api([text])[0]
+    def rerank(self, query: str, passages: List[str]) -> List[float]:
+        """ColBERT reranking via /rerank."""
+        resp = requests.post(
+            f"{self.api_url}/rerank",
+            json={"query": query, "passages": passages},
+            timeout=120,
+        )
+        resp.raise_for_status()
+        return resp.json()["scores"]
 ```
 
-**Arsitektur:**
+**Arsitektur Multi-Mode Embedding Service:**
 
 ```
-rag-app container                    embedding-service container
-┌──────────────────┐                ┌──────────────────────────┐
-│ EmbeddingService │  HTTP POST     │ FastAPI + SentenceTransf.│
-│ Client           │ ──────────→    │ BAAI/bge-m3              │
-│ (LangChain       │  /embed       │ model.encode(texts)      │
-│  Embeddings)     │ ←──────────    │                          │
-│                  │  JSON response │ Port 8001                │
-└──────────────────┘                └──────────────────────────┘
+rag-app / rag-api container          embedding-service container
+┌──────────────────────┐            ┌──────────────────────────────────┐
+│ EmbeddingService     │            │ FastAPI + FlagEmbedding          │
+│ Client               │            │ BGEM3FlagModel (BAAI/bge-m3)    │
+│                      │            │                                  │
+│ embed_documents()    │  /embed    │ → Dense vectors (1024D)         │
+│ embed_query()        │ ─────────→ │                                  │
+│                      │            │                                  │
+│ embed_multi()        │ /embed/    │ → Dense + Sparse (lexical       │
+│ embed_query_multi()  │  multi     │   weights) + ColBERT (optional) │
+│                      │ ─────────→ │                                  │
+│                      │            │                                  │
+│ rerank()             │ /rerank    │ → ColBERT late-interaction      │
+│                      │ ─────────→ │   scoring (passage reranking)   │
+│                      │            │                                  │
+│                      │ ←───────── │ JSON response                   │
+│                      │            │ Port 8001                       │
+└──────────────────────┘            └──────────────────────────────────┘
 ```
 
-**Batching:** Dokumen di-embed dalam batch @32 teks per request, bukan semua sekaligus. Ini mencegah timeout karena model besar.
+**Tiga Mode Embedding:**
+
+| Mode | Endpoint | Deskripsi | Digunakan saat |
+|---|---|---|---|
+| **Dense** | `POST /embed` | Vektor padat 1024 dimensi | Query sederhana, backward-compatible |
+| **Multi (Dense + Sparse)** | `POST /embed/multi` | Dense + Sparse (lexical weights) sekaligus | Ingestion (simpan kedua vektor ke Qdrant) |
+| **ColBERT Rerank** | `POST /rerank` | ColBERT late-interaction scoring | Post-retrieval reranking |
+
+**Batching:** Saat ingestion, dokumen di-embed dalam batch @16 teks per request via `/embed/multi`. Saat query, `embed_query_multi()` mengirim 1 teks.
 
 ```
-450 chunks total:
-  Batch  1/15: texts[  0: 32] → POST /embed → 32 vectors
-  Batch  2/15: texts[ 32: 64] → POST /embed → 32 vectors
+~450 chunks total (ingestion via /embed/multi):
+  Batch  1/29: texts[  0: 16] → POST /embed/multi → 16 × {dense + sparse}
+  Batch  2/29: texts[ 16: 32] → POST /embed/multi → 16 × {dense + sparse}
   ...
-  Batch 14/15: texts[416:448] → POST /embed → 32 vectors
-  Batch 15/15: texts[448:450] → POST /embed →  2 vectors
-  ───────────────────────────────────────────────────
-  Total: 450 vectors returned
+  Batch 29/29: texts[448:450] → POST /embed/multi →  2 × {dense + sparse}
+  ──────────────────────────────────────────────────────────────
+  Total: 450 dense vectors + 450 sparse vectors returned
 ```
 
-**Model yang digunakan: `BAAI/bge-m3`**
+**Model yang digunakan: `BAAI/bge-m3` (via FlagEmbedding)**
 
 | Properti | Detail |
 |---|---|
 | Arsitektur | Berbasis XLM-RoBERTa (transformer multibahasa) |
 | Parameter | ~568M |
-| Dimensi Output | **1024 dimensi** |
+| Dimensi Output Dense | **1024 dimensi** |
 | Panjang Sekuens Maksimum | 8192 token |
 | Bahasa | 100+ bahasa termasuk **Bahasa Indonesia** |
-| Fitur | Dense + Sparse + ColBERT multi-vector retrieval |
+| Mode Retrieval | **Dense + Sparse (lexical) + ColBERT (multi-vector reranking)** |
+| Library | FlagEmbedding (`BGEM3FlagModel`) — bukan SentenceTransformers |
 | Berjalan di | CPU atau GPU, disajikan via container embedding-service |
 
-**Mengapa `BAAI/bge-m3` dibanding `intfloat/multilingual-e5-large`?**
+**Apa itu Sparse Embedding?**
 
-| Fitur | multilingual-e5-large (lama) | BAAI/bge-m3 (saat ini) |
-|---|---|---|
-| Dimensi | 1024 | **1024** (sama) |
-| Token Maksimum | 512 | **8192** (konteks 16x lebih panjang) |
-| Perlu Prefix | Ya ("query: " / "passage: ") | **Tidak** (tanpa prefix) |
-| Mode Retrieval | Hanya dense | **Dense + Sparse + ColBERT** |
-| Skor MTEB | Kuat | **Lebih kuat** (state-of-the-art multibahasa) |
-
-BGE-M3 tidak memerlukan prefix "query: " atau "passage: " seperti E5, sehingga kode lebih sederhana — teks dikirim langsung tanpa modifikasi.
-
-**Apa itu embedding?**
-
-Embedding mengubah teks menjadi **vektor angka** di ruang 1024 dimensi. Teks dengan **makna serupa** akan memiliki vektor yang **berdekatan**.
+Berbeda dengan dense embedding yang menghasilkan vektor padat, sparse embedding menghasilkan **vektor jarang** — sebagian besar elemennya nol. Setiap dimensi merepresentasikan sebuah **token/kata** dan nilainya menunjukkan pentingnya token tersebut.
 
 ```
-"Cara membuat conda environment di ALELEON"
-        │
-        ▼  BAAI/bge-m3
-[0.032, -0.118, 0.245, ..., 0.067]    ← 1024 angka
-
-"Bagaimana membuat conda env baru?"
-        │
-        ▼  BAAI/bge-m3
-[0.029, -0.121, 0.238, ..., 0.071]    ← 1024 angka (MIRIP!)
-
-"Berapa harga berlangganan ALELEON?"
-        │
-        ▼  BAAI/bge-m3
-[-0.156, 0.089, -0.034, ..., 0.193]   ← 1024 angka (JAUH!)
+Dense:  [0.032, -0.118, 0.245, ..., 0.067]   ← 1024 angka, semua terisi
+Sparse: {token_id_42: 0.83, token_id_1505: 0.61, token_id_789: 0.44, ...}
+        ← hanya token penting yang memiliki bobot
 ```
 
-**Ini BUKAN TF-IDF atau BM25.**
+**Mengapa Dense + Sparse (Hybrid)?**
 
-| Metode | Cara kerja | Digunakan di kode ini? |
-|---|---|---|
-| **TF-IDF** | Menghitung frekuensi kata. "conda" muncul 3x = relevan. Tidak memahami makna. | ❌ |
-| **BM25** | TF-IDF lanjutan dengan normalisasi panjang dokumen. | ❌ |
-| **Sparse Retrieval** | Vektor besar, sebagian besar nol. Mencocokkan kata kunci. | ❌ |
-| **Dense Retrieval** ✅ | Teks → vektor dense 1024D via neural network. Mencocokkan **makna**. | ✅ **Dipakai di sini** |
+| Situasi | Dense saja | Sparse saja | **Hybrid (keduanya)** |
+|---|---|---|---|
+| Kueri semantik ("cara memakai memori besar") | ✅ Paham "memori" ≈ "RAM" | ❌ Gagal jika kata berbeda | ✅ Dense menangani |
+| Kueri keyword spesifik ("epyc-jumbo") | ❌ Bisa miss nama partisi eksak | ✅ Cocokkan token persis | ✅ Sparse menangani |
+| Campuran keduanya | Tergantung | Tergantung | ✅ **RRF menggabungkan kedua sinyal** |
 
-**Kelebihan Dense Retrieval:**
-
-```
-Kueri: "Saya butuh banyak memori untuk job saya"
-  │
-    ├── TF-IDF/BM25: Cari kata "memori" → TIDAK DITEMUKAN (dokumen memakai "RAM")
-  │
-    └── Dense (bge-m3): Memahami "memori" ≈ "RAM" secara semantik → DITEMUKAN ✅
-```
-
-### Langkah 7 — Basis Data Vektor (Qdrant — Persisten)
+### Langkah 7 — Basis Data Vektor Hybrid (Qdrant — Dense + Sparse)
 
 ```python
-vectorstore = QdrantVectorStore.from_documents(
-    documents=splits,
-    embedding=embeddings,
-    url=QDRANT_URL,
-    api_key=QDRANT_API_KEY,
-    collection_name=QDRANT_COLLECTION_NAME,
+# Buat hybrid collection (dense + sparse)
+client = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY, timeout=300)
+client.create_collection(
+    QDRANT_COLLECTION_NAME,
+    vectors_config={"dense": VectorParams(size=DENSE_DIM, distance=Distance.COSINE)},
+    sparse_vectors_config={"text-sparse": SparseVectorParams()},
 )
 ```
 
 **Yang terjadi:**
 
-1. Setiap chunk di-embed menjadi vektor 1024D (via embedding-service API, dalam batch @32).
-2. Vektor + teks asli + metadata disimpan ke database Qdrant **secara persisten** di server Qdrant.
+1. Dibuat **hybrid collection** di Qdrant dengan dua jenis vektor:
+   - `"dense"` — vektor padat 1024 dimensi (cosine similarity)
+   - `"text-sparse"` — vektor jarang (sparse, untuk keyword matching)
+2. Setiap chunk di-embed menghasilkan **dense + sparse** sekaligus via `/embed/multi`.
+3. Dense vector, sparse vector, teks asli, dan metadata di-upsert sebagai point ke Qdrant.
+
+```python
+# Embed semua chunk (dense + sparse sekaligus)
+multi = embeddings.embed_multi(texts, batch_size=16)
+
+# Upsert ke Qdrant
+for j in range(i, min(i + batch_size, n)):
+    sp = multi["sparse"][j]
+    points.append(
+        PointStruct(
+            id=str(uuid.uuid4()),
+            vector={
+                "dense": multi["dense"][j],
+                "text-sparse": SparseVector(
+                    indices=sp["indices"], values=sp["values"]
+                ),
+            },
+            payload={"text": texts[j], **metadatas[j]},
+        )
+    )
+client.upsert(QDRANT_COLLECTION_NAME, points)
+```
 
 ```
-Qdrant (persistent — server di http://qdrant:6333)
-┌─────────────────────────────────────────────────────────────────────┐
-│ ID │ Vector (1024D)             │ Original Text        │ Metadata  │
-├────┼────────────────────────────┼──────────────────────┼───────────┤
-│ 0  │ [0.03, -0.12, 0.24, ...]  │ "[Sumber: Spesifika- │ title,    │
-│    │                            │  si] Compute Node.." │ source,   │
-│ 1  │ [0.08, -0.05, 0.19, ...]  │ "[Sumber: Conda Env] │ Header 2, │
-│    │                            │  Membuat conda..."   │ Header 3  │
-│ 2  │ [-0.07, 0.14, 0.03, ...]  │ "[Sumber: MPI Guide] │           │
-│    │                            │  Cara submit MPI..." │           │
-│ ...│ ...                        │ ...                  │ ...       │
-└────┴────────────────────────────┴──────────────────────┴───────────┘
+Qdrant Hybrid Collection (persistent — server di http://qdrant:6333)
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ ID (UUID)│ Dense (1024D)            │ Sparse (token→weight) │ Payload       │
+├──────────┼──────────────────────────┼───────────────────────┼───────────────┤
+│ a1b2c3.. │ [0.03, -0.12, 0.24,...] │ {42:0.83, 1505:0.61}  │ text, title,  │
+│          │                          │                       │ source,       │
+│ d4e5f6.. │ [0.08, -0.05, 0.19,...] │ {789:0.44, 33:0.71}   │ Header 2,     │
+│          │                          │                       │ Header 3,     │
+│ g7h8i9.. │ [-0.07, 0.14, 0.03,...]│ {102:0.55, 45:0.32}   │ lastmod       │
+│ ...      │ ...                      │ ...                   │ ...           │
+└──────────┴──────────────────────────┴───────────────────────┴───────────────┘
 ```
 
 **Qdrant** adalah database vektor yang:
 - Berjalan sebagai **server terpisah** dalam container Podman (port 6333 REST, port 6334 gRPC).
 - Data dipersistenkan melalui named volume Podman (`qdrant-data:/qdrant/storage`).
-- Mendukung **cosine similarity search**, filtering, dan HNSW indexing.
+- Mendukung **hybrid search** (dense + sparse + RRF fusion).
 - Dilindungi oleh API key (`QDRANT__SERVICE__API_KEY`).
-- Pada run pertama: scraping + embedding + penyimpanan (~450 chunk). Pada run berikutnya: langsung load dari Qdrant.
+- Pada run pertama: scraping + embedding + penyimpanan. Pada run berikutnya: langsung load dari Qdrant.
 - Memiliki dashboard web di `http://localhost:6333/dashboard` untuk inspeksi data.
+- Menggunakan **QdrantClient langsung** (bukan LangChain `QdrantVectorStore`) untuk kontrol penuh atas hybrid search.
 
 ---
 
 ## FASE 3: Retrieval + Generasi
 
-### Retrieval — Cari Chunk yang Relevan
+### Pre-Filter — Pengecekan Relevansi Pertanyaan
+
+Sebelum melakukan embedding dan retrieval, sistem **memeriksa apakah pertanyaan relevan** dengan domain HPC/ALELEON menggunakan LLM:
 
 ```python
-docs = vectorstore.similarity_search(question, k=10)
+def is_question_relevant(question, api_url=None) -> bool:
+    """Cek apakah pertanyaan relevan dengan HPC/Aleleon sebelum proses embedding."""
+    messages = [
+        {
+            "role": "system",
+            "content": """Kamu adalah filter pertanyaan untuk layanan support ALELEON HPC.
+Tugasmu menentukan apakah pertanyaan user MUNGKIN berkaitan dengan topik-topik berikut:
+- High Performance Computing (HPC), Supercomputer, Cluster, Komputasi
+- Slurm, batch job, partisi, node, CPU, GPU, RAM, storage
+- Linux, terminal, command line, module, environment
+- Layanan ALELEON, EFIRO, EWS, akun, kuota, billing, Core Hour, GPU Hour
+- Server, VPN, SSH, SFTP, file transfer
+- Software ilmiah (GROMACS, FLACS, VASP, Conda, Python, dll)
+- IT Support, troubleshooting, error
+
+Jawab HANYA dengan kata 'YA' atau 'TIDAK'."""
+        },
+        ...
+    ]
 ```
 
-**Tipe retrieval: Approximate Nearest Neighbor (ANN) dengan kesamaan kosinus**
+```
+User: "resep nasi goreng"
+       │
+       ▼ is_question_relevant() → "TIDAK"
+       │
+       ▼ Return "Pertanyaan anda tidak relevan..."
+       (TANPA membuang resource embedding/retrieval)
 
-Ketika pengguna mengajukan pertanyaan, prosesnya adalah:
+User: "cara membuat conda environment"
+       │
+       ▼ is_question_relevant() → "YA"
+       │
+       ▼ Lanjut ke hybrid retrieval
+```
+
+**Mengapa?** Ini menghemat resource — pertanyaan yang jelas tidak relevan (resep masak, gosip, cuaca) tidak perlu melalui proses embedding dan retrieval yang mahal.
+
+### Retrieval — Hybrid Search (Dense + Sparse + RRF Fusion + ColBERT Reranking)
+
+```python
+def create_rag_chain(client: QdrantClient, embeddings: EmbeddingServiceClient, llm_api_url=None):
+    """Create RAG chain with hybrid retrieval (dense + sparse + RRF fusion)."""
+
+    def retrieve_and_answer(question):
+        # 1. Embed query → dense + sparse
+        query_multi = embeddings.embed_query_multi(question)
+
+        # 2. Hybrid search: dense + sparse → RRF fusion (over-fetch for reranking)
+        fetch_limit = TOP_K * RERANK_FETCH_MULTIPLIER  # 10 × 2 = 20
+        results = client.query_points(
+            QDRANT_COLLECTION_NAME,
+            prefetch=[
+                Prefetch(
+                    query=query_multi["dense"],
+                    using="dense",
+                    limit=fetch_limit * 2,      # 40 candidates dari dense
+                ),
+                Prefetch(
+                    query=SparseVector(
+                        indices=query_multi["sparse"]["indices"],
+                        values=query_multi["sparse"]["values"],
+                    ),
+                    using="text-sparse",
+                    limit=fetch_limit * 2,      # 40 candidates dari sparse
+                ),
+            ],
+            query=FusionQuery(fusion=Fusion.RRF),  # Reciprocal Rank Fusion
+            limit=fetch_limit,                      # 20 candidates setelah RRF
+        )
+
+        # 3. ColBERT reranking: rerank 20 candidates → ambil top 10
+        if len(candidate_docs) > TOP_K:
+            passages = [doc.page_content for doc in candidate_docs]
+            scores = embeddings.rerank(question, passages)  # POST /rerank
+            scored_docs = sorted(
+                zip(candidate_docs, scores),
+                key=lambda x: x[1],
+                reverse=True,
+            )
+            docs = [doc for doc, _ in scored_docs[:TOP_K]]
+
+        ...
+    return retrieve_and_answer
+```
+
+**Pipeline Retrieval 4-Tahap:**
 
 ```
 User: "Bagaimana cara membuat conda environment?"
          │
-         ▼ BAAI/bge-m3 (via embedding-service API)
-Query Vector: [0.029, -0.121, 0.238, ..., 0.071]    (1024D)
+    ┌────┴─────────────────────────────────────────────────────────────┐
+    │  TAHAP 1: Multi-Mode Embedding                                   │
+    │  embed_query_multi(question) → POST /embed/multi                 │
+    │                                                                  │
+    │  → Dense vector: [0.029, -0.121, 0.238, ..., 0.071] (1024D)    │
+    │  → Sparse vector: {42:0.83, 1505:0.61, ...}                    │
+    └────┬─────────────────────────────────────────────────────────────┘
          │
-         ▼ Cosine Similarity against ALL chunks in Qdrant
+    ┌────┴─────────────────────────────────────────────────────────────┐
+    │  TAHAP 2: Dual-Path Retrieval dari Qdrant                        │
+    │                                                                  │
+    │  Dense path:  query dense vector → cosine similarity → 40 hits  │
+    │  Sparse path: query sparse vector → keyword match    → 40 hits  │
+    └────┬─────────────────────────────────────────────────────────────┘
          │
-┌────────┬──────────────────────────────────────────┬────────────┐
-│ Chunk  │ Content (with source label)              │ Similarity │
-├────────┼──────────────────────────────────────────┼────────────┤
-│ 3      │ "[Sumber: Conda Env] Membuat Conda..."   │ 0.91 ← #1 │
-│ 7      │ "[Sumber: Conda Env] Module Pyload..."   │ 0.78 ← #2 │
-│ 1      │ "[Sumber: Spesifikasi] Compute Node..."  │ 0.65 ← #3 │
-│ 12     │ "[Sumber: MPI Guide] Running MPI..."     │ 0.58 ← #4 │
-│ ...    │ ...                                      │ ...        │
-│ 22     │ "[Sumber: Job Script] GPU Slurm..."      │ 0.41 ← #10│
-└────────┴──────────────────────────────────────────┴────────────┘
+    ┌────┴─────────────────────────────────────────────────────────────┐
+    │  TAHAP 3: RRF Fusion (Reciprocal Rank Fusion)                    │
+    │                                                                  │
+    │  Gabungkan ranking dari dense dan sparse:                        │
+    │                                                                  │
+    │           1                1                                      │
+    │  RRF = ────── + ──────  (k = 60 default)                        │
+    │        k+rank_d   k+rank_s                                       │
+    │                                                                  │
+    │  → 20 candidates teratas (RERANK_FETCH_MULTIPLIER × TOP_K)      │
+    └────┬─────────────────────────────────────────────────────────────┘
          │
-         ▼ Ambil Top-K (k=10)
-    Top 10 chunk → dikirim ke LLM sebagai konteks
+    ┌────┴─────────────────────────────────────────────────────────────┐
+    │  TAHAP 4: ColBERT Reranking                                      │
+    │                                                                  │
+    │  embeddings.rerank(question, 20 passages) → POST /rerank        │
+    │  ColBERT late-interaction scoring:                                │
+    │                                                                  │
+    │  Setiap token query ↔ setiap token passage                      │
+    │  → Max similarity per query token → Sum → Score                 │
+    │                                                                  │
+    │  Sort by score → Ambil top 10 (TOP_K)                           │
+    └────┬─────────────────────────────────────────────────────────────┘
+         │
+         ▼
+    10 chunk paling relevan → dikirim ke LLM sebagai konteks
 ```
 
-**Mengapa k=10?** Memberikan lebih banyak konteks ke LLM sehingga jawaban lebih lengkap. Qwen3.5-35B memiliki context window 131072 token, cukup untuk menampung 10 chunk.
+**Mengapa 4 tahap? (Dense → Sparse → RRF → ColBERT)**
 
-**Rumus Cosine Similarity:**
+| Tahap | Kekuatan | Kelemahan |
+|---|---|---|
+| Dense saja | Paham semantik ("memori" ≈ "RAM") | Bisa miss nama eksak ("epyc-jumbo") |
+| Sparse saja | Cocokkan keyword persis | Tidak paham sinonim |
+| RRF Fusion | Gabungkan kedua sinyal | Ranking masih kasar |
+| **ColBERT Rerank** | **Token-level interaction yang sangat presisi** | Mahal komputasi, jadi hanya 20 candidates |
 
-```
-                    A · B           Σ(Aᵢ × Bᵢ)
-cos(θ) = ─────────────────── = ─────────────────────
-              ||A|| × ||B||     √Σ(Aᵢ²) × √Σ(Bᵢ²)
+**Konfigurasi Retrieval:**
 
-Hasil: -1 (berlawanan) sampai +1 (identik)
-```
+| Parameter | Nilai | Makna |
+|---|---|---|
+| `TOP_K` | 10 | Jumlah chunk final yang dikirim ke LLM |
+| `RERANK_FETCH_MULTIPLIER` | 2 | Fetch 2× TOP_K = 20 dari RRF, rerank ke 10 |
+| Dense prefetch limit | 40 | Over-fetch dari dense path |
+| Sparse prefetch limit | 40 | Over-fetch dari sparse path |
+| Fusion | `Fusion.RRF` | Reciprocal Rank Fusion |
 
 ### Prompt — Format OpenAI Messages (Bahasa Indonesia)
 
-Prompt tidak lagi menggunakan string template ChatML. Sekarang menggunakan format **OpenAI messages** — array objek `{role, content}` yang dikirim ke vLLM melalui OpenAI-compatible API.
+Prompt menggunakan format **OpenAI messages** — array objek `{role, content}` yang dikirim ke vLLM melalui OpenAI-compatible API.
 
 ```python
-def generate_response(question: str, context: str) -> str:
+def generate_response(question, context, api_url=None):
+    client = OpenAI(
+        base_url=api_url,
+        api_key=os.getenv("LLM_API_KEY", "EMPTY")
+    )
+
     messages = [
         {
             "role": "system",
-            "content": """Kamu adalah agen AI asisten admin HPC Slurm yang ahli. Tugasmu adalah membantu user berdasarkan dokumen referensi yang diberikan. Gunakan Bahasa Indonesia yang jelas.
+            "content": """Kamu adalah agen AI asisten admin HPC Slurm yang ahli. ...
 
 Aturan:
-0. Tidak perlu bilang kalo berdasarkan dokumen referensi yang diberikan, langsung saja menyapa klien dengan sopan. Jangan outputkan chain of thought atau proses berpikirmu, langsung saja jawab dengan ringkas dan jelas.
-1. Jawab HANYA berdasarkan dokumen referensi. KUTIP langkah-langkah dan perintah PERSIS seperti di dokumen. Jangan menambahkan langkah atau perintah yang tidak ada di dokumen. Anda adalah L1 Support bot ALELEON. JANGAN PERNAH menyarankan solusi atau tool di luar dokumen yang diberikan. Jika di dokumen tidak ada, katakan Anda tidak tahu.
-2a. Sertakan angka, nama, versi, dan spesifikasi PERSIS seperti tertulis di dokumen. Jangan membulatkan atau menambah presisi. Contoh: jika dokumen bilang ">=11", jawab ">=11", BUKAN "11.0" atau "11.2".
-2b. Gunakan penomoran (1, 2, 3) untuk langkah-langkah, JANGAN gunakan bullet points/titik.
-3. Jika informasi bisa DISIMPULKAN dari dokumen, berikan kesimpulan tersebut.
-4. Jika informasi benar-benar TIDAK ADA di dokumen, katakan "Saya tidak menemukan informasi tersebut di sistem."
-5. Jangan mengarang angka, rumus, perintah, URL, nama partisi, atau prosedur yang tidak ada di dokumen. KHUSUSNYA jangan mengarang nama partisi seperti "bigmem" jika tidak disebutkan di dokumen.
-6. JANGAN mengganti perintah dari dokumen dengan perintah alternatif. Contoh: jika dokumen menulis "source activate", JANGAN ganti dengan "conda activate".
-7. Bedakan "minimal" dan "maksimal". Jika dokumen hanya menyebutkan "minimal X" TANPA batas maksimal, jawab bahwa informasi batas maksimal tidak tersedia di dokumen.
-8. Perhatikan label LEGACY. Jika halaman bertanda LEGACY untuk versi lama (misal Mk.III), JANGAN terapkan info tersebut untuk versi baru (Mk.V).
-9. Jawab dengan LENGKAP termasuk contoh perintah dan kode jika ada di dokumen. Jangan hanya menjawab kalimat pembuka lalu berhenti.
-10. WAJIB menjawab minimal 2 kalimat. Jangan mengeluarkan jawaban kosong.""",
+0. Sapa user dengan ramah seperti customer service layanan HPC Aleleon
+   Supercomputer support yang memiliki hospitality tinggi. Ucapkan salam,
+   terima kasih, dan akhiri dengan konfirmasi.
+0. Jangan bilang "berdasarkan dokumen referensi yang diberikan"...
+1. Jawab HANYA berdasarkan dokumen referensi. KUTIP PERSIS...
+2a. Angka/versi harus presisi...
+2b. Gunakan penomoran, bukan bullet...
+3. Deduksi diperbolehkan...
+4. "Saya tidak menemukan informasi tersebut di sistem."
+5. Dilarang mengarang...
+6. Jangan ganti perintah...
+7. Bedakan minimum vs maksimum...
+8. Perhatikan label LEGACY...
+9. Jawab LENGKAP dengan contoh...
+10. Minimal 2 kalimat...""",
         },
         {
             "role": "user",
@@ -483,43 +685,26 @@ Aturan:
     ]
 
     response = client.chat.completions.create(
-        model=VLLM_MODEL_NAME,
+        model=os.getenv("LLM_MODEL_NAME", "Qwen/Qwen3.5-35B-A3B-GPTQ-Int4"),
         messages=messages,
+        max_tokens=8192,
         temperature=0.3,
         top_p=0.9,
-        max_tokens=32768,
         presence_penalty=1.5,
-        extra_body={"top_k": 20, "chat_template_kwargs": {"enable_thinking": False}},
+        extra_body={
+            "top_k": 20,
+            "chat_template_kwargs": {"enable_thinking": False},
+        }
     )
     return response.choices[0].message.content
-```
-
-**Format: OpenAI Messages (bukan string ChatML)**
-
-vLLM menyediakan OpenAI-compatible API. Kita menggunakan `openai.OpenAI` client untuk mengirim request — vLLM otomatis mengkonversi messages ke format ChatML yang dipahami Qwen.
-
-```
-client.chat.completions.create(
-    messages=[
-        {"role": "system", "content": "..."},    ← System prompt + rules
-        {"role": "user", "content": "..."},      ← Context + question
-    ]
-)
-        │
-        ▼ vLLM converts to ChatML internally
-        │
-<|im_start|>system
-...<|im_end|>
-<|im_start|>user
-...<|im_end|>
-<|im_start|>assistant
 ```
 
 **11 Aturan Anti-Halusinasi (0-10):**
 
 | Aturan | Tujuan |
 |---|---|
-| 0. Langsung jawab, tanpa chain of thought | Menyapa klien dengan sopan, tidak menyebut "berdasarkan dokumen", jawab ringkas dan jelas |
+| 0. Sapa user ramah, hospitality tinggi | Customer service yang sopan, ucapkan salam dan terima kasih |
+| 0. Langsung jawab, tanpa chain of thought | Tidak menyebut "berdasarkan dokumen", jawab ringkas dan jelas |
 | 1. Jawab HANYA dari dokumen, KUTIP PERSIS | Mencegah generasi info dari pengetahuan pra-latih. L1 Support bot ALELEON |
 | 2a. Angka/versi harus presisi | Mencegah pembulatan ">=11" menjadi "11.0" |
 | 2b. Gunakan penomoran, bukan bullet | Langkah-langkah dalam format 1, 2, 3 |
@@ -537,7 +722,7 @@ client.chat.completions.create(
 ```python
 from openai import OpenAI
 
-client = OpenAI(base_url=VLLM_API_URL, api_key="not-needed")
+client = OpenAI(base_url=VLLM_API_URL, api_key="EMPTY")
 ```
 
 Model dijalankan di container **vllm-rocm** pada AMD GPU menggunakan vLLM dengan OpenAI-compatible API.
@@ -548,36 +733,15 @@ Model dijalankan di container **vllm-rocm** pada AMD GPU menggunakan vLLM dengan
 vllm serve Qwen/Qwen3.5-35B-A3B-GPTQ-Int4 \
     --dtype float16 \
     --enforce-eager \
-    --max-model-len 131072
-```
-
-**Alur generasi:**
-
-```
-┌──────────────────────────────────────────────────────────────┐
-│ Panggilan OpenAI API ke vLLM:                                │
-│                                                              │
-│ client.chat.completions.create(                              │
-│   model="Qwen/Qwen3.5-35B-A3B-GPTQ-Int4",                   │
-│   messages=[                                                 │
-│     {"role": "system", "content": "Kamu adalah agen AI...    │
-│      Aturan: 0-10 (11 aturan anti-halusinasi)"},             │
-│     {"role": "user", "content": "Dokumen Referensi:\n...     │
-│      Pertanyaan: Bagaimana cara membuat conda environment?"}│
-│   ],                                                         │
-│   temperature=0.3, top_p=0.9, max_tokens=32768,             │
-│   presence_penalty=1.5,                                      │
-│   extra_body={top_k=20,                                      │
-│     chat_template_kwargs={"enable_thinking": False}}         │
-│ )                                                            │
-│         │                                                    │
-│         ▼ vLLM mengonversi ke ChatML + menghasilkan jawaban  │
-│                                                              │
-│ "Untuk membuat conda environment di ALELEON,                 │
-│  jalankan perintah berikut:                                  │
-│  1. module load anaconda3/2025.06-1                          │
-│  2. conda create -n myenv python=3.12..."                    │
-└──────────────────────────────────────────────────────────────┘
+    --gpu-memory-utilization 0.99 \
+    --max-model-len 262144 \
+    --max-num-seqs 16 \
+    --tensor-parallel-size 1 \
+    --enable-auto-tool-choice \
+    --tool-call-parser qwen3_coder \
+    --reasoning-parser qwen3 \
+    --enable-prefix-caching \
+    --trust-remote-code
 ```
 
 **Parameter generasi:**
@@ -588,9 +752,13 @@ vllm serve Qwen/Qwen3.5-35B-A3B-GPTQ-Int4 \
 | `top_p=0.9` | Nucleus sampling — probabilitas 90% teratas | Mengurangi jawaban acak |
 | `top_k=20` | Hanya mempertimbangkan 20 token teratas tiap langkah | Semakin membatasi randomness |
 | `presence_penalty=1.5` | Penalti kuat untuk token berulang | Mencegah output repetitif |
-| `max_tokens=32768` | Maks 32K token output | Memungkinkan jawaban sangat detail |
+| `max_tokens=8192` | Maks 8K token output | Cukup untuk jawaban detail |
 | `enable_thinking=False` | Menonaktifkan mode "thinking" Qwen3.5 (via `chat_template_kwargs`) | Jawaban langsung tanpa jejak reasoning |
-| `--max-model-len 131072` | Maks 128K token total (prompt + output) | Context window penuh untuk prompt besar |
+| `--max-model-len 262144` | Maks 256K token total (prompt + output) | Context window penuh untuk prompt besar |
+| `--gpu-memory-utilization 0.99` | Gunakan 99% VRAM | Maksimalkan kapasitas model di GPU |
+| `--max-num-seqs 16` | Maks 16 sequence paralel | Batasi concurrency untuk stabilitas |
+| `--enable-prefix-caching` | Cache prefix prompt yang berulang | Mempercepat inference untuk prompt serupa |
+| `--enable-auto-tool-choice` | Aktifkan tool calling otomatis | Untuk fitur tool-use Qwen3.5 |
 | `--dtype float16` | Presisi FP16 | Dibutuhkan model GPTQ di ROCm |
 | `--enforce-eager` | Menonaktifkan CUDAGraph | Kompatibilitas ROCm / GPU AMD |
 
@@ -600,104 +768,268 @@ vllm serve Qwen/Qwen3.5-35B-A3B-GPTQ-Int4 \
 |---|---|
 | Parameter | 35B total, ~3B aktif (arsitektur MoE) |
 | Kuantisasi | GPTQ 4-bit |
-| Context Window | 131072 token (128K) |
+| Context Window | 262144 token (256K) |
 | Arsitektur | Mixture of Experts (MoE) |
 | Disajikan via | vLLM pada GPU AMD ROCm |
 
-### Pelacakan Sumber — Menampilkan Sumber Dokumen
+### Pelacakan Sumber + Justifikasi "Why This Source"
+
+Setelah setiap jawaban, sistem **menampilkan sumber dokumen** yang dipakai dan **justifikasi relevansi** setiap sumber. Justifikasi di-generate oleh LLM terpisah:
 
 ```python
-for i, pertanyaan in enumerate(pertanyaan_list, 1):
-    result = rag_chain(pertanyaan)
-    print(result['answer'].strip())
+def generate_source_justifications(question, answer, docs, api_url=None):
+    """Generate 'Why This Source' justification for each unique retrieved source."""
+    # Deduplicate sources by (title, header)
+    unique_sources = [...]
 
-    # Tampilkan sumber dokumen yang digunakan
-    if result.get('context'):
-        seen = []
-        for doc in result['context']:
-            title = doc.metadata.get("title", "Unknown")
-            source = doc.metadata.get("source", "")
-            header = doc.metadata.get("Header 2", doc.metadata.get("Header 3", ""))
-            key = (title, header)
-            if key not in seen:
-                seen.append(key)
-                label = f"    • {title}"
-                if header:
-                    label += f" → {header}"
-                if source:
-                    label += f"  ({source})"
-                print(label)
+    messages = [
+        {
+            "role": "system",
+            "content": "Kamu adalah asisten yang menjelaskan relevansi sumber dokumen. "
+                       "Berikan justifikasi singkat (1 kalimat) untuk setiap sumber. "
+                       "Jika TIDAK relevan, jawab 'TIDAK RELEVAN'."
+        },
+        {
+            "role": "user",
+            "content": f"Pertanyaan: {question}\nJawaban: {answer[:500]}\n\nSumber:\n{source_list}..."
+        }
+    ]
 ```
 
-**Yang terjadi:**
-
-Setelah setiap jawaban, sistem menampilkan halaman dan section wiki yang dipakai untuk menghasilkan respons. **De-duplication** diterapkan agar pasangan sumber/section yang sama hanya tampil sekali.
+**Filter sumber tidak relevan:** Setelah justifikasi di-generate, sumber yang dijustifikasi sebagai "TIDAK RELEVAN" **dibuang** dari daftar sumber yang ditampilkan ke user.
 
 ```
 Contoh output:
 ============================================================
-[Q1/23] Bagaimana cara membuat conda environment di aleleon?
+[Q1/69] Bagaimana cara membuat conda environment di aleleon?
 ------------------------------------------------------------
-Untuk membuat conda environment di ALELEON, jalankan...
+Selamat datang! Terima kasih telah menghubungi layanan support
+ALELEON. Untuk membuat conda environment di ALELEON, silakan
+ikuti langkah-langkah berikut...
 
     📚 Sumber (10 chunks):
     • Komputasi Python dengan Conda Environment User → Membuat Conda Environment
       (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+      💡 Why: Berisi langkah lengkap pembuatan conda environment di ALELEON
     • Komputasi Python dengan Conda Environment User → Module Pyload
       (https://wiki.efisonlt.com/wiki/Komputasi_Python_dengan_Conda_Environment_User)
+      💡 Why: Menjelaskan cara membuat modul pyload setelah conda env aktif
     • ...
 ```
 
-### RAG Chain — Fungsi Python Kustom
+### RAG Chain — Fungsi Python Kustom (Closure)
 
-Tidak lagi menggunakan `create_stuff_documents_chain` atau `create_retrieval_chain` dari LangChain. Sekarang menggunakan fungsi Python sederhana dengan pola *closure*:
+Tidak menggunakan `create_stuff_documents_chain` atau `create_retrieval_chain` dari LangChain. Menggunakan fungsi Python kustom dengan pola *closure*:
 
 ```python
-def create_rag_chain(vectorstore, llm_api_url=None):
-    """Create RAG chain using embedding service and vLLM API."""
+def create_rag_chain(client: QdrantClient, embeddings: EmbeddingServiceClient, llm_api_url=None):
+    """Create RAG chain with hybrid retrieval (dense + sparse + RRF fusion)."""
 
     def retrieve_and_answer(question):
-        # Retrieve relevant documents from Qdrant
-        docs = vectorstore.similarity_search(question, k=10)
-        context = "\n\n".join([doc.page_content for doc in docs])
+        # 0. Cek relevansi pertanyaan (tanpa embedding)
+        if not is_question_relevant(question, llm_api_url):
+            return {"answer": "Pertanyaan anda tidak relevan...", "context": [], "justifications": []}
 
-        # Generate response using vLLM API
-        answer = generate_response(question, context, llm_api_url)
+        # 1. Embed query → dense + sparse (via /embed/multi)
+        # 2. Hybrid search: dense + sparse → RRF fusion
+        # 3. ColBERT reranking: 20 candidates → top 10
+        # 4. Generate response using vLLM API
+        # 5. Generate "Why This Source" justifications
+        # 6. Filter out irrelevant sources
 
         return {
             "answer": answer,
-            "context": docs
+            "context": filtered_docs,
+            "justifications": filtered_justifications
         }
 
     return retrieve_and_answer
 ```
 
-**Strategi: "Stuff" (manual)**
-
-Sama seperti sebelumnya — semua chunks digabung ke 1 prompt. Bedanya, sekarang dilakukan secara eksplisit dengan Python, bukan via LangChain chain abstraction. Fungsi `create_rag_chain()` mengembalikan *closure* `retrieve_and_answer` yang menggabungkan retrieval dan generation dalam satu panggilan.
-
 ```
 Pertanyaan Pengguna
     │
     ▼
-┌──────────────────┐     ┌─────────────────────┐     ┌──────────────────┐
-│ similarity_search│ ──→ │ retrieve_and_answer()│ ──→ │ generate_response│
-│ (k=10)           │     │ join chunks          │     │ (OpenAI client)  │
-│                  │     │ → context            │     │ → answer text    │
-└──────────────────┘     └─────────────────────┘     └──────────────────┘
-    │                        │                          │
-    │ 10 relevant            │ context =                │ return {
-    │ Documents              │ chunk1\n\nchunk2\n\n...  │   "answer": ...,
-    ▼                        ▼                          ▼   "context": docs }
- From Qdrant          To generate_response()       Return to caller
+┌────────────────────┐
+│ is_question_relevant│ → TIDAK → return "tidak relevan"
+│ (LLM filter)       │
+└─────────┬──────────┘
+          │ YA
+    ┌─────┴──────────────┐     ┌──────────────────────┐
+    │ embed_query_multi() │ ──→ │ query_points()        │
+    │ (dense + sparse)    │     │ (Prefetch dense +     │
+    │                     │     │  Prefetch sparse +     │
+    │                     │     │  RRF Fusion)           │
+    └─────────────────────┘     └───────────┬────────────┘
+                                            │ 20 candidates
+                                ┌───────────┴────────────┐
+                                │ rerank()                │
+                                │ (ColBERT scoring)       │
+                                │ → top 10 docs           │
+                                └───────────┬────────────┘
+                                            │
+                                ┌───────────┴────────────┐
+                                │ generate_response()     │
+                                │ (OpenAI messages → vLLM)│
+                                └───────────┬────────────┘
+                                            │
+                                ┌───────────┴────────────┐
+                                │ generate_source_        │
+                                │ justifications()        │
+                                │ → filter TIDAK RELEVAN  │
+                                └───────────┬────────────┘
+                                            │
+                                            ▼
+                                return {answer, context, justifications}
 ```
 
 **Mengapa fungsi kustom, bukan chain LangChain?**
 
 - Lebih transparan — bisa di-debug dengan print statement
-- Tidak perlu `langchain_classic` dependency
-- Mudah dikustomisasi (filter, reranking, etc.)
+- Hybrid retrieval memerlukan `QdrantClient.query_points()` langsung (bukan `as_retriever()`)
+- Mendukung ColBERT reranking sebagai post-processing
+- Mendukung source justification dan filtering
 - `generate_response()` menggunakan OpenAI client langsung
+
+---
+
+## FASE 4: Fitur Tambahan
+
+### Incremental Sync — Sinkronisasi Sitemap
+
+Saat startup API dan via endpoint `POST /refresh`, sistem melakukan **incremental sync** antara sitemap wiki terkini dan data di Qdrant:
+
+```python
+def sync_vectorstore(client, embeddings):
+    """
+    Incremental sync: bandingkan sitemap terkini dengan data di Qdrant,
+    scrape + embed + upsert hanya halaman yang berubah/baru.
+    Hapus halaman yang sudah tidak ada di sitemap.
+    """
+    # 1. Parse sitemap terkini → {url: lastmod}
+    sitemap_data = parse_sitemap(SITEMAP_URL)
+
+    # 2. Get stored state dari Qdrant → {url: lastmod}
+    stored_data = get_stored_sitemap_state(client)
+
+    # 3. Bandingkan
+    new_urls = sitemap_urls - stored_urls          # Halaman baru
+    deleted_urls = stored_urls - sitemap_urls       # Halaman dihapus
+    changed_urls = {url for url in common_urls      # Halaman diubah
+                    if sitemap_data[url] != stored_data[url]}
+
+    # 4. Hapus points untuk URL yang berubah atau dihapus
+    # 5. Scrape + embed + upsert URL baru dan yang berubah
+```
+
+```
+Sync Flow:
+┌─────────────────┐       ┌──────────────────┐
+│ Sitemap terkini  │       │  Qdrant stored   │
+│ (URL + lastmod)  │       │  (URL + lastmod) │
+└────────┬────────┘       └────────┬─────────┘
+         │                         │
+         └──────────┬──────────────┘
+                    │ Bandingkan
+         ┌──────────┴──────────┐
+         │ New: 3 URL          │ → Scrape + embed + upsert
+         │ Updated: 2 URL      │ → Delete old + scrape + embed + upsert
+         │ Deleted: 1 URL      │ → Delete from Qdrant
+         │ Unchanged: 45 URL   │ → Skip
+         └─────────────────────┘
+```
+
+### Hybrid Script Review — Review Skrip Bash/Slurm
+
+Endpoint `POST /review-script` melakukan **review skrip 3 tahap** (hybrid):
+
+```python
+def review_script_hybrid(script_content, api_url=None, qdrant_client=None, embeddings=None):
+    """
+    1. LLM ekstrak resource parameters dari skrip (#SBATCH directives)
+    2. Jika ada resource params → retrieval kebijakan HPC dari Qdrant
+    3. LLM review teknis + validasi kebijakan berdasarkan dokumen
+    """
+```
+
+```
+Script Slurm dari user
+       │
+  ┌────┴────────────────────────────────────────────┐
+  │ STEP 1: extract_resource_params()                │
+  │ LLM → parsing #SBATCH → JSON                    │
+  │ {"partition": "ampere", "mem": "64G", ...}       │
+  └────┬─────────────────────────────────────────────┘
+       │
+  ┌────┴────────────────────────────────────────────┐
+  │ STEP 2: retrieve_policy_context()                │
+  │ Berdasarkan params → targeted queries ke Qdrant  │
+  │ Misal: "kapasitas RAM partisi ampere"            │
+  │ → Retrieve kebijakan HPC yang relevan            │
+  └────┬─────────────────────────────────────────────┘
+       │
+  ┌────┴────────────────────────────────────────────┐
+  │ STEP 3: LLM Review                              │
+  │ Review teknis (syntax, best practice) +          │
+  │ Validasi kebijakan (limit partisi, walltime, dll)│
+  │ → Output: review text + issues count +           │
+  │   policy sources + template skrip standar        │
+  └──────────────────────────────────────────────────┘
+```
+
+**Review mencakup:**
+1. Syntax Bash (shebang, quoting, variable expansion)
+2. Format #SBATCH (spasi, satuan, double dash)
+3. Best practice Slurm (format --mem, --time, dll.)
+4. Potensi error (variabel tidak didefinisikan, path salah)
+5. Keamanan (`rm -rf` tanpa konfirmasi, hardcoded password)
+6. **Validasi kebijakan HPC ALELEON** (dari dokumen di Qdrant — limit partisi, walltime, RAM, dll.)
+
+### Telegram Bot — Interface Chat
+
+Bot Telegram menyediakan interface chat yang terhubung ke RAG API:
+
+| Command | Fungsi |
+|---|---|
+| `/start` | Pesan selamat datang |
+| `/ask <pertanyaan>` | Tanya jawab RAG (standard question) |
+| `/askscript <skrip>` | Review skrip Bash/Slurm (paste teks) |
+| Upload file `.sh`/`.slurm`/`.sbatch`/`.bash` | Review skrip dari file upload |
+| `/status` | Cek status RAG API |
+| `/help` | Bantuan penggunaan |
+
+**Fitur:**
+- Animasi placeholder saat menunggu respons RAG (typing indicator + rotating text)
+- Konversi Markdown → HTML untuk Telegram (code blocks, bold, italic, headings, links)
+- Auto-split pesan panjang (>4000 karakter) dengan HTML tag tracking
+- Fallback ke plain text jika HTML parsing gagal
+- Justifikasi sumber ditampilkan dengan emoji 💡
+
+### REST API — FastAPI Endpoints
+
+```
+POST /ask
+  Request:  {"question": "Bagaimana cara membuat conda environment?"}
+  Response: {"answer": "...", "sources": [{title, source_url, section, justification}]}
+
+POST /review-script
+  Request:  {"script": "#!/bin/bash\n#SBATCH --mem= 64 GB\nsrun gmx_mpi mdrun"}
+  Response: {"review": "...", "issues_found": N, "policy_sources": [...]}
+
+POST /refresh
+  Response: {"status": "started", "message": "Sync dimulai di background..."}
+
+GET /refresh/status
+  Response: {"running": false, "last_result": {new, updated, deleted, unchanged}, ...}
+
+GET /health
+  Response: {"status": "ready", "service": "rag-api"}
+```
+
+**Fitur API tambahan:**
+- **Question logging** — Setiap pertanyaan dicatat ke `logs/user_questions.logs` dengan timestamp UTC.
+- **Startup sync** — Saat API mulai, otomatis cek perubahan sitemap.
+- **Background sync** — `POST /refresh` menjalankan sync di background thread, tidak blocking.
 
 ### Menunggu vLLM — Pemeriksaan Kesehatan
 
@@ -726,79 +1058,92 @@ Model besar (35B params) memerlukan waktu loading ke VRAM. Fungsi ini polling `/
 ## Diagram End-to-End Lengkap
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                     FASE STARTUP                              │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  [0] wait_for_vllm() — polling /health tiap 10 dtk (maks 10 mnt) │
-│         │                                                   │
-│         ▼                                                   │
-│  [1] qdrant_collection_exists()? ── YA ──→ load_vectorstore()│
-│         │                                   (skip to [7])  │
-│         TIDAK                                               │
-│         │                                                   │
-│  Wiki Sitemap XML                                           │
-│  (https://wiki.efisonlt.com/sitemap/...)                    │
-│         │                                                   │
-│  [2] Parse XML → ekstrak semua URL halaman wiki            │
-│         │                                                   │
-│  [3] Untuk setiap URL:                                      │
-│      requests.get() → BeautifulSoup                         │
-│      → extract <div id="mw-content-text">                  │
-│         │                                                   │
-│  [4] HTMLSectionSplitter (split berdasarkan heading h1/h2/h3) │
-│      → Fallback: RecursiveCharacterTextSplitter             │
-│        (4500 chars, 900 overlap)                            │
-│         │                                                   │
-│  [5] Add source labels:                                     │
-│      "[Sumber: title] [Section: header]"                   │
-│         │                                                   │
-│  ~450 Chunks                                                │
-│         │                                                   │
-│  [6] BAAI/bge-m3 via API embedding-service                  │
-│      Dibatch @32 chunk per request                          │
-│      Each chunk → 1024-dimensional vector                  │
-│         │                                                   │
-│      build_vectorstore() →                                  │
-│  [7] Qdrant (persistent — http://qdrant:6333)              │
-│      ~450 vectors + texts + metadata stored                │
-│      Podman volume: qdrant-data:/qdrant/storage            │
-│                                                             │
-├─────────────────────────────────────────────────────────────┤
-│                  FASE PER PERTANYAAN                         │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  User: "Bagaimana cara membuat conda env?"                  │
-│         │                                                   │
-│  [a] Embed question → 1024D vector                         │
-│      (BAAI/bge-m3 via embedding-service API)               │
-│         │                                                   │
-│  [b] Cosine similarity vs ~450 chunk di Qdrant            │
-│         │                                                   │
-│  [c] Ambil 10 chunk paling relevan                          │
-│         │                                                   │
-│  [d] rag_chain() → similarity_search + join chunks         │
-│         │                                                   │
-│  [e] generate_response() → OpenAI messages format          │
-│      with 11 anti-hallucination rules (0-10)               │
-│         │                                                   │
-│  [f] Send to Qwen3.5-35B-A3B-GPTQ-Int4 via vLLM           │
-│      (OpenAI-compatible API, AMD ROCm GPU)                 │
-│      temperature=0.3, presence_penalty=1.5                 │
-│         │                                                   │
-│  [g] Model menghasilkan jawaban                              │
-│         │                                                   │
-│  [h] Display answer + source attribution                   │
-│      (de-duplicated title/section/URL)                     │
-│         │                                                   │
-│         ▼                                                   │
-│  "Untuk membuat conda environment di ALELEON:               │
-│   1. module load anaconda3/2025.06-1                        │
-│   2. conda create -n myenv python=3.12..."                  │
-│                                                             │
-│      📚 Sumber (10 chunks):                                 │
-│      • Conda Environment User → Membuat Conda Environment  │
-│        (https://wiki.efisonlt.com/wiki/...)                 │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                     FASE STARTUP                                │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  [0] wait_for_vllm() — polling /health tiap 10 dtk (maks 10 mnt)│
+│         │                                                       │
+│         ▼                                                       │
+│  [1] qdrant_collection_exists()? ── YA ──→ load_vectorstore()  │
+│         │                                   (skip to [7])      │
+│         TIDAK                                                   │
+│         │                                                       │
+│  Wiki Sitemap XML                                               │
+│  (https://wiki.efisonlt.com/sitemap/sitemap-wiki.efisonlt.com-0.xml)│
+│         │                                                       │
+│  [2] Parse XML → filter non-webpage → ekstrak URL halaman wiki │
+│         │                                                       │
+│  [3] Untuk setiap URL:                                          │
+│      requests.get() → BeautifulSoup                             │
+│      → extract <div id="mw-content-text">                      │
+│         │                                                       │
+│  [4] HTMLSectionSplitter (split berdasarkan heading h1/h2/h3)  │
+│      → Fallback: RecursiveCharacterTextSplitter                │
+│        (4500 chars, 900 overlap)                                │
+│         │                                                       │
+│  [5] Add source labels:                                         │
+│      "[Sumber: title] [Section: header]"                       │
+│         │                                                       │
+│  ~450 Chunks                                                    │
+│         │                                                       │
+│  [6] BAAI/bge-m3 via API /embed/multi                           │
+│      Dibatch @16 chunk per request                              │
+│      Each chunk → Dense vector (1024D) + Sparse vector          │
+│         │                                                       │
+│      build_vectorstore() →                                      │
+│  [7] Qdrant Hybrid Collection (http://qdrant:6333)              │
+│      Collection: "wiki_aleleon_qdrant"                          │
+│      ~450 points: dense + sparse + text + metadata              │
+│      Podman volume: qdrant-data:/qdrant/storage                │
+│         │                                                       │
+│  [8] sync_vectorstore() — incremental sync sitemap              │
+│      (pada startup API dan via POST /refresh)                   │
+│                                                                 │
+├─────────────────────────────────────────────────────────────────┤
+│                  FASE PER PERTANYAAN                             │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  User: "Bagaimana cara membuat conda env?"                      │
+│  (via Telegram /ask, REST API POST /ask, atau CLI)              │
+│         │                                                       │
+│  [a] is_question_relevant() — LLM filter (YA/TIDAK)           │
+│         │ YA                                                    │
+│  [b] Embed question → Dense + Sparse                            │
+│      (BAAI/bge-m3 via /embed/multi)                            │
+│         │                                                       │
+│  [c] Hybrid search: Dense path + Sparse path                   │
+│      → RRF Fusion → 20 candidates                              │
+│         │                                                       │
+│  [d] ColBERT reranking (/rerank) → top 10 docs                 │
+│         │                                                       │
+│  [e] generate_response() → OpenAI messages format              │
+│      with 11 anti-hallucination rules (0-10)                   │
+│      + hospitality tone                                         │
+│         │                                                       │
+│  [f] Send to Qwen3.5-35B-A3B-GPTQ-Int4 via vLLM               │
+│      (OpenAI-compatible API, AMD ROCm GPU)                     │
+│      temperature=0.3, presence_penalty=1.5                     │
+│         │                                                       │
+│  [g] Model menghasilkan jawaban                                  │
+│         │                                                       │
+│  [h] generate_source_justifications()                           │
+│      LLM → 1 kalimat justifikasi per sumber                   │
+│      → Filter "TIDAK RELEVAN"                                  │
+│         │                                                       │
+│  [i] Display answer + source attribution + justifications      │
+│      (de-duplicated title/section/URL + 💡 Why)                │
+│         │                                                       │
+│         ▼                                                       │
+│  "Selamat datang! Terima kasih telah menghubungi layanan        │
+│   support ALELEON. Untuk membuat conda environment:             │
+│   1. module load anaconda3/2025.06-1                            │
+│   2. conda create -n myenv python=3.12..."                      │
+│                                                                 │
+│      📚 Sumber (10 chunks):                                     │
+│      • Conda Environment User → Membuat Conda Environment      │
+│        (https://wiki.efisonlt.com/wiki/...)                     │
+│        💡 Why: Berisi langkah lengkap pembuatan conda env       │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
 ```
