@@ -695,6 +695,10 @@ Pertanyaan: {question}"""
             "chat_template_kwargs": {"enable_thinking": False},  # Non-thinking mode
         }
     )
+
+    # Log token usage
+    if response.usage:
+        print(f"    📊 [generate_response] Tokens — input: {response.usage.prompt_tokens}, output: {response.usage.completion_tokens}, total: {response.usage.total_tokens}")
     
     return response.choices[0].message.content
 
@@ -764,6 +768,11 @@ Format output HARUS persis (hanya nomor dan alasan, tanpa label sumber):
                 "chat_template_kwargs": {"enable_thinking": False},
             }
         )
+
+        # Log token usage
+        if response.usage:
+            print(f"    📊 [generate_source_justifications] Tokens — input: {response.usage.prompt_tokens}, output: {response.usage.completion_tokens}, total: {response.usage.total_tokens}")
+
         raw = response.choices[0].message.content
         if raw is None:
             print("    ⚠️  LLM returned None content for justifications")
@@ -857,6 +866,10 @@ Jangan outputkan chain of thought atau penjelasan."""
                 "chat_template_kwargs": {"enable_thinking": False},
             }
         )
+
+        # Log token usage
+        if response.usage:
+            print(f"    📊 [extract_resource_params] Tokens — input: {response.usage.prompt_tokens}, output: {response.usage.completion_tokens}, total: {response.usage.total_tokens}")
 
         raw = response.choices[0].message.content
         if raw is None:
@@ -1150,6 +1163,10 @@ Gunakan Bahasa Indonesia. Jangan outputkan chain of thought."""
             }
         )
 
+        # Log token usage
+        if response.usage:
+            print(f"    📊 [review_script_hybrid] Tokens — input: {response.usage.prompt_tokens}, output: {response.usage.completion_tokens}, total: {response.usage.total_tokens}")
+
         raw = response.choices[0].message.content
         if raw is None:
             print("    ⚠️  review_script_hybrid: LLM returned None")
@@ -1255,6 +1272,11 @@ Jawab HANYA dengan kata 'YA' atau 'TIDAK'. Jangan berikan alasan."""
                 "chat_template_kwargs": {"enable_thinking": False},
             }
         )
+
+        # Log token usage
+        if response.usage:
+            print(f"    📊 [is_question_relevant] Tokens — input: {response.usage.prompt_tokens}, output: {response.usage.completion_tokens}, total: {response.usage.total_tokens}")
+
         raw = response.choices[0].message.content
         if raw is None:
             print(f"    ⚠️  is_question_relevant: LLM returned None (fallback ke True)")
