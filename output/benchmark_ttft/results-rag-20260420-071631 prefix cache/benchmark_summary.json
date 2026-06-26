@@ -1,0 +1,87 @@
+{
+  "benchmark_info": {
+    "target_url": "http://rag-api:8080/ask",
+    "total_questions": 48,
+    "requests_per_level": 49,
+    "concurrency_levels": [
+      1,
+      2,
+      4,
+      8,
+      16
+    ],
+    "timestamp": "20260420-071631"
+  },
+  "results": [
+    {
+      "concurrency": 1,
+      "total_requests": 49,
+      "successful": 49,
+      "failed": 0,
+      "avg_latency_s": 20.3758,
+      "min_latency_s": 12.9475,
+      "max_latency_s": 65.0933,
+      "p50_latency_s": 18.5951,
+      "p99_latency_s": 47.8361,
+      "stdev_latency_s": 7.7792,
+      "throughput_rps": 0.0491,
+      "wall_clock_s": 998.4141
+    },
+    {
+      "concurrency": 2,
+      "total_requests": 49,
+      "successful": 49,
+      "failed": 0,
+      "avg_latency_s": 39.2027,
+      "min_latency_s": 15.4295,
+      "max_latency_s": 62.0102,
+      "p50_latency_s": 37.4525,
+      "p99_latency_s": 57.7087,
+      "stdev_latency_s": 7.8807,
+      "throughput_rps": 0.0505,
+      "wall_clock_s": 969.6101
+    },
+    {
+      "concurrency": 4,
+      "total_requests": 49,
+      "successful": 37,
+      "failed": 12,
+      "avg_latency_s": 72.7082,
+      "min_latency_s": 19.4616,
+      "max_latency_s": 135.1217,
+      "p50_latency_s": 70.0613,
+      "p99_latency_s": 132.5027,
+      "stdev_latency_s": 27.3324,
+      "throughput_rps": 0.0478,
+      "wall_clock_s": 773.6725
+    },
+    {
+      "concurrency": 8,
+      "total_requests": 49,
+      "successful": 35,
+      "failed": 14,
+      "avg_latency_s": 129.6416,
+      "min_latency_s": 20.3551,
+      "max_latency_s": 290.9441,
+      "p50_latency_s": 138.336,
+      "p99_latency_s": 274.5277,
+      "stdev_latency_s": 69.53,
+      "throughput_rps": 0.0521,
+      "wall_clock_s": 672.2017
+    },
+    {
+      "concurrency": 16,
+      "total_requests": 49,
+      "successful": 35,
+      "failed": 14,
+      "avg_latency_s": 230.5599,
+      "min_latency_s": 13.0377,
+      "max_latency_s": 329.4969,
+      "p50_latency_s": 311.724,
+      "p99_latency_s": 327.0561,
+      "stdev_latency_s": 108.4734,
+      "throughput_rps": 0.0526,
+      "wall_clock_s": 664.8527
+    }
+  ]
+}

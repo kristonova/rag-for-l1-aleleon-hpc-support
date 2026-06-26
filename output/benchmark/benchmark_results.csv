@@ -1,0 +1,1634 @@
+question_id,question,retrieval_dense_ms,retrieval_sparse_ms,retrieval_multi_ms,retrieval_hybrid_ms,dense_vs_sparse,dense_vs_multi,dense_vs_hybrid,sparse_vs_multi,sparse_vs_hybrid,multi_vs_hybrid,e2e_dense_ms,answer_dense,e2e_sparse_ms,answer_sparse,e2e_multi_ms,answer_multi,e2e_hybrid_ms,answer_hybrid
+0,Berapa kapasitas RAM efektif per node di partisi epyc-jumbo?,8.1,0.9,126.3,5.5,0.25,0.538,0.667,0.25,0.429,0.538,3877.7,"Berdasarkan dokumen referensi ""Spesifikasi ALELEON Supercomputer"" pada bagian Partisi epyc-jumbo, kapasitas RAM efektif per node adalah **500GB**.
+
+Namun, perlu dicatat bahwa pada bagian tersebut juga disebutkan bahwa jumlah node untuk partisi ini saat ini adalah **0** karena sedang dalam perbaikan.",3673.6,"Berdasarkan dokumen referensi ""Spesifikasi ALELEON Supercomputer"" pada bagian ""Partisi epyc-jumbo"", kapasitas RAM efektif per node di partisi tersebut adalah **500GB**.
+
+Berikut detailnya:
+*   **Partisi:** epyc-jumbo
+*   **RAM per node:** 500GB efektif",2700.6,"Berdasarkan dokumen referensi Spesifikasi ALELEON Supercomputer pada bagian Partisi epyc-jumbo, kapasitas RAM efektif per node adalah **500GB**.",3617.1,"Berdasarkan dokumen referensi ""Spesifikasi ALELEON Supercomputer"" pada bagian Partisi epyc-jumbo, kapasitas RAM efektif per node adalah **500GB**.
+
+Namun, perlu diperhatikan bahwa pada bagian tersebut juga tertulis bahwa jumlah *Nodes* untuk partisi ini adalah 0 dan sedang dalam perbaikan."
+1,Berapa batas maksimal walltime (waktu komputasi) per job untuk golongan akun perseorangan?,2.5,1.3,155.7,5.6,0.176,0.25,0.429,0.111,0.538,0.25,3875.6,"Berdasarkan dokumen referensi, batas maksimal walltime (waktu komputasi) per job untuk **Akun Perseorangan** adalah **3 hari (72 jam)**.
+
+Informasi ini tercantum pada bagian ""LFU - Setiap Job Komputasi"" di bawah kolom ""Waktu job"" untuk akun perseorangan.",5213.4,"Berdasarkan dokumen referensi, batas maksimal walltime (waktu komputasi) per job untuk golongan akun perseorangan adalah **3 hari (72 jam)**.
+
+Hal ini tercantum pada bagian ""Limitasi Fair Usage ALELEON Supercomputer"" di bawah tabel ""LFU - Setiap Job Komputasi"", yang menyatakan bahwa limit maksimal waktu job untuk Akun Perseorangan adalah 3 hari (72 jam).",3412.0,"Berdasarkan dokumen referensi, batas maksimal walltime (waktu komputasi) per job untuk golongan **Akun Perseorangan** adalah **3 hari (72 jam)**.
+
+Informasi ini tercantum pada bagian ""LFU - Setiap Job Komputasi"" dalam dokumen *Limitasi Fair Usage ALELEON Supercomputer*.",4480.9,"Berdasarkan dokumen referensi, batas maksimal **walltime** (waktu komputasi) per job untuk akun perseorangan adalah **3 hari (72 jam)**.
+
+Hal ini tercantum dalam bagian ""LFU - Setiap Job Komputasi"" pada dokumen *Limitasi Fair Usage ALELEON Supercomputer*, yang menyatakan bahwa untuk Akun Perseorangan, limit waktu job adalah 3 hari (72 jam)."
+2,Saya ingin pakai partisi GPU. GPU jenis apa yang terpasang di partisi ampere?,2.2,0.8,139.0,3.3,0.429,0.538,0.538,0.538,0.667,0.667,1968.3,"Berdasarkan dokumen referensi, partisi **ampere** terpasang GPU jenis **2x NVIDIA RTX 3090 (Ampere)** dengan kapasitas memori **24GB** dan fitur **NVLink**.",5728.9,"Berdasarkan dokumen referensi, partisi **ampere** di ALELEON Supercomputer terpasang GPU jenis **NVIDIA RTX 3090 (Ampere)** dengan spesifikasi berikut:
+
+*   **Jumlah:** 2 unit per node.
+*   **Kapasitas Memori:** 24GB NVLink per kartu.
+*   **Interkoneksi:** Menggunakan NVLink antar kedua GPU tersebut.
+
+Informasi ini didukung oleh bagian ""Partisi ampere"" pada Spesifikasi ALELEON Supercomputer dan konfirmasi pada bagian Library NVIDIA serta Kompatibilitas Komputasi yang menyatakan penggunaan GPU NV",3344.7,"Berdasarkan dokumen referensi, partisi **ampere** di ALELEON Supercomputer terpasang GPU:
+
+*   **2x NVIDIA RTX 3090 (Ampere)** dengan kapasitas memori **24GB** dan fitur **NVLink**.
+
+Informasi ini dapat ditemukan pada bagian ""Spesifikasi ALELEON Supercomputer"" untuk Partisi ampere.",3144.5,"Berdasarkan dokumen referensi, partisi **ampere** terpasang GPU jenis **NVIDIA RTX 3090 (Ampere)** dengan spesifikasi berikut:
+
+*   **Jumlah:** 2x kartu per node.
+*   **Memori:** 24GB NVLink.
+*   **Interkoneksi:** Mendukung NVLink antar kedua kartu tersebut."
+3,Apa alamat website portal EFIRO Web Service (EWS) untuk login?,2.3,1.1,113.0,6.3,0.429,0.429,0.538,0.429,0.538,0.429,1418.4,"Berdasarkan dokumen referensi, alamat website portal EFIRO Web Service (EWS) untuk login adalah:
+
+**https://aleleonsuper.computer**",1849.4,"Berdasarkan dokumen referensi, alamat website portal EFIRO Web Service (EWS) untuk login adalah:
+
+**https://aleleonsuper.computer**",1485.4,"Berdasarkan dokumen referensi, alamat website portal EFIRO Web Service (EWS) untuk login adalah:
+
+**https://aleleonsuper.computer**",5182.0,"Berdasarkan dokumen referensi, alamat website untuk login ke **EFIRO Web Service (EWS)** adalah:
+
+*   **https://aleleonsuper.computer**
+
+Informasi ini tercantum pada bagian ""Opsi Login"" yang menyebutkan EWS sebagai portal web untuk akses ALELEON Supercomputer.
+
+*Catatan Tambahan:*
+Jika Anda menggunakan sistem operasi **Linux**, terdapat juga alamat alternatif untuk mengakses portal EFIRO setelah koneksi VPN aktif, yaitu **http://10.192.50.11**. Namun, alamat utama yang direkomendasikan untuk log"
+4,Perintah apa yang harus saya ketik di terminal untuk melihat daftar environment python/pyload yang saya buat?,3.5,1.3,170.7,3.9,0.176,0.25,0.429,0.429,0.538,0.25,2595.1,"Berdasarkan dokumen referensi, perintah untuk melihat daftar environment (modul pyload) yang telah dibuat adalah:
+
+`pyl list`
+
+Perintah ini akan menampilkan daftar modul di bagian **USER-DEFINED**.",7620.8,"Berdasarkan dokumen referensi, tidak ada perintah tunggal yang secara eksplisit disebut untuk ""melihat daftar environment"" (seperti `conda env list` atau `ls`).
+
+Namun, dokumen menyebutkan langkah berikut untuk **memverifikasi** atau **melihat status** modul pyload yang telah dibuat:
+
+1.  Untuk melihat apakah nama modul sudah berubah (pada bagian Manajemen Image SIF):
+    ```bash
+    pyl list
+    ```
+    *Catatan: Lihat bagian **USER-DEFINED** pada outputnya.*
+
+2.  Untuk mengecek kelengkapan pac",2417.9,"Berdasarkan dokumen referensi, perintah untuk melihat daftar environment Python atau modul pyload yang telah dibuat adalah:
+
+`pyl list`
+
+Perintah ini akan menampilkan bagian **USER-DEFINED** yang berisi modul buatan user.",2910.3,"Berdasarkan dokumen referensi, perintah untuk melihat daftar environment (modul pyload) yang telah dibuat adalah:
+
+`pyl list`
+
+Perintah ini harus dijalankan di terminal. Hasilnya akan menampilkan bagian **USER-DEFINED** yang berisi daftar modul/pyload Anda."
+5,Berapa harga 1 GPU Hour (GH) untuk pengguna golongan perseorangan non-akademia?,2.8,0.8,138.7,2.9,0.538,0.429,0.667,0.429,0.667,0.333,3754.3,"Berdasarkan dokumen referensi, harga untuk 1 GPU Hour (GH) bagi pengguna golongan perseorangan non-akademia adalah **Rp8.585,-/GH**.
+
+Informasi ini terdapat pada tabel ""Biaya Core Hour Golongan Perseorangan"" di bagian [3.1. Golongan Perseorangan], yang membedakan harga antara golongan akademia dan non-akademia. Harga tersebut sudah termasuk PPN.",3617.3,"Berdasarkan dokumen referensi, harga 1 GPU Hour (GH) untuk pengguna golongan perseorangan non-akademia adalah **Rp8.585,-**.
+
+Informasi ini terdapat pada tabel ""Biaya Core Hour Golongan Perseorangan"" di bagian [3.1. Golongan Perseorangan], yang membedakan harga antara golongan akademia dan non-akademia. Harga tersebut sudah termasuk PPN.",3619.2,"Berdasarkan dokumen referensi, harga untuk **1 GPU Hour (GH)** bagi pengguna golongan perseorangan **non-akademia** adalah **Rp8.585,-**.
+
+Hal ini tercantum pada tabel ""Biaya Core Hour Golongan Perseorangan"" di bagian 3.1 Golongan Perseorangan, dengan catatan bahwa harga tersebut sudah termasuk PPN.",4123.4,"Berdasarkan dokumen referensi, harga untuk 1 GPU Hour (GH) bagi pengguna golongan perseorangan non-akademia adalah **Rp8.585,-**.
+
+Informasi ini tercantum pada bagian ""Biaya Core Hour Golongan Perseorangan"" di mana:
+*   Golongan: Non-akademia
+*   Metrik: GPU Hour (GH)
+*   Harga: Rp8.585,-/GH (Harga sudah termasuk PPN)."
+6,Saya mau cek sisa kuota core hour saya. Perintah sausage apa yang harus diketik?,2.9,1.1,152.4,2.9,0.111,0.818,0.429,0.111,0.429,0.429,8178.0,"Berdasarkan dokumen referensi yang diberikan, **tidak ada perintah spesifik** (command line) untuk menjalankan tool `sausage` yang tercantum dalam teks.
+
+Dokumen hanya menjelaskan bahwa:
+1.  `Sausage` adalah tool yang digunakan untuk memonitor penggunaan Core Hour, Limit Fair Usage, dan storage di ALELEON.
+2.  Tool ini membaca data dari manajemen Slurm.
+3.  Informasi mengenai sisa kuota ditampilkan oleh `sausage` sebagai **Effective Core Hour Remaining**, **Actual Core Hour Usage**, atau **Total",2302.6,"Berdasarkan dokumen referensi, untuk mengecek sisa kuota core hour Anda, Anda harus menjalankan perintah:
+
+**`sausage`**
+
+Perintah ini berfungsi untuk membaca penggunaan core hour user. Setelah menjalankannya, Anda dapat memilih menu sesuai kebutuhan di dalam tool tersebut.",3022.4,"Berdasarkan dokumen referensi, untuk memantau status dan melihat sisa kuota core hour (menu Konsumsi Core Hour), Anda harus menjalankan perintah berikut di terminal:
+
+`$ sausage`
+
+Setelah perintah dijalankan, pilih **Menu 1** yang bertuliskan ""Konsumsi Core Hour"".",7503.9,"Berdasarkan dokumen referensi yang diberikan, **tidak ada perintah spesifik** (command line) untuk mengecek sisa kuota core hour yang disebutkan secara eksplisit.
+
+Namun, dokumen tersebut menjelaskan bahwa:
+1.  Tool **Sausage** digunakan untuk memonitor penggunaan core hour dan sisa kuota.
+2.  Sausage akan menampilkan nilai **Effective Core Hour Remaining** (sisa kuota efektif), **Actual Core Hour Usage**, dan **Total Core Hour Usage** tergantung pada status job Anda (apakah sedang berjalan atau"
+7,Apa itu PKSPIAS dalam pendaftaran akun ALELEON?,3.1,1.0,95.2,2.8,0.176,0.538,0.429,0.333,0.538,0.667,9102.0,"Berdasarkan dokumen referensi, **PKSPIAS** adalah singkatan dari **Perjanjian Kerja Sama Pengguna Institusi ALELEON Supercomputer**.
+
+Berikut adalah detail mengenai PKSPIAS:
+*   **Tujuan:** Dokumen ini membahas legalitas kerjasama dan kesepakatan teknis antara institusi dengan EFISON.
+*   **Isi Kesepakatan:** PKSPIAS mencakup ketentuan khusus yang berbeda dengan pengguna perseorangan, meliputi:
+    *   Syarat, ketentuan, dan alur penggunaan ALELEON.
+    *   Besar QoS alokasi komputasi atau Limit",9835.7,"Berdasarkan dokumen referensi, **PKSPIAS** adalah singkatan dari **Perjanjian Kerja Sama Pengguna Institusi ALELEON Supercomputer**.
+
+Berikut adalah detail mengenai PKSPIAS:
+*   **Tujuan:** Dokumen ini membahas legalitas kerjasama dan kesepakatan teknis antara pihak institusi dengan EFISON.
+*   **Konteks Penggunaan:** PKSPIAS merupakan syarat wajib bagi **Golongan Institusi** (institusi/lembaga/badan usaha/organisasi yang berdiri secara hukum di Indonesia) untuk menggunakan ALELEON Supercomputer",7906.6,"Berdasarkan dokumen referensi, **PKSPIAS** adalah singkatan dari **Perjanjian Kerja Sama Pengguna Institusi ALELEON Supercomputer**.
+
+Berikut adalah detail mengenai PKSPIAS:
+*   **Tujuan:** Dokumen ini diadakan oleh kedua belah pihak (pengguna institusi dan EFISON) untuk membahas legalitas kerjasama serta kesepakatan teknis terkait alokasi komputasi.
+*   **Konteks Penggunaan:** PKSPIAS wajib ditandatangani bagi **Golongan Institusi** (institusi/lembaga/badan usaha/organisasi yang berdiri di Indo",8486.6,"Berdasarkan dokumen referensi, **PKSPIAS** adalah singkatan dari **Perjanjian Kerja Sama Pengguna Institusi ALELEON Supercomputer**.
+
+Berikut adalah detail mengenai PKSPIAS:
+*   **Tujuan:** Dokumen ini membahas legalitas kerjasama dan kesepakatan teknis antara pihak institusi dengan EFISON.
+*   **Konten Kesepakatan:** PKSPIAS mencakup hal-hal khusus yang berbeda untuk golongan institusi dibandingkan perseorangan, meliputi:
+    *   Syarat, ketentuan, dan alur penggunaan ALELEON.
+    *   Besar QoS"
+8,"Jika saya pakai aplikasi SFTP seperti FileZilla, apakah ada limit ukuran file yang bisa diupload?",3.6,1.1,151.7,3.7,0.111,0.25,0.429,0.538,0.429,0.429,3736.3,"Berdasarkan dokumen referensi, **tidak ada limit ukuran upload** jika Anda menggunakan aplikasi SFTP (seperti FileZilla).
+
+Berikut detailnya:
+*   **Via EFIRO Web Service:** Ada batasan upload sebesar 100MB per file. Jika lebih dari itu, disarankan menggunakan aplikasi SFTP.
+*   **Via Aplikasi SFTP:** Tidak ada limit ukuran upload maupun download.",5675.2,"Berdasarkan dokumen referensi yang diberikan, berikut adalah jawabannya:
+
+**Tidak ada batasan (limit) ukuran upload/download** jika Anda menggunakan aplikasi SFTP (seperti FileZilla).
+
+Dokumen secara spesifik membedakan antara transfer via web dan aplikasi SFTP pada bagian **Transfer Data Direktori HOME**:
+*   **Via EFIRO Web Service:** Ada limit upload sebesar **100MB per file**.
+*   **Via Aplikasi SFTP:** Dinyatakan **""Tidak ada limit ukuran upload / download""**.
+
+Oleh karena itu, jika Anda me",3746.5,"Berdasarkan dokumen referensi yang diberikan, **tidak ada batasan (limit) ukuran upload** jika Anda menggunakan aplikasi SFTP (seperti FileZilla).
+
+Berikut detailnya:
+*   **Via EFIRO Web Service:** Ada limit upload sebesar **100MB per file**. Jika lebih dari itu, disarankan menggunakan aplikasi SFTP.
+*   **Via Aplikasi SFTP:** Tidak ada limit ukuran upload maupun download.",4192.0,"Berdasarkan dokumen referensi, **tidak ada batasan (limit) ukuran upload** jika Anda menggunakan aplikasi SFTP seperti FileZilla.
+
+Berikut rinciannya:
+*   **Via Aplikasi SFTP:** Tidak ada limit ukuran upload maupun download.
+*   **Via EFIRO Web Service:** Terdapat batas upload sebesar 100MB per file. Jika ukuran file lebih dari 100MB, disarankan untuk menggunakan aplikasi SFTP."
+9,OS (Sistem Operasi) apa yang digunakan oleh ALELEON Mk.V?,2.5,0.7,131.7,2.8,0.429,0.667,0.667,0.25,0.667,0.429,3266.8,"Berdasarkan dokumen referensi ""Spesifikasi ALELEON Supercomputer"", Sistem Operasi yang digunakan oleh ALELEON (termasuk Mk.V) adalah:
+
+*   **Rocky Linux 9.7 (Blue Onyx)**
+*   Kernel: **5.14.0-611.41.1.el9_7.x86_64**",4181.0,"Berdasarkan dokumen referensi, ALELEON Mk.V menggunakan **Rocky Linux 9.7 (Blue Onyx)** sebagai Sistem Operasi.
+
+Informasi ini tercantum pada bagian ""Spesifikasi Software Sistem"" yang menyebutkan:
+*   **Sistem Operasi:** Rocky Linux 9.7 (Blue Onyx)
+*   **Kernel:** 5.14.0-611.41.1.el9_7.x86_64",2739.4,"Berdasarkan dokumen referensi ""Spesifikasi Software Sistem"", ALELEON Mk.V menggunakan sistem operasi **Rocky Linux 9.7 (Blue Onyx)** dengan kernel **5.14.0-611.41.1.el9_7.x86_64**.",2656.8,"Berdasarkan dokumen referensi, Sistem Operasi yang digunakan oleh ALELEON Mk.V adalah **Rocky Linux 9.7 (Blue Onyx)** dengan Kernel **5.14.0-611.41.1.el9_7.x86_64**."
+10,Versi SLURM berapa yang terpasang di sistem ALELEON saat ini?,2.4,3.0,121.3,2.8,0.053,0.667,0.333,0.053,0.429,0.333,3074.7,"Berdasarkan dokumen referensi ""Spesifikasi ALELEON Supercomputer"" pada bagian Spesifikasi Software Sistem, versi Slurm yang terpasang di sistem ALELEON adalah **Slurm 25.05.7**.
+
+Versi ini merupakan *custom compiled* yang disesuaikan dengan arsitektur ALELEON Supercomputer.",6300.4,"Berdasarkan dokumen referensi yang diberikan, **tidak disebutkan** versi spesifik SLURM yang terpasang di sistem ALELEon saat ini.
+
+Dokumen hanya menjelaskan bahwa:
+1.  User menjalankan job komputasi dari login node ke compute node melalui manajemen **Slurm**.
+2.  Slurm terintegrasi di login node dan EFIRO Web Service.
+3.  Terdapat berbagai template script untuk submission job (R, GAMESS, NAMD, CP2K, NWChem) yang menggunakan perintah standar Slurm seperti `sbatch`, `squeue`, dan `scancel`.
+
+Info",3404.6,"Berdasarkan dokumen referensi ""Spesifikasi ALELEON Supercomputer"" pada bagian ""Manajemen job (scheduler)"", versi Slurm yang terpasang di sistem ALELEON adalah **Slurm 25.05.7**.
+
+Versi ini merupakan *custom compiled* yang disesuaikan dengan arsitektur ALELEON Supercomputer.",2769.8,"Berdasarkan dokumen referensi ""Spesifikasi Software Sistem"", sistem ALELEON Supercomputer menggunakan **Slurm versi 25.05.7**.
+
+Versi ini merupakan *custom compiled* yang disesuaikan dengan arsitektur ALELEON Supercomputer."
+11,Bagaimana cara membatalkan/menghentikan job yang berstatus PENDING di terminal?,2.8,1.1,134.1,9.3,0.0,0.538,0.25,0.176,0.429,0.538,7258.5,"Berdasarkan dokumen referensi, berikut adalah cara membatalkan atau menghentikan job yang berstatus **PENDING** (atau status lainnya) di terminal:
+
+1.  **Dapatkan Job ID**:
+    Lihat daftar job dan statusnya menggunakan perintah `squeue` untuk menemukan Job ID yang ingin dibatalkan.
+    ```bash
+    squeue -ul $USER
+    ```
+
+2.  **Jalankan Perintah Pembatalan**:
+    Gunakan perintah `scancel` diikuti dengan Job ID tersebut.
+    
+    *Contoh:* Jika Job ID adalah **231**, jalankan perintah:
+    ```",7894.7,"Berdasarkan dokumen referensi, berikut adalah langkah-langkah untuk membatalkan/menghentikan job yang berstatus **PENDING** di terminal:
+
+1.  **Cari ID Job:**
+    Jalankan perintah berikut untuk melihat daftar job user dan mencari nomor ID job yang berstatus `PENDING`:
+    ```bash
+    $ squeue -lu $USER
+    ```
+
+2.  **Batalkan Job:**
+    Setelah menemukan nomor ID job yang diinginkan (misalnya: `[job-ID]`), jalankan perintah `scancel` dengan format berikut:
+    ```bash
+    $ scancel [job-ID]
+   ",7990.5,"Berdasarkan dokumen referensi, berikut adalah cara membatalkan/menghentikan job yang berstatus **PENDING** di terminal:
+
+1.  **Lihat status job dan dapatkan Job ID:**
+    Jalankan perintah `squeue` (atau `squeue -ul $USER`) untuk melihat daftar job Anda. Identifikasi nomor **Job ID** dari job yang memiliki status **PD (PENDING)**.
+
+2.  **Jalankan perintah pembatalan:**
+    Gunakan perintah `scancel` diikuti dengan nomor Job ID tersebut.
+    
+    Contoh format perintah:
+    ```bash
+    scancel [j",7859.7,"Berdasarkan dokumen referensi, berikut adalah langkah-langkah untuk membatalkan atau menghentikan job yang berstatus **PENDING** di terminal:
+
+1.  **Cek Status dan ID Job**
+    Jalankan perintah berikut untuk melihat daftar job Anda beserta statusnya:
+    ```bash
+    $ squeue -lu $USER
+    ```
+    Cari nomor **ID job** yang memiliki status **PENDING**.
+
+2.  **Batalkan Job**
+    Setelah mendapatkan ID job-nya, jalankan perintah `scancel` diikuti dengan ID job tersebut:
+    ```bash
+    $ scancel ["
+12,Berapa kapasitas limit storage HOME untuk akun perseorangan?,3.1,0.9,91.5,2.8,0.333,0.538,0.538,0.333,0.667,0.429,3989.6,"Berdasarkan dokumen referensi, kapasitas limit storage HOME untuk golongan perseorangan adalah **150 GiB**.
+
+Informasi ini tercantum pada bagian ""Kapasitas Storage HOME"" yang menyatakan:
+*   Golongan perseorangan -> 150 GiB.
+*   Bagi golongan perseorangan, monitor penggunaan storage menjadi tanggung jawab user (dapat dipantau berkala dengan `sausage ncdu`).",3268.3,"Berdasarkan dokumen referensi yang diberikan, kapasitas limit storage HOME untuk golongan perseorangan adalah **150 GiB**.
+
+Informasi ini tercantum pada bagian ""Kapasitas Storage HOME"" di mana disebutkan:
+*   Golongan perseorangan -> 150 GiB.
+*   Golongan institusi, sesuai perjanjian kerja sama.",11326.7,"Berdasarkan dokumen referensi, kapasitas limit storage HOME untuk golongan perseorangan adalah **150 GiB**.
+
+Informasi ini tercantum pada bagian ""Kapasitas Storage HOME"" yang menyatakan:
+*   Golongan perseorangan -> 150 GiB.",3096.4,"Berdasarkan dokumen referensi, kapasitas limit storage HOME untuk golongan perseorangan adalah **150 GiB**.
+
+Informasi ini tercantum pada bagian ""Kapasitas Storage HOME"" yang menyatakan:
+*   Golongan perseorangan -> 150 GiB.
+*   Golongan institusi, sesuai perjanjian kerja sama."
+13,Apakah sistem ALELEON memiliki backup jika saya tidak sengaja menghapus data di HOME?,2.5,1.0,121.3,4.9,0.538,0.667,0.818,0.429,0.667,0.667,9005.4,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai sistem backup otomatis atau fitur pemulihan data (restore) jika user tidak sengaja menghapus data di direktori HOME.
+
+Dokumen hanya memberikan instruksi bagi user untuk melakukan **backup data secara manual** sebelum migrasi atau untuk keperluan penyimpanan, dengan opsi sebagai berikut:
+1.  **Via Aplikasi SFTP** (direkomendasikan oleh tim admin).
+2.  **Via EWS App Job Composer** (untuk data komputasi).
+3.  **Via EWS A",7466.9,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai fitur backup otomatis atau sistem pemulihan data (restore) jika user tidak sengaja menghapus data di direktori HOME.
+
+Dokumen hanya menjelaskan prosedur untuk melakukan **backup data secara manual** oleh user sebelum migrasi dari Mk.III ke Mk.V melalui tiga opsi:
+1.  Backup Data via Aplikasi SFTP (direkomendasikan).
+2.  Backup Data Komputasi Job Composer EWS.
+3.  Backup Data via EWS App Home Directory.
+
+Selain itu, do",10095.2,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai adanya fitur backup otomatis atau sistem pemulihan data jika Anda tidak sengaja menghapus data di direktori HOME.
+
+Dokumen hanya menekankan hal berikut terkait penyimpanan dan keamanan data:
+1.  **Tanggung Jawab User:** Bagi golongan perseorangan, memantau penggunaan storage menjadi tanggung jawab user.
+2.  **Risiko Penuh:** Job komputasi akan putus atau tidak dapat berjalan apabila storage HOME penuh.
+3.  **Prosedur ",13229.3,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** yang menyatakan bahwa sistem ALELEON menyediakan fitur backup otomatis atau pemulihan data jika user tidak sengaja menghapus data di direktori HOME.
+
+Dokumen hanya menekankan hal berikut terkait tanggung jawab data:
+1.  **Tanggung Jawab User:** Bagi golongan perseorangan, memantau penggunaan storage dan menjaga data menjadi tanggung jawab penuh user (Sumber: *Sausage dan Aturan Metrik Penggunaan ALELEON*).
+2.  **Prosedur Backu"
+14,Email resmi apa yang harus saya hubungi jika ingin submit support ticket?,3.3,1.6,115.5,7.2,0.176,0.538,0.429,0.25,0.538,0.538,8970.2,"Berdasarkan dokumen referensi yang diberikan, berikut adalah penjelasan mengenai cara menghubungi support:
+
+1.  **Untuk Submit Support Ticket:** Anda tidak perlu mengirim email khusus untuk *submit* tiket. Anda harus melakukan langkah berikut:
+    *   Login ke **EFIRO Web Service** (atau EWS).
+    *   Buka menu **Help (?)**.
+    *   Pilih **Submit Support Ticket**.
+
+2.  **Kontak Email Resmi:** Jika Anda ingin menghubungi tim admin melalui email (misalnya jika Anda tidak dapat login ke EWS atau u",8700.5,"Berdasarkan dokumen referensi yang diberikan, berikut adalah informasi mengenai cara menghubungi tim admin untuk submit support:
+
+1.  **Untuk Submit Support Ticket:**
+    Anda tidak mengirim email langsung ke alamat tertentu untuk membuat tiket. Sebaliknya, Anda harus melakukan langkah berikut:
+    *   Login ke **[EFIRO Web Service]**.
+    *   Buka menu **Help (?)**.
+    *   Pilih **Submit Support Ticket**.
+
+2.  **Alternatif Kontak (Email):**
+    Jika Anda ingin menghubungi tim admin melalui ema",10908.8,"Berdasarkan dokumen referensi yang diberikan, berikut adalah informasi mengenai cara menghubungi support:
+
+1.  **Untuk Submit Support Ticket:**
+    Anda **tidak** perlu mengirim email khusus hanya untuk membuat tiket. Cara resmi untuk submit support ticket adalah melalui portal web dengan langkah-langkah berikut:
+    *   Login ke **EFIRO Web Service**.
+    *   Buka menu **Help (?)**.
+    *   Pilih **Submit Support Ticket**.
+
+2.  **Kontak Email Resmi:**
+    Alamat email resmi yang disediakan dala",13761.2,"Berdasarkan dokumen referensi yang diberikan, berikut adalah informasi mengenai cara menghubungi tim admin:
+
+1.  **Untuk Submit Support Ticket:**
+    Anda tidak perlu mengirim email khusus untuk *submit* tiket. Anda harus melakukan langkah berikut:
+    *   Login ke **EFIRO Web Service** (atau **aleleonsuper.computer** pada bagian Troubleshooting).
+    *   Buka menu **Help (?)**.
+    *   Pilih **Submit Support Ticket**.
+
+2.  **Kontak Email Resmi:**
+    Alamat email resmi yang tercantum dalam doku"
+15,"Saya mau menjalankan simulasi GROMACS, apa nama binary MPI yang dipakai? Apakah gmx atau yang lain?",3.0,1.0,371.3,10.3,0.667,0.818,0.818,0.818,0.818,1.0,4407.2,"Berdasarkan dokumen referensi, nama binary MPI yang harus digunakan adalah **`gmx_mpi`**, bukan `gmx`.
+
+Hal ini dikarenakan GROMACS di ALELEON Supercomputer telah diinstal dengan MPI (untuk komputasi multi-node CPU dan GPU). Jika Anda membawa script GROMACS sendiri, Anda diminta untuk menyesuaikannya agar menggunakan `gmx_mpi`.",5364.6,"Berdasarkan dokumen referensi, nama binary MPI yang harus digunakan untuk menjalankan simulasi GROMACS di ALELEON Supercomputer adalah **`gmx_mpi`**.
+
+Anda **tidak boleh** menggunakan binary `gmx` biasa. Hal ini dikarenakan GROMACS diinstal dengan dukungan MPI (untuk komputasi multi-node CPU dan GPU). Jika Anda membawa script GROMACS sendiri, pastikan disesuaikan untuk memanggil `gmx_mpi`.",4670.5,"Berdasarkan dokumen referensi, binary MPI yang dipakai untuk menjalankan GROMACS di ALELEON Supercomputer adalah **`gmx_mpi`**.
+
+Anda **tidak boleh** menggunakan binary `gmx`. Hal ini karena GROMACS diinstal dengan MPI (untuk komputasi multi-node CPU-GPU), sehingga pengguna wajib menyesuaikan script mereka untuk memanggil `gmx_mpi` alih-alih `gmx`.",4555.5,"Berdasarkan dokumen referensi, nama binary MPI yang harus dipakai adalah **`gmx_mpi`**, bukan `gmx`.
+
+Hal ini dikarenakan GROMACS di ALELEON Supercomputer telah diinstal dengan MPI (untuk komputasi multi-node CPU-GPU). Jika Anda membawa script GROMACS sendiri, Anda diminta untuk menyesuaikannya agar menggunakan `gmx_mpi`."
+16,"Di EFIRO Account Manager, aplikasi authenticator apa saja yang didukung untuk fitur 2FA?",2.7,1.8,308.8,5.8,0.538,0.818,0.667,0.667,0.818,0.818,2214.6,"Berdasarkan dokumen referensi, EFIRO Account Manager mendukung aplikasi mobile berikut untuk fitur Two-factor Authentication (2FA):
+
+1.  Microsoft Authenticator
+2.  Google Authenticator
+3.  FreeOTP",3283.2,"Berdasarkan dokumen referensi, EFIRO Account Manager mendukung aplikasi mobile berikut untuk fitur Two-factor Authentication (2FA):
+
+1.  Microsoft Authenticator
+2.  Google Authenticator
+3.  FreeOTP
+
+User diwajibkan menginstal salah satu dari aplikasi tersebut pada perangkat mobile sebelum mengatur 2FA.",4082.0,"Berdasarkan dokumen referensi, EFIRO Account Manager (EAM) mendukung aplikasi mobile berikut untuk fitur Two-factor Authentication (2FA):
+
+1.  **Microsoft Authenticator**
+2.  **Google Authenticator**
+3.  **FreeOTP**
+
+Jika pengguna belum memiliki salah satu aplikasi tersebut, disarankan untuk menginstalnya di perangkat mobile sebelum melakukan pengaturan 2FA.",3459.9,"Berdasarkan dokumen referensi, EFIRO Account Manager (EAM) mendukung aplikasi mobile berikut untuk Two-factor Authentication (2FA):
+
+1.  **Microsoft Authenticator**
+2.  **Google Authenticator**
+3.  **FreeOTP**
+
+Jika user belum memiliki salah satu aplikasi tersebut, disarankan untuk menginstalnya di perangkat mobile sebelum mengatur 2FA."
+17,Apa perintah terminal untuk mengecek status antrian job saya di Slurm?,3.0,1.8,139.5,5.9,0.333,0.333,0.538,0.429,0.667,0.538,6803.7,"Berdasarkan dokumen referensi, perintah terminal untuk mengecek status antrian dan jalannya job Anda di Slurm adalah:
+
+`$ squeue -ul $USER`
+
+Perintah ini akan menampilkan daftar status job (ST/STATE) seperti:
+*   **PD (PENDING):** Job mengantri dan belum berjalan.
+*   **R (RUN):** Job sedang berjalan.
+*   **Tidak ada di squeue:** Job bersangkutan telah selesai.",6657.9,"Berdasarkan dokumen referensi, perintah terminal untuk mengecek status antrian job Anda di Slurm adalah:
+
+`$ squeue -ul $USER`
+
+Perintah ini akan menampilkan daftar status job (ST/STATE) Anda, seperti:
+*   **PD (PENDING):** Job mengantri dan belum berjalan.
+*   **R (RUN):** Job sedang berjalan.
+*   **Tidak ada di squeue:** Job bersangkutan telah selesai.",4591.7,"Berdasarkan dokumen referensi, perintah terminal untuk mengecek status antrian job Anda di Slurm adalah:
+
+`$ squeue -ul $USER`
+
+Perintah ini akan menampilkan daftar status job (ST/STATE) milik user yang sedang login.",7480.4,"Berdasarkan dokumen referensi, perintah terminal untuk mengecek status antrian job Anda di Slurm adalah:
+
+`squeue -ul $USER`
+
+Perintah ini akan menampilkan daftar status job (ST/STATE) yang sedang berjalan atau mengantri. Berikut adalah arti dari beberapa status yang mungkin muncul:
+*   **PD (PENDING):** Job sedang mengantri dan belum berjalan.
+*   **R (RUN):** Job sedang berjalan.
+*   **Tidak ada di squeue:** Job bersangkutan telah selesai."
+18,Apakah ALELEON mendukung instalasi package Python menggunakan pip?,4.9,2.2,201.1,5.7,0.25,0.667,0.667,0.25,0.429,0.538,5770.4,"Ya, ALELEON mendukung instalasi package Python menggunakan **pip**.
+
+Berdasarkan dokumen referensi:
+1.  **AI Compilation ALELEON** didefinisikan sebagai environment yang berisikan koleksi berbagai instalasi pip (PyPi) package Python untuk komputasi AI umum.
+2.  Dalam panduan **Komputasi Python dengan Python Virtualenv User**, disebutkan bahwa proses instalasi package Python kebutuhan user mendukung package manager **pip** dan **conda**.",10022.8,"Ya, ALELEON mendukung instalasi package Python menggunakan `pip`.
+
+Berdasarkan dokumen referensi:
+1.  **Dukungan Package Manager:** Sistem ini secara eksplisit menyatakan mendukung package manager `pip` dan `conda` untuk instalasi kebutuhan user (Sumber: *Komputasi Python dengan Python Virtualenv User*, Section 2).
+2.  **Contoh Penggunaan:** Terdapat contoh perintah instalasi package menggunakan pip, seperti `pip install jupyter notebook` saat menggunakan virtualenv di sesi JupyterLab (Sumber: *",8114.6,"Ya, ALELEON mendukung instalasi package Python menggunakan `pip`.
+
+Berdasarkan dokumen referensi:
+1.  Pada panduan **Mengaktifkan Virtualenv dan Instalasi Package** serta **Mengaktifkan Conda Env dan Instalasi Package**, disebutkan bahwa proses instalasi package kebutuhan user ""Mendukung package manager **pip** dan conda"".
+2.  Sebagai contoh penggunaan, terdapat instruksi untuk menginstal paket Jupyter di dalam sesi virtualenv/conda dengan perintah: `(env) $ pip install jupyter notebook`.",8584.0,"Ya, ALELEON mendukung instalasi package Python menggunakan **pip**.
+
+Berdasarkan dokumen referensi:
+1.  Pada bagian **Mengaktifkan Virtualenv dan Instalasi Package**, disebutkan bahwa untuk menginstal package Python kebutuhan user, sistem mendukung package manager **pip** (dan conda).
+2.  Contoh perintah yang diberikan adalah `(env) $ pip install jupyter notebook` saat berada di dalam sesi virtualenv atau JupyterLab."
+19,Modul Lmod apa yang harus saya load jika ingin menggunakan compiler GCC versi 15.2.0?,4.4,1.7,293.0,6.1,0.25,0.25,0.538,0.333,0.538,0.429,7933.9,"Berdasarkan dokumen referensi, modul Lmod yang harus Anda load untuk menggunakan compiler GCC versi 15.2.0 adalah:
+
+**`gcc/15.2.0-gcc-13.4.0-pnb`**
+
+Anda dapat memuatnya dengan perintah berikut di terminal atau dalam submit script:
+```bash
+ml gcc/15.2.0-gcc-13.4.0-pnb
+```",14846.3,"Berdasarkan dokumen referensi, terdapat dua modul Lmod yang menyediakan compiler **GCC versi 15.2.0**:
+
+1.  Untuk compiler C/C++/Fortran (Section 4.1):
+    `gcc/15.2.0-gcc-13.4.0-pnb`
+
+2.  Untuk Open MPI (Section 4.2):
+    `openmpi/5.0.8-gcc-15.2.0-bip`
+
+Anda dapat memuatnya menggunakan perintah:
+`ml load gcc/15.2.0-gcc-13.4.0-pnb` (untuk compiler umum)
+atau
+`ml load openmpi/5.0.8-gcc-15.2.0-bip` (jika membutuhkan Open MPI dengan GCC 15.2.0).",7096.5,"Berdasarkan dokumen referensi **Katalog Software ALELEON Supercomputer** pada bagian **4.1. Compiler C/C++/Fortran**, berikut adalah nama modul Lmod untuk compiler GCC versi 15.2.0:
+
+*   `gcc/15.2.0-gcc-13.4.0-pnb`
+
+Catatan: Dokumen juga menyebutkan bahwa sistem memiliki GCC 15.2.0, namun nama modul spesifik yang terdaftar dalam tabel hanya satu yaitu `gcc/15.2.0-gcc-13.4.0-pnb`.",6542.0,"Berdasarkan dokumen referensi **Section 4.1. Compiler C/C++/Fortran**, modul Lmod yang harus Anda load untuk menggunakan compiler GCC versi 15.2.0 adalah:
+
+**`gcc/15.2.0-gcc-13.4.0-pnb`**
+
+Anda dapat memuatnya dengan perintah berikut di terminal atau submit script:
+```bash
+ml load gcc/15.2.0-gcc-13.4.0-pnb
+```"
+20,"Saya ingin buka sesi interaktif JupyterLab menggunakan GPU. Apa bedanya partisi torti dan tilla, dan mana yang harus saya pilih?",3.2,1.5,234.5,3.5,0.538,0.538,0.818,0.667,0.667,0.538,17107.6,"Berdasarkan dokumen referensi, berikut adalah perbedaan dan rekomendasi partisi untuk sesi JupyterLab menggunakan GPU:
+
+**Perbedaan Partisi:**
+*   **torti**: Digunakan untuk **interactive node CPU**. Partisi ini tidak menyediakan akses ke GPU.
+    *   Spesifikasi: AMD Threadripper 3990X (32 v-thread), RAM 55GB efektif.
+*   **tilla**: Digunakan untuk **interactive node GPU**. Partisi ini dilengkapi dengan GPU NVIDIA RTX 3090 (Ampere) 24GB per node.
+    *   Spesifikasi: Sama dengan torti untuk CPU",10270.0,"Berdasarkan dokumen referensi, berikut adalah perbedaan dan rekomendasi pemilihan partisi untuk sesi JupyterLab Anda:
+
+**Perbedaan Partisi:**
+*   **torti**: Digunakan untuk **interactive node CPU**.
+*   **tilla**: Digunakan untuk **interactive node GPU**.
+
+**Rekomendasi Pilihan:**
+Karena Anda ingin menggunakan **GPU**, Anda harus memilih partisi **`tilla`**.
+
+**Catatan Tambahan untuk Partisi `tilla`:**
+1.  Pada formulir sesi Jupyter, pastikan Anda mengisi kolom **Number of GPUs** dengan angka **",8209.2,"Berdasarkan dokumen referensi, berikut adalah perbedaan dan rekomendasi partisi untuk sesi JupyterLab Anda:
+
+**Perbedaan Partisi:**
+*   **torti**: Digunakan untuk **interactive node CPU**.
+*   **tilla**: Digunakan untuk **interactive node GPU**.
+
+**Rekomendasi Pilihan:**
+Karena Anda ingin menggunakan GPU, Anda harus memilih partisi **`tilla`**.
+
+**Catatan Tambahan saat memilih `tilla`:**
+1.  Pada kolom **Number of GPUs**, isi angka **1**.
+2.  Perhatikan kebutuhan modul CUDA:
+    *   Jika Anda me",6354.2,"Berdasarkan dokumen referensi, berikut adalah perbedaan dan rekomendasi partisi untuk sesi JupyterLab menggunakan GPU:
+
+**Perbedaan Partisi:**
+*   **Partisi `torti`:** Digunakan untuk **interactive node CPU**. Partisi ini tidak memiliki GPU.
+*   **Partisi `tilla`:** Digunakan untuk **interactive node GPU**. Partisi ini dilengkapi dengan 1 unit GPU NVIDIA RTX 3090 (24GB).
+
+**Rekomendasi Pilihan:**
+Karena Anda ingin membuka sesi interaktif JupyterLab **menggunakan GPU**, Anda harus memilih partisi"
+21,Saya punya file simulasi.ipynb. Bagaimana urutan langkah menjalankannya sebagai batch job di Job Composer EWS menggunakan conda environment saya sendiri?,3.2,1.0,136.8,3.1,0.176,0.818,0.538,0.176,0.429,0.538,29017.9,"Berdasarkan dokumen referensi **Komputasi Python dengan Conda Environment User**, berikut adalah urutan langkah untuk menjalankan file `simulasi.ipynb` Anda sebagai batch job di Job Composer EWS:
+
+**1. Login dan Buat Ruang Job**
+*   Login ke **[EFIRO Web Service]**, lalu buka menu **Jobs > Job Composer**.
+*   Buat ruang job baru dengan memilih menu **New Jobs > From Template**.
+
+**2. Pilih Template**
+*   Pilih template sesuai kebutuhan komputasi Anda:
+    *   **Conda Environment User (CPU)** jik",26285.1,"Berdasarkan dokumen referensi **Komputasi Python dengan Conda Environment User**, berikut adalah urutan langkah untuk menjalankan file `simulasi.ipynb` sebagai batch job di Job Composer EWS:
+
+**1. Login dan Buat Ruang Job**
+*   Login ke **[EFIRO Web Service]**, buka menu **Jobs > Job Composer**.
+*   Buat ruang job baru dengan memilih menu **New Jobs > From Template**.
+
+**2. Pilih Template dan Beri Nama**
+*   Pilih template sesuai kebutuhan komputasi Anda (CPU atau GPU):
+    *   **Conda Environme",26833.5,"Berdasarkan dokumen referensi **Komputasi Python dengan Conda Environment User**, berikut adalah urutan langkah untuk menjalankan file `simulasi.ipynb` Anda sebagai batch job di Job Composer EWS:
+
+**1. Login dan Buat Ruang Job**
+*   Login ke **[EFIRO Web Service]**, buka menu **Jobs > Job Composer**.
+*   Buat ruang job baru dengan memilih menu **New Jobs > From Template**.
+
+**2. Pilih Template**
+*   Pilih template sesuai kebutuhan komputasi Anda:
+    *   **Conda Environment User (CPU)** jika ber",23327.8,"Berdasarkan dokumen referensi **Komputasi Python dengan Conda Environment User**, berikut adalah urutan langkah untuk menjalankan file `simulasi.ipynb` Anda sebagai batch job di Job Composer EWS:
+
+**1. Login dan Buat Ruang Job**
+*   Login ke **[EFIRO Web Service]**, buka menu **Jobs > Job Composer**.
+*   Buat ruang job baru dengan memilih menu **New Jobs > From Template**.
+*   Pilih template sesuai kebutuhan:
+    *   **Conda Environment User (CPU)** jika berjalan di compute node CPU.
+    *   **C"
+22,Jelaskan perbedaan arti status job 'PD' dan 'CG' saat saya mengecek squeue. Lalu sebutkan satu contoh Reason kenapa job bisa berstatus PD!,3.1,0.8,145.2,2.4,0.176,0.538,0.538,0.333,0.429,0.538,8101.1,"Berdasarkan dokumen referensi, berikut adalah penjelasan perbedaan status job 'PD' dan 'CG', serta contoh alasan mengapa job bisa berstatus PD:
+
+**Perbedaan Status Job:**
+*   **PD (PENDING):** Artinya job sedang **mengantri dan belum berjalan**. Job ini tertahan menunggu sumber daya tersedia.
+*   **CG (COMPLETING):** Artinya job sudah **selesai melakukan komputasi** dan saat ini sedang dalam proses *clean-up*.
+
+**Contoh Alasan Job Berstatus PD:**
+Dokumen referensi menyebutkan bahwa jika job bers",9155.1,"Berdasarkan dokumen referensi, berikut adalah penjelasan mengenai perbedaan status job 'PD' dan 'CG', serta contoh alasan mengapa job bisa berstatus PD:
+
+**Perbedaan Status Job:**
+*   **PD (PENDING):** Menandakan bahwa job sedang **diantri atau tertahan** dan belum berjalan.
+*   **CG (COMPLETING):** Menandakan bahwa job telah **selesai** melakukan komputasi dan sedang dalam proses *clean-up*.
+
+**Contoh Alasan Job Berstatus PD:**
+Dokumen referensi menyebutkan bahwa jika job berstatus **PD**, user",9722.5,"Berdasarkan dokumen referensi, berikut adalah penjelasan mengenai perbedaan status job 'PD' dan 'CG', serta contoh alasan mengapa job bisa berstatus PD:
+
+**Perbedaan Status Job:**
+*   **PD (PENDING):** Menandakan bahwa job sedang **mengantri dan belum berjalan**. Job ini tertahan menunggu sumber daya tersedia.
+*   **CG (COMPLETING):** Menandakan bahwa job telah **selesai melakukan komputasi** dan saat ini sedang dalam proses *clean-up* (pembersihan).
+
+**Contoh Alasan Job Berstatus PD:**
+Dokumen ",10111.5,"Berdasarkan dokumen referensi, berikut adalah penjelasan perbedaan status job 'PD' dan 'CG', serta contoh alasan mengapa job bisa berstatus PD:
+
+**Perbedaan Status Job:**
+*   **PD (PENDING):** Menunjukkan bahwa job sedang **mengantri dan belum berjalan**. Job ini tertahan menunggu sumber daya tersedia.
+*   **CG (COMPLETING):** Menunjukkan bahwa job telah **selesai melakukan komputasi** dan saat ini sedang dalam proses *clean-up* (pembersihan).
+
+**Contoh Alasan Job Berstatus PD:**
+Dokumen referen"
+23,"Sebagai pengguna dari Akun Institusi, apakah job saya dibatasi maksimal 128 core CPU seperti akun perseorangan, dan apakah saya menggunakan sistem kuota (beli di awal)?",2.8,1.2,156.7,2.7,0.25,0.818,0.538,0.333,0.538,0.667,14709.7,"Berdasarkan dokumen referensi yang diberikan, berikut adalah jawaban untuk pertanyaan Anda sebagai pengguna **Akun Institusi**:
+
+**1. Apakah job dibatasi maksimal 128 core CPU?**
+**Tidak.** Alokasi komputasi (termasuk batas CPU) untuk Akun Institusi **tidak dibatasi sebesar 128 core** seperti Akun Perseorangan.
+*   Sesuai pada bagian *Limitasi Fair Usage ALELEON Supercomputer*, batas maksimal CPU untuk Akun Institusi ditentukan oleh **PKSPIAS (Perjanjian Kerja Sama Pengguna Institusi ALELEON Sup",12261.3,"Berdasarkan dokumen referensi yang diberikan, berikut adalah jawaban untuk pertanyaan Anda sebagai pengguna **Akun Institusi**:
+
+**1. Apakah job dibatasi maksimal 128 core CPU seperti akun perseorangan?**
+**Tidak.** Akun Institusi tidak menggunakan batas maksimal 128 core CPU (yang merupakan limitasi Fair Usage/LFU untuk akun Perseorangan).
+*   Sesuai dokumen *Limitasi Fair Usage ALELEON Supercomputer*, alokasi komputasi untuk Akun Institusi ditentukan berdasarkan **PKSPIAS** (Perjanjian Kerja S",16074.3,"Berdasarkan dokumen referensi yang diberikan, berikut adalah jawaban untuk pertanyaan Anda sebagai pengguna **Akun Institusi**:
+
+**1. Apakah job dibatasi maksimal 128 core CPU?**
+**Tidak.** Akun Institusi tidak dibatasi maksimal 128 core CPU (yang merupakan batas untuk akun perseorangan).
+*   Sesuai tabel ""LFU - Akumulasi Semua Job Komputasi"" pada dokumen *Limitasi Fair Usage ALELEON Supercomputer*, alokasi CPU untuk **Akun Institusi** adalah **""Sesuai PKSPIAS""**.
+*   PKSPIAS (*Perjanjian Kerja ",13098.1,"Berdasarkan dokumen referensi yang diberikan, berikut adalah jawaban untuk pertanyaan Anda sebagai pengguna **Akun Institusi**:
+
+**1. Apakah job dibatasi maksimal 128 core CPU?**
+**Tidak.** Batasan alokasi komputasi (Limitasi Fair Usage/LFU) untuk Akun Institusi tidak sama dengan Akun Perseorangan (yang terbatas pada 128 CPU).
+*   Sesuai tabel pada bagian *Limitasi Fair Usage ALELEON*, batas maksimal CPU untuk **Akun Institusi** ditentukan oleh **PKSPIAS** (*Perjanjian Kerja Sama Pengguna Instit"
+24,"Saya mau ganti password akun ALELEON saya. Di portal web mana saya harus login, dan menu apa yang harus diklik?",2.8,0.9,108.3,2.3,0.111,0.667,0.429,0.111,0.429,0.333,6546.5,"Berdasarkan dokumen referensi, berikut adalah langkah untuk mengganti password akun ALELEON Anda:
+
+1.  **Portal Web yang harus dibuka:**
+    Buka **EFIRO Account Manager (EAM)** di alamat:
+    `https://login.efisonlt.com`
+
+2.  **Cara Login:**
+    Login menggunakan kredensial user ALELEON Anda saat ini.
+
+3.  **Menu/Fitur:**
+    Setelah login, Anda dapat melakukan manajemen akun (termasuk mengganti password) melalui fitur **EFIRO Account Manager**.
+
+*Catatan: Dokumen juga menyebutkan bahwa panduan",7502.9,"Berdasarkan dokumen referensi yang tersedia, **tidak ada informasi** mengenai langkah-langkah untuk mengganti password akun ALELEON melalui portal web atau menu tertentu.
+
+Dokumen hanya menjelaskan:
+1.  **Pembuatan password awal:** Dilakukan saat login pertama kali melalui terminal (langkah 4 pada ""Login Pertama ALELEON Supercomputer"") dengan memasukkan password OTP lalu password buatan sendiri.
+2.  **Manajemen Akun:** Terdapat portal bernama **EFIRO Account Manager (EAM)** yang berfungsi sebaga",6338.6,"Berdasarkan dokumen referensi, berikut adalah langkah untuk mengganti password akun ALELEON Anda:
+
+**1. Portal Web yang harus dibuka:**
+Anda harus membuka **EFIRO Account Manager (EAM)** di alamat:
+`https://login.efisonlt.com`
+
+*(Catatan: Meskipun portal utama akses supercomputer ada di `https://aleleonsuper.computer`, panduan manajemen akun secara spesifik mengarahkan pengguna ke EAM).*
+
+**2. Langkah-langkah yang harus dilakukan:**
+1.  Buka halaman `https://login.efisonlt.com`.
+2.  Login menggu",5621.1,"Berdasarkan dokumen referensi, berikut adalah langkah untuk mengganti password akun ALELEON Anda:
+
+1.  **Portal Web yang harus dibuka:**
+    Buka **EFIRO Account Manager (EAM)** di alamat: `https://login.efisonlt.com`
+
+2.  **Langkah Login:**
+    Login menggunakan kredensial user ALELEON Anda saat ini.
+
+3.  **Menu yang harus diklik:**
+    Setelah login, Anda dapat melakukan manajemen akun (termasuk mengganti password) melalui menu **EFIRO Account Manager**.
+
+*Catatan: Untuk panduan lengkap mengen"
+25,"File upload saya ukurannya 500 MB. Kenapa saya selalu gagal upload lewat menu Files di EWS, dan apa solusi spesifik serta alamat host yang harus saya gunakan?",3.1,1.0,158.8,3.2,0.111,0.25,0.429,0.176,0.429,0.111,10267.6,"Berdasarkan dokumen referensi, berikut adalah penjelasan dan solusi untuk masalah Anda:
+
+**Penyebab Kegagalan Upload:**
+Anda gagal mengupload file berukuran 500 MB karena terdapat **limit upload sebesar 100 MB per file** pada menu *Files* (baik di Job Composer maupun Direktori HOME) melalui EFIRO Web Service. Karena ukuran file Anda (500 MB) melebihi batas tersebut, proses upload akan ditolak atau gagal.
+
+**Solusi Spesifik:**
+Untuk mengatasi batasan ini, Anda **harus menggunakan aplikasi SFTP** ",13286.1,"Berdasarkan dokumen referensi, berikut adalah penjelasan dan solusi untuk masalah Anda:
+
+**Penyebab Kegagalan Upload:**
+Menu **Upload** pada aplikasi Job Composer (EFIRO Web Service) memiliki batasan ukuran file sebesar **100MB per file**. Karena file yang Anda miliki berukuran **500 MB**, hal tersebut melebihi batas limit yang ditentukan sehingga menyebabkan kegagalan upload.
+
+**Solusi Spesifik:**
+Anda harus menggunakan aplikasi **SFTP** untuk mengunggah file dengan ukuran lebih dari 100MB ke d",8483.8,"Berdasarkan dokumen referensi, berikut adalah penjelasan dan solusi untuk masalah Anda:
+
+**Penyebab Kegagalan Upload:**
+Menu **Files** (Upload) di EFIRO Web Service memiliki batasan ukuran file sebesar **100MB per file**. Karena file yang ingin Anda upload berukuran **500 MB**, hal tersebut melebihi batas maksimal yang diperbolehkan oleh menu tersebut, sehingga proses upload akan gagal.
+
+**Solusi Spesifik:**
+Anda harus menggunakan aplikasi **SFTP** untuk mengunggah file dengan ukuran lebih dari ",11045.3,"Berdasarkan dokumen referensi, berikut adalah penjelasan dan solusi untuk masalah Anda:
+
+**Penyebab Kegagalan Upload:**
+Anda mengalami kegagalan karena terdapat **limit upload sebesar 100MB per file** melalui menu *Files* (Job Composer atau Home Directory) di EFIRO Web Service. Karena ukuran file Anda adalah **500 MB**, hal ini melebihi batas yang diperbolehkan oleh antarmuka web tersebut.
+
+**Solusi Spesifik:**
+Untuk mengunggah file berukuran lebih dari 100MB, Anda **wajib menggunakan aplikasi S"
+26,Saya ingin mengkompilasi code C++ menggunakan compiler AMD target Zen 2 dan OpenMPI terbaru. Modul apa saja yang harus saya module load secara berurutan?,2.6,0.7,134.9,2.3,0.667,0.818,0.667,0.667,0.818,0.667,27236.6,"Berdasarkan dokumen referensi yang tersedia, berikut adalah langkah-langkah untuk mengkompilasi kode C++ dengan target AMD Zen 2 menggunakan OpenMPI terbaru di ALELEON Supercomputer:
+
+**1. Rekomendasi Compiler C/C++**
+Dokumen merekomendasikan penggunaan compiler **GCC** atau library **AMD (AOCL/AOCC)** dengan target arsitektur `AMD Zen 2` (contoh flag: `-march=znver2`).
+*   Modul GCC yang tersedia meliputi versi 13.3.0, 13.4.0, 14.2.0, dan 15.2.0.
+*   Untuk mendapatkan dukungan CUDA (jika diperl",40452.7,"Berdasarkan dokumen referensi yang tersedia, berikut adalah langkah-langkah untuk mengkompilasi kode C++ menggunakan compiler AMD target Zen 2 dan OpenMPI terbaru di ALELEON Supercomputer:
+
+**1. Analisis Kebutuhan:**
+*   **Compiler C++:** Dokumen merekomendasikan penggunaan compiler GNU GCC atau AMD (AOCL/AOCC) dengan target arsitektur `AMD Zen 2` (contoh flag: `-march=znver2`). Namun, dalam daftar modul **Compiler C/C++/Fortran**, tidak ada modul yang secara eksplisit bernama ""AMD Compiler"" (se",31459.7,"Berdasarkan dokumen referensi yang tersedia, berikut adalah langkah-langkah untuk mengkompilasi kode C++ menggunakan compiler AMD (AOCC) target Zen 2 dan OpenMPI terbaru di ALELEON Supercomputer:
+
+**1. Compiler C/C++/Fortran (AMD AOCC)**
+Dokumen merekomendasikan penggunaan compiler **GNU GCC atau AMD (AOCL - AOCC)** untuk arsitektur CPU AMD Zen 2. Namun, pada bagian **""4.1. Compiler C/C++/Fortran""** dalam katalog software, **tidak terdapat entri modul Lmod spesifik untuk ""AMD AOCC""**. Daftar mod",22352.5,"Berdasarkan dokumen referensi yang diberikan, berikut adalah langkah-langkah untuk mengkompilasi kode C++ dengan target AMD Zen 2 menggunakan OpenMPI terbaru di ALELEON Supercomputer:
+
+**1. Rekomendasi Target Arsitektur**
+Dokumen merekomendasikan penggunaan flag optimasi `-march=znver2` karena ALELEON menggunakan CPU AMD Zen 2.
+
+**2. Penentuan Modul Compiler C++ (C/C++)**
+Untuk compiler C++, Anda dapat memilih salah satu versi GCC yang tersedia. Berdasarkan daftar modul, versi **GCC 15.2.0** ada"
+27,"Saya mau pre-processing data GROMACS menggunakan binary gmx_mpi. Boleh tidak saya menjalankannya di Login Node? Jika boleh, apa syaratnya agar tidak di-kill admin?",2.7,0.9,188.1,2.2,0.176,0.429,0.429,0.429,0.538,0.818,11314.8,"Berdasarkan dokumen referensi yang diberikan, berikut adalah jawaban untuk pertanyaan Anda:
+
+**1. Apakah boleh menjalankan pre-processing di Login Node?**
+**Boleh**, namun dengan catatan bahwa Login Node hanya diperbolehkan untuk **pre/post processing dengan beban komputasi kecil**.
+
+*Catatan Penting mengenai Binary:* Dokumen menyebutkan bahwa GROMACS di ALELEON Supercomputer diinstal dengan MPI dan mengharuskan penggunaan binary `gmx_mpi` (bukan `gmx`) untuk komputasi multi-node. Meskipun dokum",17463.6,"Berdasarkan dokumen referensi, **boleh** Anda menjalankan pre-processing data GROMACS menggunakan binary `gmx_mpi` di Login Node, namun dengan syarat dan batasan tertentu.
+
+Berikut adalah rincian syarat agar komputasi Anda tidak dihentikan oleh admin:
+
+1.  **Sifat Komputasi:**
+    *   Hanya diperbolehkan untuk **komputasi ringan** atau **pre/post processing kecil**.
+    *   Tujuannya biasanya untuk menguji jalannya software sebelum disubmit ke Compute Node.
+
+2.  **Alokasi Sumber Daya (Khusus ACP",15237.0,"Berdasarkan dokumen referensi, **boleh** Anda menjalankan pre-processing data GROMACS menggunakan `gmx_mpi` di Login Node, namun dengan syarat dan batasan tertentu agar tidak dihentikan oleh tim admin.
+
+Berikut adalah rincian syaratnya:
+
+1.  **Kondisi Komputasi:**
+    *   Hanya diperbolehkan untuk **pre-processing dengan beban komputasi kecil**.
+    *   Tujuannya biasanya untuk **menguji jalannya software** sebelum disubmit ke Compute Node.
+
+2.  **Syarat Agar Tidak Dihentikan Admin:**
+    Tim ad",18692.4,"Berdasarkan dokumen referensi, **boleh** Anda menjalankan pre-processing data GROMACS menggunakan binary `gmx_mpi` di Login Node, namun dengan syarat dan batasan tertentu.
+
+Berikut adalah rincian syarat agar komputasi Anda tidak dihentikan (di-kill) oleh tim admin:
+
+1.  **Beban Komputasi Kecil:**
+    Penggunaan Login Node hanya diperbolehkan untuk *pre/post processing* dengan beban komputasi kecil atau sekadar menguji jalannya software sebelum disubmit ke Compute Node. Jika kebutuhan komputasi b"
+28,"Jika saya menjalankan batch job lalu tiba-tiba koneksi internet rumah saya mati dan laptop saya disconnect dari VPN ALELEON, apakah job saya di Slurm ikut berhenti?",3.0,1.6,312.0,5.7,0.111,0.429,0.538,0.111,0.333,0.25,5853.4,"Berdasarkan dokumen referensi, **tidak**, job Anda di Slurm tidak akan berhenti meskipun koneksi internet rumah Anda mati atau laptop Anda disconnect dari VPN ALELEON.
+
+Hal ini karena:
+1.  Batch job bersifat **non-interaktif** dan sudah dititipkan ke Slurm untuk dijalankan.
+2.  Koneksi user **tidak mempengaruhi jalannya batch job**. Job akan terus berjalan walau koneksi terputus atau user keluar (log out) dari ALELEON.",10633.8,"Berdasarkan dokumen referensi, **tidak**, job batch Anda tidak akan berhenti meskipun koneksi internet rumah Anda mati atau laptop Anda disconnect dari VPN ALELEON.
+
+Berikut adalah alasannya menurut dokumen:
+1.  **Job sudah dititipkan ke Slurm:** Setelah submit script dijalankan, komputasi telah ""dititipkan"" ke sistem Slurm untuk dijalankan secara mandiri.
+2.  **Non-interaktif dan Terpisah dari Koneksi:** Batch job bersifat non-interaktif dan berjalan di *compute node*. Dokumen secara eksplisit ",8300.6,"Berdasarkan dokumen referensi, **tidak**, job Anda di Slurm **tidak akan berhenti**.
+
+Berikut adalah penjelasannya:
+1.  **Koneksi tidak mempengaruhi jalannya batch job:** Job sudah dititipkan ke Slurm untuk dijalankan.
+2.  **Ketahanan terhadap disconnect:** Job tidak akan berhenti walaupun koneksi user ke ALELEON terputus atau user keluar (*log out*) dari ALELEON.
+3.  **Alasan:** Karena job tersebut telah diserahkan sepenuhnya kepada sistem Slurm untuk dieksekusi pada *compute node*, sehingga st",7574.0,"Berdasarkan dokumen referensi, **tidak**, job batch Anda **tidak akan berhenti** meskipun koneksi internet rumah Anda mati atau laptop Anda terputus dari VPN ALELEON.
+
+Berikut adalah alasannya sesuai dokumen:
+1.  **Non-Interaktif:** Batch job bersifat non-interaktif dan berjalan di *compute node*, bukan di komputer user.
+2.  **Koneksi Tidak Mempengaruhi:** Dokumen secara eksplisit menyatakan bahwa ""Koneksi user tidak mempengaruhi jalannya batch job"". Job sudah dititipkan ke Slurm untuk dijalanka"
+29,Apa bedanya Effective Core Hour dengan Actual Core Hour di dalam sistem ALELEON?,3.0,1.6,161.5,5.1,0.667,0.667,0.818,0.818,0.667,0.667,18254.9,"Berdasarkan dokumen referensi, berikut adalah perbedaan antara **Effective Core Hour** dan **Actual Core Hour** di sistem ALELEON:
+
+1.  **Definisi dan Fungsi:**
+    *   **Actual Core Hour Usage:** Adalah penggunaan core hour yang sesungguhnya (realtime). Nilai ini menjadi **basis biaya** penggunaan ALELEON.
+    *   **Effective Core Hour Remaining:** Adalah sisa kuota core hour efektif yang menjadi basis bagi Slurm ALELEON untuk menjalankan job.
+
+2.  **Nilai Berdasarkan Status Job:**
+    *   **Ke",17996.2,"Berdasarkan dokumen referensi, berikut adalah perbedaan antara **Effective Core Hour** dan **Actual Core Hour** di sistem ALELEON:
+
+**1. Definisi dan Fungsi Utama**
+*   **Actual Core Hour (Penggunaan Sesungguhnya):** Merupakan penggunaan core hour yang terjadi secara *realtime*. Nilai ini menjadi **basis biaya** penggunaan ALELEON.
+*   **Effective Core Hour Remaining (Sisa Kuota Efektif):** Merupakan sisa kuota core hour efektif yang menjadi dasar bagi Slurm untuk menentukan apakah sebuah job da",19773.9,"Berdasarkan dokumen referensi, berikut adalah perbedaan antara **Effective Core Hour** dan **Actual Core Hour** di sistem ALELEON:
+
+**1. Definisi dan Fungsi Utama**
+*   **Effective Core Hour Remaining:** Adalah sisa kuota core hour efektif yang menjadi dasar Slurm ALELEON dalam menentukan apakah sebuah job dapat dijalankan atau tidak (menjadi basis eksekusi).
+*   **Actual Core Hour Usage:** Adalah penggunaan core hour sesungguhnya secara *realtime*. Nilai ini menjadi basis perhitungan biaya peng",13896.5,"Berdasarkan dokumen referensi, berikut adalah perbedaan antara **Effective Core Hour** dan **Actual Core Hour** di sistem ALELEON:
+
+**1. Definisi dan Fungsi Utama**
+*   **Effective Core Hour Remaining:** Adalah sisa kuota core hour efektif yang menjadi **basis Slurm ALELEON menjalankan job**. Nilainya berubah tergantung status pekerjaan (job) yang sedang berjalan atau tertahan.
+*   **Actual Core Hour Usage:** Adalah penggunaan core hour **sesungguhnya (realtime)**. Nilai ini menjadi **basis biay"
+30,"Saya menjalankan simulasi FLACS-CFD dengan 192 proses MPI murni. Di partisi epyc, otomatis job ini butuh lebih dari 1 node. Berapa angka yang harus saya tulis persisnya di #SBATCH --mem= jika total RAM yang saya butuhkan untuk seluruh job adalah 400GB?",2.5,0.8,283.3,2.3,0.429,0.538,0.667,0.333,0.667,0.538,19151.0,"Berdasarkan dokumen referensi yang diberikan, berikut adalah penjelasan dan jawaban untuk pertanyaan Anda:
+
+**Analisis Dokumen:**
+1.  **Format Penulisan Memori:** Dalam template batch job (misalnya pada bagian `#SBATCH --mem=////GB`), nilai yang ditulis adalah **alokasi memori per task/node**, bukan total memori seluruh cluster.
+2.  **Rumus Total Memori:** Dokumen secara eksplisit menyatakan rumus perhitungan total memori sebagai:
+    > ""Total memori = mem * array"" (untuk job array) atau secara ",25090.1,"Berdasarkan dokumen referensi **[Sumber: MPI ALELEON Supercomputer] [Section: 4B. Multi Node]**, berikut adalah penjelasannya:
+
+1.  **Rumus Perhitungan:** Pada bagian ""Multi Node"", dijelaskan bahwa total reservasi memori dihitung dengan rumus:
+    `Memori RAM = mem * nodes`
+    Di mana `mem` adalah nilai yang Anda tulis di dalam script SBATCH (`#SBATCH --mem=////GB`).
+
+2.  **Konteks Job Anda:**
+    *   Anda menggunakan partisi **epyc**.
+    *   Anda menjalankan simulasi dengan **192 proses MPI**",16165.7,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai cara menghitung atau menulis angka spesifik untuk `#SBATCH --mem` jika Anda menjalankan simulasi FLACS-CFD dengan 192 proses MPI murni yang otomatis membutuhkan lebih dari 1 node.
+
+Dokumen referensi hanya memberikan panduan berikut terkait FLACS-CFD dan alokasi memori:
+1.  **Template FLACS-CFD (SW-GXN Section 5B)** menggunakan konfigurasi **Job Array** (`--array`) pada partisi `epyc`, bukan konfigurasi multi-node MPI ",53902.6,"Berdasarkan dokumen referensi yang diberikan, berikut adalah penjelasan dan jawaban untuk pertanyaan Anda:
+
+**Jawaban:**
+Anda harus menulis angka **400** pada perintah `#SBATCH --mem=400GB`.
+
+**Penjelasan Berdasarkan Dokumen:**
+1.  **Partisi CPU (Epyc):** Pada bagian **[Sumber: SW-GXN] [Section: 5B]** dan **[Sumber: MPI ALELEON Supercomputer] [Section: 4A]**, partisi CPU menggunakan parameter `--mem` yang menyatakan jumlah memori RAM per node atau total reservasi tergantung konfigurasi job array"
+31,(Troubleshooting) Saya submit job GROMACS tapi selalu gagal dengan pesan error Invalid syntax. Di script saya menulis #SBATCH --mem= 64 GB. Apa yang salah dari tulisan saya?,3.0,1.1,207.3,2.4,0.667,0.667,0.818,0.667,0.667,0.667,14741.8,"Berdasarkan dokumen referensi, kesalahan pada penulisan perintah `#SBATCH --mem= 64 GB` terletak pada **penambahan spasi dan satuan ""GB"" di dalam nilai parameter**.
+
+Berikut adalah penjelasan detailnya:
+
+1.  **Format Penulisan Memori:**
+    Dalam template submit script (baik versi CPU maupun GPU), format yang benar untuk alokasi memori adalah angka diikuti langsung oleh teks `GB` tanpa spasi di antara keduanya.
+    *   **Salah:** `#SBATCH --mem= 64 GB` (Ada spasi setelah tanda sama dengan dan se",14687.5,"Berdasarkan dokumen referensi, kesalahan pada penulisan `#SBATCH --mem= 64 GB` terletak pada **penambahan satuan ""GB"" secara eksplisit di dalam nilai parameter**.
+
+Berikut adalah penjelasan detailnya:
+
+1.  **Format Penulisan yang Benar:**
+    Dalam template submit script (baik versi CPU maupun GPU), format untuk memori RAM hanya memerlukan angka saja tanpa satuan teks.
+    *   **Salah:** `#SBATCH --mem= 64 GB`
+    *   **Benar:** `#SBATCH --mem=64` (atau `#SBATCH --mem=////GB` sebagai placeholder",8667.2,"Berdasarkan dokumen referensi, kesalahan pada tulisan Anda terletak pada **penulisan satuan memori**.
+
+Dalam template submit script GROMACS (baik versi CPU maupun GPU), format yang benar untuk parameter `#SBATCH --mem` adalah **hanya angka** diikuti oleh teks `GB` di akhir baris perintah, tanpa spasi di antara angka dan satuan.
+
+*   **Tulisan Anda (Salah):** `#SBATCH --mem= 64 GB`
+    *   Terdapat spasi setelah tanda sama dengan (`=`) dan sebelum satuan (`GB`).
+*   **Format yang Benar:** `#SBATC",8972.2,"Berdasarkan dokumen referensi, kesalahan pada tulisan Anda terletak pada **penulisan satuan memori**.
+
+Dalam template submit script (baik versi CPU maupun GPU), format penulisan untuk alokasi memori RAM adalah **tanpa spasi** di antara angka dan satuan ""GB"".
+
+*   **Salah:** `#SBATCH --mem= 64 GB` (Ada spasi sebelum angka dan spasi sebelum GB)
+*   **Benar:** `#SBATCH --mem=64GB` (Angka langsung diikuti oleh GB tanpa spasi)
+
+Silakan perbaiki baris tersebut menjadi format:
+```bash
+#SBATCH --mem=64G"
+32,"Saya submit 3 batch job berturut-turut. Job 1 pakai 64 CPU. Job 2 pakai 32 CPU. Kenapa saat saya submit Job 3 yang butuh 64 CPU, statusnya malah PENDING dengan tulisan QOSMaxCpuPerUserLimit, padahal node epyc masih banyak yang kosong?",2.2,1.3,270.9,2.9,0.333,0.333,0.538,0.176,0.667,0.25,8902.0,"Berdasarkan dokumen referensi, status **PENDING** dengan alasan **QOSMaxCpuPerUserLimit** pada Job 3 Anda terjadi karena:
+
+1.  **Melebihi Limit Alokasi:** Job tersebut melewati batas alokasi QOS (Quality of Service) CPU yang diperbolehkan untuk user Anda secara individu.
+2.  **Bukan Masalah Ketersediaan Node:** Meskipun node *epyc* masih kosong, sistem menolak menjalankan job karena total alokasi CPU yang diminta melebihi limit atau sisa kuota komputasi (*Fair Usage Limit/LFU*) yang dimiliki ole",14988.3,"Berdasarkan dokumen referensi, berikut adalah penjelasan mengapa Job 3 Anda berada dalam status **PENDING** dengan alasan **QOSMaxCpuPerUserLimit**, meskipun node epyc terlihat kosong:
+
+1.  **Penjelasan Kode Reason:**
+    Status `QOSMaxCpuPerUserLimit` berarti job Anda melewati batas alokasi **QOS CPU user**. Sesuai dokumen, ini terjadi karena alokasi CPU yang diminta oleh job melebihi limit atau sisa limit komputasi (Fair Usage Limit/LFU) milik user tersebut.
+
+2.  **Analisis Kasus Anda:**
+    *",17325.2,"Berdasarkan dokumen referensi, berikut adalah penjelasan mengapa Job 3 Anda berada dalam status **PENDING** dengan alasan **QOSMaxCpuPerUserLimit**, meskipun node epyc terlihat kosong:
+
+1.  **Penyebab Masalah:**
+    Status `QOSMaxCpuPerUserLimit` muncul karena job Anda telah **melewati batas alokasi QOS CPU user**.
+    *   Dalam kasus ini, total alokasi CPU yang sedang berjalan atau terpending dari akun Anda (Job 1 + Job 2 + Job 3) kemungkinan besar sudah melebihi batas maksimal yang diperbolehk",9013.3,"Berdasarkan dokumen referensi, alasan job Anda (Job 3) berada dalam status **PENDING** dengan kode **QOSMaxCpuPerUserLimit** adalah karena:
+
+1.  **Melebihi Limit Alokasi:** Job tersebut melewati batas alokasi QOS CPU user atau sisa limit komputasi (Limitasi Fair Usage/LFU) yang dimiliki oleh akun Anda.
+2.  **Kondisi Node Kosong Tidak Relevan:** Meskipun node fisik masih kosong, sistem menolak menjalankan job karena batasan ini bersifat *per-user* (terkait kuota/limitasi penggunaan per pengguna),"
+33,(Troubleshooting) Job saya berstatus PD dengan alasan AssocMaxWallDurationPerJobLimit. Di script saya menulis #SBATCH --time=4-00:00:00. Akun saya adalah akun perseorangan biasa. Mengapa tertahan?,2.3,0.8,220.5,2.4,0.25,0.25,0.538,0.333,0.538,0.333,19372.9,"Berdasarkan dokumen referensi yang diberikan, berikut adalah analisis mengenai status job Anda:
+
+1.  **Status PD (PENDING):**
+    Sesuai dengan **[Sumber: TRIAL A6] [Section: Batch Job]**, status `PD` berarti ""Job tertahan"". Untuk mengetahui alasan spesifiknya, user disarankan untuk melihat **[ Daftar Job Reason ]**. Dalam kasus Anda, sistem memberikan alasan `AssocMaxWallDurationPerJobLimit`.
+
+2.  **Analisis Alasan `AssocMaxWallDurationPerJobLimit`:**
+    Alasannya menunjukkan bahwa waktu maksi",7721.3,"Berdasarkan dokumen referensi, job Anda tertahan dengan status **PD** dan alasan **AssocMaxWallDurationPerJobLimit** karena:
+
+1.  **Alokasi waktu melebihi batas:** Alokasi waktu (walltime) yang Anda tentukan dalam script (`#SBATCH --time=4-00:00:00`) melebihi **walltime maksimum** dari compute node yang dituju oleh submit script Anda.
+2.  **Solusi:** Dokumen referensi menyarankan untuk melihat **Appendix 2** untuk solusi terkait batasan ini.
+
+Secara umum, akun perseorangan biasa memiliki batasan",15377.4,"Berdasarkan dokumen referensi, job Anda tertahan (status **PD**) dengan alasan **AssocMaxWallDurationPerJobLimit** karena waktu yang Anda tentukan melebihi batas maksimum yang diizinkan oleh sistem.
+
+Berikut adalah penjelasan detailnya:
+
+1.  **Alasan Penahanan:**
+    Kode `AssocMaxWallDurationPerJobLimit` berarti ""Job tidak dapat berjalan karena melewati batas walltime maksimum partisi"".
+
+2.  **Analisis Konfigurasi Script Anda:**
+    *   Di script Anda tertulis: `#SBATCH --time=4-00:00:00` (arti",13087.3,"Berdasarkan dokumen referensi, berikut adalah penjelasan mengapa job Anda tertahan (status **PD**) dengan alasan **AssocMaxWallDurationPerJobLimit**:
+
+1.  **Penjelasan Alasan:**
+    Status `AssocMaxWallDurationPerJobLimit` berarti **alokasi waktu (walltime) yang Anda minta melebihi batas maksimum waktu yang diperbolehkan oleh compute node** yang dituju oleh script Anda.
+    *   Referensi: [Sumber: Troubleshooting dan Support] [Section: A1. Daftar Kode Reason ALELEON Supercomputer]
+
+2.  **Analisi"
+34,"Saya mau menjalankan 10 simulasi FLACS-CFD sekaligus menggunakan fitur Slurm Array. Setiap simulasi butuh 4 core CPU dan 8GB RAM. Di script, apakah saya harus menulis --cpus-per-task=40 atau --cpus-per-task=4?",2.5,1.1,225.0,2.3,0.111,0.667,0.429,0.176,0.429,0.538,10075.8,"Berdasarkan dokumen referensi untuk **FLACS-CFD** (bagian 5B), Anda harus menulis:
+
+`#SBATCH --cpus-per-task=4`
+
+**Alasannya:**
+1.  **Definisi `--cpus-per-task`:** Parameter ini menentukan jumlah core per *satu tugas* (task) dalam array, bukan total keseluruhan. Karena setiap simulasi membutuhkan 4 core, maka nilainya adalah 4.
+2.  **Perhitungan Total CPU:** Dokumentasi secara eksplisit menyatakan rumus penghitungannya sebagai:
+    > ""Total CPU = cpus-per-task * array""
+    
+    Dalam skenario An",13876.0,"Berdasarkan dokumen referensi untuk **FLACS-CFD (Array)** pada bagian **[Sumber: SW-GXN] [Section: 5B. Batch Job dengan Slurm di Terminal]**, Anda harus menulis:
+
+**`--cpus-per-task=4`**
+
+**Alasannya:**
+1.  **Definisi `cpus-per-task`:** Parameter ini menentukan jumlah core CPU yang dialokasikan **per satu tugas (task)** dalam array job tersebut. Karena setiap simulasi membutuhkan 4 core, maka nilainya adalah 4.
+2.  **Perhitungan Total CPU:** Dokumen menjelaskan bahwa total CPU dihitung dengan ru",9194.1,"Berdasarkan dokumen referensi pada bagian **5B. Batch Job dengan Slurm di Terminal** untuk FLACS-CFD, Anda harus menulis:
+
+`#SBATCH --cpus-per-task=4`
+
+**Alasannya:**
+1.  **Rumus Total CPU:** Dokumen menyatakan bahwa ""Total CPU = cpus-per-task * array"".
+2.  **Kebutuhan per Simulasi:** Karena setiap simulasi (task) membutuhkan 4 core CPU, maka nilai `--cpus-per-task` harus disetel ke **4**.
+3.  **Perhitungan Total:** Dengan mengatur `--array=1-10` (untuk 10 simulasi) dan `--cpus-per-task=4`, sist",14392.7,"Berdasarkan dokumen referensi untuk **FLACS-CFD** (Sumber: SW-GXN, Section 5B), Anda harus menulis `--cpus-per-task=4`.
+
+Berikut penjelasannya berdasarkan teks referensi:
+1.  **Definisi Variabel:** Dalam template script FLACS-CFD Array, variabel `--cpus-per-task` didefinisikan sebagai jumlah core thread CPU **per task** (per simulasi).
+2.  **Rumus Total CPU:** Dokumen secara eksplisit menyatakan rumus perhitungan total CPU adalah:
+    > ""Total CPU = cpus-per-task * array""
+3.  **Konteks Job Array"
+35,"Saya menjalankan script dengan #SBATCH --ntasks=4 dan #SBATCH --cpus-per-task=8 untuk OpenMX hibrida. Berapa total core thread CPU yang saya konsumsi, dan berapa Actual Core Hour yang terpotong jika job ini jalan 2 jam?",2.4,1.4,256.5,2.4,0.429,0.667,0.818,0.333,0.538,0.538,11445.3,"Berdasarkan dokumen referensi yang diberikan, berikut adalah perhitungannya:
+
+**1. Total Core Thread CPU yang Dikonsumsi**
+Menurut bagian **Appendix 1. Pilihan Hybrid Menjalankan OpenMX**, rumus total jumlah CPU adalah:
+`Total jumlah CPU = ntasks * cpus-per-task`
+
+Dengan konfigurasi Anda:
+*   `ntasks` = 4
+*   `cpus-per-task` = 8
+
+Maka total core thread CPU adalah:
+$4 \times 8 = 32$ **Core CPU**.
+
+**2. Actual Core Hour yang Terpotong**
+Menurut bagian **Contoh Penghitungan Core Hour** pada dokumen",8945.0,"Berdasarkan dokumen referensi, berikut adalah perhitungannya:
+
+**1. Total Core Thread CPU yang Dikonsumsi**
+Rumus total CPU adalah `ntasks * cpus-per-task`.
+*   `--ntasks` (jumlah task MPI) = 4
+*   `--cpus-per-task` (jumlah thread OpenMP) = 8
+*   Total = 4 * 8 = **32 core CPU**.
+
+**2. Actual Core Hour yang Terpotong**
+Rumus *Actual Core Hour Usage* adalah `Total Core CPU * Waktu Berjalan`.
+*   Total Core CPU = 32
+*   Waktu berjalan = 2 jam
+*   Actual Core Hour = 32 * 2 = **64 CCH**.
+
+*(Catatan: ",7626.0,"Berdasarkan dokumen referensi **Appendix 1. Pilihan Hybrid Menjalankan OpenMX**, berikut adalah perhitungannya:
+
+**1. Total Core Thread CPU yang Dikonsumsi:**
+Rumus total jumlah CPU adalah `ntasks * cpus-per-task`.
+*   `--ntasks` = 4 (jumlah task MPI)
+*   `--cpus-per-task` = 8 (jumlah thread OpenMP per task)
+*   Total = 4 * 8 = **32 core CPU**.
+
+**2. Actual Core Hour yang Terpotong:**
+Core hour dihitung berdasarkan total core yang digunakan dikalikan dengan durasi waktu berjalan.
+*   Total Core ",8291.0,"Berdasarkan dokumen referensi yang diberikan, berikut adalah perhitungannya:
+
+**1. Total Core Thread CPU yang Dikonsumsi**
+Rumus total CPU adalah `ntasks * cpus-per-task`.
+*   `--ntasks` = 4 (jumlah task MPI)
+*   `--cpus-per-task` = 8 (jumlah thread OpenMP per task)
+*   Total = 4 × 8 = **32 core CPU**.
+
+**2. Actual Core Hour yang Terpotong**
+Berdasarkan bagian ""Contoh Penghitungan Core Hour"" pada dokumen referensi:
+*   Rumus *Actual Core Hour Usage* adalah: `Jumlah Core CPU × Jam Berjalan`.
+*   "
+36,Saya butuh komputasi memori raksasa sebesar 350 GB untuk satu aplikasi yang non-MPI (tidak bisa dibagi ke banyak node). Partisi apa yang WAJIB saya gunakan agar tidak error kehabisan memori?,2.1,0.7,208.4,2.2,0.25,0.25,0.538,0.333,0.538,0.333,11999.6,"Berdasarkan dokumen referensi, partisi yang **WAJIB** Anda gunakan adalah **partisi epyc-jumbo**.
+
+Berikut adalah alasannya berdasarkan data spesifikasi:
+1.  **Kebutuhan Memori:** Aplikasi Anda membutuhkan **350 GB** RAM.
+2.  **Spesifikasi Partisi epyc-jumbo:** Bagian ""Partisi epyc-jumbo"" pada dokumen menyebutkan bahwa setiap node memiliki **RAM per node sebesar 500GB efektif**. Karena aplikasi tersebut bersifat *non-MPI* (hanya berjalan di satu node), kapasitas 500 GB ini sudah cukup untuk mena",9405.3,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi spesifik** mengenai partisi mana yang secara eksplisit menjamin ketersediaan memori sebesar 350 GB untuk satu node.
+
+Dokumen hanya memberikan panduan umum berikut:
+1.  Terdapat rentang nilai alokasi komputasi (termasuk memori RAM) berdasarkan ketentuan metrik (SLA) ALELEON.
+2.  Untuk mengetahui rentang nilai yang tersedia (termasuk batas maksimal memori per node), Anda harus menjalankan perintah `sausage` pada menu Job Composer ",10463.6,"Berdasarkan dokumen referensi, **tidak ada partisi** di ALELEON Supercomputer yang memiliki kapasitas memori RAM per node sebesar 350 GB.
+
+Berikut adalah rincian batas maksimal memori RAM per node berdasarkan spesifikasi (Sumber: [Sausage dan Aturan Metrik Penggunaan ALELEON] - Section 2A):
+
+*   **Partisi epyc:** Maksimal **240 GB** per node.
+*   **Partisi ampere:** Maksimal **120 GB** per node.
+*   **Partisi tilla:** Maksimal **55 GB** per node.
+*   **Partisi torti:** Maksimal **55 GB** per nod",10572.3,"Berdasarkan dokumen referensi spesifikasi ALELEON Supercomputer, partisi yang **WAJIB** Anda gunakan adalah **`epyc-jumbo`**.
+
+Berikut alasannya berdasarkan data pada dokumen:
+1.  **Kebutuhan Memori:** Aplikasi Anda membutuhkan **350 GB** RAM.
+2.  **Spesifikasi Partisi `epyc-jumbo`:** Dokumen menyebutkan bahwa partisi ini memiliki **500GB efektif** per node. Ini memenuhi kebutuhan Anda (350 GB < 500 GB).
+3.  **Spesifikasi Partisi Lain:**
+    *   Partisi `torti` dan `tilla` hanya menyediakan **55"
+37,"Saya mencoba mengisi form Sesi JupyterLab di EFIRO. Saya set waktu 3 hari (72 jam) dan minta 1 GPU. Namun tombol Launch ditolak karena saldo kurang. Jika sisa kuota GPU Hour (GH) saya tinggal 50 GH, berapa maksimal hari/jam yang bisa saya ajukan?",2.1,0.8,273.3,2.9,0.818,0.818,0.818,1.0,1.0,1.0,19386.4,"Berdasarkan dokumen referensi yang diberikan, berikut adalah analisis dan jawaban untuk pertanyaan Anda:
+
+**1. Konversi Waktu ke Jam**
+Dokumen referensi (khususnya pada bagian *Trial A6* dan *AI Compilation ALELEON*) menyebutkan bahwa waktu sesi Jupyter diukur dalam satuan **jam**, bukan hari.
+*   Permintaan Anda: 3 hari = $3 \times 24$ jam = **72 jam**.
+
+**2. Perhitungan Maksimal Waktu Berdasarkan Sisa Kuota**
+*   **Sisa Kuota GPU Hour (GH):** 50 GH.
+*   **Kebutuhan GPU:** 1 unit (sesuai permin",18213.0,"Berdasarkan dokumen referensi yang diberikan, berikut adalah analisis dan jawaban untuk pertanyaan Anda:
+
+**1. Analisis Batasan Waktu dalam Dokumen**
+Dokumen referensi **[Sumber: TRIAL A6]** secara eksplisit menyebutkan batasan waktu (walltime) untuk alokasi komputasi:
+> ""Walltime (waktu limit komputasi) **24 jam**.""
+
+Selain itu, pada bagian formulir di dokumen tersebut juga tertulis rentang waktu maksimal sesi Jupyter:
+> ""Number of hours ... range **1 - 24**""
+
+**2. Analisis Ketersediaan Saldo (",20130.1,"Berdasarkan dokumen referensi yang diberikan, berikut adalah analisis mengenai batas waktu sesi JupyterLab Anda:
+
+**1. Batasan Waktu Maksimal per Sesi (Walltime)**
+Dokumen **[Sumber: TRIAL A6]** secara eksplisit menyatakan batasan alokasi komputasi untuk akun uji coba (Trial):
+*   **Walltime (waktu limit komputasi):** Maksimal **24 jam**.
+*   Rentang waktu yang dapat diisi dalam formulir juga disebutkan sebagai range **1 - 24 jam**.
+
+Oleh karena itu, meskipun saldo GPU Hour (GH) Anda mencukupi u",19163.8,"Berdasarkan dokumen referensi yang diberikan, berikut adalah analisis dan jawaban untuk pertanyaan Anda:
+
+**1. Analisis Batasan Waktu dalam Dokumen**
+Dokumen referensi (khususnya bagian *Sumber: TRIAL A6*) secara eksplisit menyatakan batasan waktu (walltime) maksimal untuk sesi Jupyter:
+*   **Range waktu:** 1 - 24 jam.
+*   **Keterangan:** ""Waktu maksimal sesi Jupyter, range 1 - 24"".
+*   **Limit Komputasi:** Akun uji coba memiliki limit walltime maksimal **24 jam**.
+
+Oleh karena itu, pengajuan wa"
+38,"Kenapa saat saya meminta alokasi #SBATCH --ntasks=7, sistem Slurm ALELEON akan membulatkannya menjadi 8 dan saya ditagih biaya untuk 8 core?",2.7,0.8,174.6,2.4,0.053,0.538,0.333,0.111,0.429,0.333,17692.3,"Berdasarkan dokumen referensi, berikut adalah alasan mengapa alokasi Anda dibulatkan menjadi 8 dan ditagih biaya untuk 8 core:
+
+1.  **Satuan Alokasi adalah Core Thread dengan SMT:**
+    ALELEON mengaktifkan fitur **SMT (Simultaneous Multi-Threading)** pada CPU AMD Zen 2-nya, di mana setiap core fisik memiliki 2 thread. Satuan reservasi di Slurm ALELEON adalah **core thread**.
+
+2.  **Aturan Eksklusivitas Cgroup:**
+    Kebijakan cgroup ALELEON menetapkan bahwa setiap 1 core fisik (yang terdiri dar",13156.7,"Berdasarkan dokumen referensi, berikut adalah alasan mengapa alokasi `#SBATCH --ntasks=7` dibulatkan menjadi 8 dan ditagih biaya untuk 8 core:
+
+1.  **Kebijakan Reservasi per Core Fisik (cgroup):**
+    Sistem Slurm ALELEON mengaktifkan fitur **SMT (Simultaneous Multi-Threading)** pada CPU. Satuan reservasi CPU di Slurm ALELEON adalah **core thread**.
+
+2.  **Aturan Eksklusifitas:**
+    Kebijakan *cgroup* ALELEON menetapkan bahwa setiap **1 core fisik** harus dialokasikan secara eksklusif untuk **2",14221.3,"Berdasarkan dokumen referensi, berikut adalah alasan mengapa alokasi Anda dibulatkan dari 7 menjadi 8 core:
+
+1.  **Aturan Minimum dan Genap:** ALELEON memberlakukan ketentuan bahwa jumlah alokasi minimum CPU pada submit script adalah **2**. Selain itu, Slurm secara otomatis akan **menggenapkan ke atas** jika jumlah alokasi CPU yang diminta adalah ganjil.
+    *   Contoh dalam dokumen: Jumlah 7 menjadi 8, 23 menjadi 24, dst.
+    *   Oleh karena itu, permintaan `--ntasks=7` (ganjil) otomatis diubah",19168.7,"Berdasarkan dokumen referensi, berikut adalah alasan mengapa alokasi 7 core thread dibulatkan menjadi 8 dan bagaimana biaya dihitung:
+
+**1. Alasan Pembulatan ke 8 (Aturan Cgroup & SMT)**
+*   **Satuan Reservasi:** Satuan reservasi CPU di Slurm ALELEON adalah **core thread**. Karena ALELEON mengaktifkan SMT (*Simultaneous Multi-Threading*), setiap 1 core fisik memiliki 2 thread.
+*   **Kebijakan Eksklusifitas:** Kebijakan *cgroup* ALELEON menetapkan bahwa **setiap 1 core fisik (yang terdiri dari 2 "
+39,Apakah ada gunanya saya upload file Slaster-Koster (SK) ke setiap ruang Job Composer DFTB+? Ataukah ada cara yang lebih hemat storage?,3.1,1.1,139.0,2.8,0.333,0.538,0.667,0.333,0.538,0.538,17826.0,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi spesifik** mengenai file bernama ""Slaster-Koster (SK)"" atau instruksi khusus untuk menguploadnya ke setiap ruang Job Composer DFTB+.
+
+Namun, dokumen memberikan panduan umum terkait manajemen penyimpanan dan upload file pada sistem ALELEON sebagai berikut:
+
+1.  **Lokasi Upload File:**
+    *   Jika menggunakan **Job Composer**, Anda dapat melakukan upload/download melalui menu **[Edit Files]** di dalam aplikasi tersebut.
+    *   N",8439.0,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai file ""Slaster-Koster (SK)"" atau instruksi spesifik untuk menguploadnya ke setiap ruang Job Composer DFTB+.
+
+Dokumen hanya menjelaskan prosedur umum berikut:
+1.  **Persiapan File:** User diminta menyiapkan file komputasi melalui menu **[Edit Files]** pada ruang job yang dibuat.
+2.  **Limit Upload:** Terdapat batas upload sebesar **100MB per file**. Jika ukuran file lebih besar dari 100MB, disarankan menggunakan **[Apli",17417.5,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi spesifik** mengenai file bernama ""Slaster-Koster (SK)"" atau instruksi khusus untuk menguploadnya ke setiap ruang Job Composer DFTB+.
+
+Namun, dokumen memberikan panduan umum mengenai manajemen file dan penyimpanan di Job Composer yang dapat Anda gunakan sebagai acuan:
+
+1.  **Limitasi Upload:**
+    Terdapat batasan upload sebesar **100MB per file** jika menggunakan fitur *Edit Files* di dalam Job Composer. Jika ukuran file melebih",13017.2,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai file spesifik bernama ""Slaster-Koster (SK)"" atau instruksi khusus untuk mengunggahnya ke setiap ruang Job Composer DFTB+.
+
+Namun, berikut adalah panduan umum mengenai manajemen file dan penyimpanan di Job Composer berdasarkan dokumen:
+
+1.  **Upload File:**
+    *   Anda dapat mengunggah file melalui menu **[Edit Files]** di dalam ruang job.
+    *   Terdapat batasan ukuran upload sebesar **100MB per file**.
+    *   Jika"
+40,Berapa kapasitas ukuran penyimpanan (storage) SSD untuk satu node Login di ALELEON?,2.6,0.8,88.6,2.7,0.111,0.538,0.429,0.111,0.429,0.429,5927.9,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai kapasitas penyimpanan (storage) SSD khusus untuk satu node Login.
+
+Dokumen hanya mencantumkan spesifikasi berikut terkait storage:
+1.  **Storage Node**: Memiliki total kapasitas Hot storage (SSD SAS) sebesar **28TB efektif**. Storage node ini berfungsi menyimpan keseluruhan data user dan instalasi software.
+2.  **Login Node**: Spesifikasi yang tercantum meliputi jumlah node (2), CPU, RAM (16GB efektif), dan interkonek",5026.9,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai kapasitas ukuran penyimpanan (storage) SSD khusus untuk satu node Login.
+
+Dokumen hanya menyebutkan spesifikasi berikut terkait Login Node:
+*   **RAM:** 16GB efektif per node.
+*   **CPU:** 1x AMD EPYC 7313P.
+*   **Interkoneksi:** Mellanox RoCE 100Gbps.
+
+Informasi mengenai kapasitas penyimpanan SSD (28TB efektif) dan HDD (83TiB efektif) yang tercantum dalam dokumen merujuk pada **Storage Node**, bukan Login Node.",6220.5,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai kapasitas penyimpanan (storage) SSD khusus untuk node Login di ALELEON.
+
+Dokumen hanya menyediakan informasi berikut terkait storage:
+1.  **Storage Node**: Menyimpan keseluruhan data user dengan spesifikasi Hot storage (SSD SAS) sebesar **28TB efektif**. Namun, ini adalah spesifikasi untuk *Storage Node*, bukan *Login Node*.
+2.  **Login Node**: Dokumen hanya menyebutkan spesifikasi CPU (AMD EPYC 7313P), RAM (16GB efek",7003.1,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai kapasitas penyimpanan (storage) SSD khusus untuk satu node Login.
+
+Dokumen hanya menyebutkan spesifikasi berikut terkait Login Node:
+*   **RAM:** 16GB efektif per node.
+*   **CPU:** 1x AMD EPYC 7313P.
+*   **Fungsi:** Tempat login dan ""transit"" user.
+
+Informasi mengenai kapasitas storage SSD (28TB efektif) disebutkan dalam bagian **Spesifikasi Storage Node**, bukan Login Node. Selain itu, pada bagian *Kapasitas Storage"
+41,Bagaimana langkah-langkah submit job menggunakan aplikasi MATLAB di ALELEON?,2.6,0.8,69.2,2.7,0.111,0.25,0.429,0.25,0.429,0.538,6973.2,"Berdasarkan dokumen referensi yang diberikan, **tidak terdapat informasi atau langkah-langkah mengenai cara submit job menggunakan aplikasi MATLAB** di ALELEON Supercomputer.
+
+Dokumen referensi hanya menyediakan panduan untuk aplikasi berikut:
+1.  **R** (termasuk RMPI)
+2.  **GAMESS**
+3.  **AI Compilation** (untuk komputasi Python/AI)
+4.  **Job Container dengan Apptainer** (untuk image container user)
+5.  **Job Python** (dengan modul pyl)
+
+Untuk informasi terkait MATLAB, disarankan untuk menghubu",7145.4,"Berdasarkan dokumen referensi yang diberikan, **tidak terdapat informasi atau langkah-langkah khusus** mengenai cara submit job menggunakan aplikasi **MATLAB** di ALELEON.
+
+Dokumen referensi hanya menyediakan panduan lengkap untuk software berikut:
+*   R (termasuk versi MPI/RMPI)
+*   DFTB+
+*   OpenMX
+*   FLACS-CFD (SW-GXN)
+*   Python (dengan modul pyl)
+
+Untuk informasi mengenai MATLAB, disarankan untuk memeriksa bagian **[Daftar Software Komputasi dan Tutorial]** secara langsung di portal ALELEO",7407.7,"Berdasarkan dokumen referensi yang diberikan, **tidak terdapat informasi atau langkah-langkah** mengenai cara submit job menggunakan aplikasi **MATLAB** di ALELEON Supercomputer.
+
+Dokumen referensi hanya menyediakan panduan untuk aplikasi berikut:
+1.  **R** (Termasuk versi MPI/RMPI)
+2.  **GAMESS**
+3.  **DFTB+**
+4.  **Software Instalasi User** (Umum)
+5.  **Anaconda Python** (Khusus akun TRIAL A6)
+
+Jika Anda ingin menjalankan MATLAB, disarankan untuk memeriksa modul software yang tersedia di siste",6709.9,"Berdasarkan dokumen referensi yang diberikan, **tidak terdapat informasi atau langkah-langkah** mengenai cara submit job menggunakan aplikasi **MATLAB** di ALELEON Supercomputer.
+
+Dokumen referensi hanya menyediakan panduan untuk software berikut:
+1.  **R** (termasuk versi MPI/RMPI)
+2.  **DFTB+**
+3.  **AI Compilation** (CPU dan GPU)
+4.  **GAMESS**
+5.  **Python** (User Installation dengan modul `pyl`)
+
+Jika Anda memerlukan panduan untuk salah satu software di atas, saya dapat membantu menjelaskan"
+42,Berapa biaya denda yang harus dibayar jika file di HOME saya melebihi kuota 150GB?,2.3,0.7,74.8,2.6,0.333,0.429,0.667,0.053,0.538,0.25,4446.8,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi mengenai biaya denda** jika file di HOME melebihi kuota 150 GiB.
+
+Dokumen hanya menjelaskan konsekuensi berikut apabila storage HOME penuh:
+*   Job komputasi akan putus atau tidak dapat berjalan.
+*   Bagi golongan perseorangan, memantau penggunaan storage menjadi tanggung jawab user.
+
+Jika Anda ingin mengetahui lebih lanjut mengenai batas penggunaan atau aturan lainnya, disarankan untuk menghubungi tim admin via email `support@e",5701.8,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi mengenai biaya denda** jika file di direktori HOME melebihi kuota 150 GiB.
+
+Dokumen hanya menjelaskan konsekuensi teknis berikut jika storage HOME penuh:
+*   Job komputasi akan putus atau tidak dapat berjalan (Sumber: *Sausage dan Aturan Metrik Penggunaan ALELEON*, Section 2F/2E).
+*   Pengguna bertanggung jawab memantau penggunaan storage secara berkala menggunakan perintah `sausage ncdu`.
+
+Jika Anda mengalami masalah terkait pe",4015.9,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi mengenai biaya denda** yang harus dibayar jika file di HOME melebihi kuota 150 GiB.
+
+Dokumen hanya menyebutkan konsekuensi berikut jika storage HOME penuh:
+1.  Job komputasi akan putus atau tidak dapat berjalan.
+2.  Bagi golongan perseorangan, memantau penggunaan storage menjadi tanggung jawab user (dapat dilakukan dengan perintah `sausage ncdu`).",4798.7,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi mengenai biaya denda** jika file di HOME melebihi kuota 150 GiB.
+
+Dokumen hanya menyebutkan konsekuensi teknis berikut apabila penyimpanan HOME penuh:
+*   Job komputasi akan putus atau tidak dapat berjalan.
+*   Bagi golongan perseorangan, memantau penggunaan storage menjadi tanggung jawab user (dapat dipantau menggunakan `sausage ncdu`).
+
+Jika Anda memiliki pertanyaan lain mengenai alokasi kuota atau cara pemantauan, silakan tan"
+43,Apakah saya bisa menginstal package R menggunakan perintah conda install r-seurat di ALELEON?,2.6,0.7,95.7,2.6,0.333,0.538,0.538,0.429,0.667,0.538,15056.9,"Berdasarkan dokumen referensi yang diberikan, **tidak disarankan** atau tidak dijelaskan untuk menginstal package R menggunakan perintah `conda install` di ALELEON.
+
+Berikut adalah penjelasan berdasarkan dokumen:
+
+1.  **Metode Instalasi Package R:**
+    Dokumen **[Sumber: R] [Section: Instalasi Library Package R]** secara eksplisit menyatakan bahwa instalasi library R dilakukan dengan cara:
+    *   Melayangkan permintaan ke admin melalui email (`support@efisonlt.com`).
+    *   Melakukan instalas",9319.3,"Berdasarkan dokumen referensi yang diberikan, **tidak disarankan** atau tidak dijelaskan untuk menginstal package R menggunakan perintah `conda install` di ALELEON.
+
+Dokumen merujuk pada dua metode instalasi package R yang sah:
+
+1.  **Instalasi Mandiri di Login Node:**
+    *   Anda harus memuat modul R terlebih dahulu (`module load [nama-modul-R]`).
+    *   Jalankan R dengan perintah `$ R`.
+    *   Gunakan format perintah standar R untuk menginstal package:
+        ```r
+        > install.package",14511.6,"Berdasarkan dokumen referensi yang diberikan, **tidak disarankan** menggunakan perintah `conda install r-seurat` untuk menginstal package R di ALELEON.
+
+Berikut adalah penjelasan berdasarkan dokumen:
+
+1.  **Metode Instalasi Package R:**
+    Dokumen **[Instalasi Library Package R]** secara eksplisit menyatakan bahwa instalasi library R dilakukan dengan cara:
+    *   Melayangkan permintaan ke admin melalui email `support@efisonlt.com`; **ATAU**
+    *   Melakukan instalasi mandiri di Login Node men",8639.9,"Berdasarkan dokumen referensi yang diberikan, **tidak disarankan** atau tidak dijelaskan langkah-langkahnya untuk menginstal package R menggunakan perintah `conda install r-seurat` di ALELEON.
+
+Dokumen referensi hanya menjelaskan dua metode instalasi package R:
+1.  **Meminta Admin:** Mengirim permintaan instalasi package ke admin melalui email `support@efisonlt.com`.
+2.  **Instalasi Mandiri di Login Node:** Melakukan instalasi secara mandiri dengan cara:
+    *   Memuat modul R (`module load [nam"
+44,Berapa kecepatan internet/bandwidth VPN jika saya akses dari luar pulau Jawa?,2.8,0.7,60.6,2.4,0.429,0.429,0.818,0.538,0.538,0.538,3440.1,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai kecepatan internet atau bandwidth VPN ALELEON Supercomputer, baik untuk akses dari dalam maupun luar pulau Jawa.
+
+Dokumen hanya membahas langkah-langkah instalasi OpenVPN, cara membuat profil OVPN, dan prosedur koneksi (untuk Linux, Windows, MacOS, Android, dan iOS), serta kontak support jika mengalami kesulitan.",4344.4,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai kecepatan internet atau bandwidth VPN untuk akses dari luar pulau Jawa.
+
+Dokumen tersebut hanya membahas:
+1.  Cara menghubungi tim admin jika mengalami kesulitan (support@efisonlt.com).
+2.  Langkah-langkah instalasi OpenVPN Connect dan konfigurasi profil OVPN untuk berbagai sistem operasi (Windows, MacOS, Android, iOS, Linux).
+3.  Prosedur login ke ALELEON Mk.III melalui portal web EFIRO atau SSH setelah koneksi VPN a",5672.6,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai kecepatan internet atau bandwidth VPN ALELEON Supercomputer, baik untuk akses dari dalam maupun luar pulau Jawa.
+
+Dokumen hanya menyediakan panduan teknis mengenai:
+1.  Cara instalasi OpenVPN.
+2.  Langkah-langkah membuat dan mengaktifkan profil OVPN (untuk Linux, Windows, MacOS, Android, iOS).
+3.  Prosedur update profil VPN.
+4.  Informasi kontak support admin jika mengalami kesulitan koneksi.
+
+Untuk pertanyaan spesifi",5025.6,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai kecepatan internet atau bandwidth VPN untuk akses dari luar pulau Jawa.
+
+Dokumen hanya membahas:
+1.  Cara menghubungi tim admin jika mengalami kesulitan (support@efisonlt.com).
+2.  Langkah-langkah instalasi OpenVPN Connect v3 pada berbagai sistem operasi (Windows, MacOS, Android, iOS, Linux).
+3.  Cara membuat dan mengaktifkan profil OVPN ALELEON.
+4.  Prosedur update profil VPN.
+5.  Kebijakan keamanan yang mewajibkan l"
+45,Bagaimana cara mereset environment Python bawaan sistem (python 3.9) ke kondisi pabrik jika saya merusaknya?,2.1,1.1,94.9,2.5,0.176,0.538,0.538,0.176,0.429,0.429,7638.0,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai cara mereset atau mengembalikan environment Python bawaan sistem (Python 3.9) ke kondisi pabrik jika dirusak.
+
+Dokumen hanya menjelaskan bahwa:
+1.  Python 3.9.21 adalah versi **bawaan/default sistem** yang sudah aktif secara otomatis.
+2.  Jika user membutuhkan versi Python lain, mereka harus memuat modul Lmod yang sesuai (misalnya `python/3.11.11-gcc-13.4.0-he2` atau `Anaconda3`).
+3.  Untuk instalasi versi Python lain",6289.8,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai cara mereset atau mengembalikan environment Python bawaan sistem (Python 3.9) ke kondisi pabrik jika dirusak.
+
+Dokumen hanya menyebutkan bahwa:
+1.  ALELEON menggunakan **Python 3.9.21** sebagai modul bawaan/default sistem (`module load Python`).
+2.  Terdapat versi default lain yaitu **Python 3.11.11**.
+3.  Panduan yang tersedia berfokus pada pembuatan dan penggunaan **Conda Environment** buatan user (menggunakan Anaco",8310.7,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai cara mereset atau mengembalikan environment Python bawaan sistem (Python 3.9) ke kondisi pabrik jika dirusak.
+
+Dokumen hanya menjelaskan bahwa:
+1.  ALELEON menggunakan **Python 3.9.21** sebagai modul standar/bawaan sistem (`python/3.9.21`).
+2.  User disarankan untuk membuat lingkungan kerja sendiri menggunakan **Conda Environment** atau **Virtualenv** agar terisolasi dari sistem utama.
+3.  Jika terjadi masalah pada Co",6315.2,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai cara mereset atau mengembalikan environment Python bawaan sistem (Python 3.9) ke kondisi pabrik jika dirusak.
+
+Dokumen hanya menjelaskan bahwa:
+1.  **Python 3.9.21** adalah versi bawaan/default sistem yang sudah aktif secara otomatis tanpa perlu perintah aktivasi khusus (`ml`).
+2.  Panduan yang tersedia berfokus pada cara membuat dan mengelola *environment* baru oleh pengguna (seperti `virtualenv` atau `conda env`) me"
+46,Apakah tersedia modul aplikasi ANSYS Fluent di ALELEON?,2.2,0.8,55.6,2.6,0.111,0.429,0.429,0.176,0.429,0.333,6259.6,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai ketersediaan modul aplikasi **ANSYS Fluent** di ALELEON.
+
+Dokumen hanya menyebutkan daftar software komputasi tertentu seperti CP2K, DFTB+, GROMACS, LAMMPS, NVIDIA NGC, NAMD, NWChem, OpenMX, ORCA, PHASE/0, QIIME 2, Quantum ESPRESSO, dan SIESTA. Selain itu, terdapat catatan bahwa untuk software yang belum tersedia atau tidak tercantum dalam katalog (seperti GAMESS dan R yang statusnya *obsolete* atau *coming soon*), us",5548.1,"Berdasarkan dokumen referensi yang diberikan, **tidak tersedia** informasi mengenai modul aplikasi ANSYS Fluent di ALELEON Supercomputer.
+
+Dokumen hanya merinci ketersediaan untuk:
+*   **R** (Versi 4.3.0)
+*   **GAMESS** (Versi 2020.2)
+*   Software Python (via Conda/Virtualenv dengan modul `pyl`)
+*   Container Apptainer
+
+Untuk permintaan instalasi versi software lain yang tidak tercantum dalam daftar tersebut, dokumen menyarankan untuk menghubungi tim admin melalui email `support@efisonlt.com`.",7061.6,"Berdasarkan dokumen referensi yang diberikan, **tidak tersedia** informasi mengenai modul aplikasi ANSYS Fluent di ALELEON.
+
+Dokumen hanya mencantumkan ketersediaan modul untuk:
+*   **Python** (versi 3.9.21, 3.11.11, 3.13.5) dan pengelola paketnya (Anaconda, Mamba).
+*   **Library NVIDIA** (CUDA, NCCL, HPC-X, dll).
+*   **AI Compilation** (PyTorch, TensorFlow, JAX, dll).
+*   Software sistem dasar seperti compiler (GCC), build tools (CMake, Make), dan container engine (Apptainer).
+
+Untuk konfirmasi",8567.2,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai ketersediaan modul aplikasi ANSYS Fluent di ALELEON.
+
+Dokumen hanya menyebutkan software berikut:
+*   **Python & Environment:** Python 3 (default dan versi user via `pyl`/ngupyl), Anaconda, Mamba.
+*   **AI Compilation:** PyTorch, TensorFlow, JAX, PennyLane, XGBoost, dll.
+*   **Bahasa Pemrograman:** R (versi 4.3.0).
+*   **Komputasi Kimia:** GAMESS.
+*   **Library Matematika:** AMD AOCL, Intel oneAPI MKL, FFTW, LAPACK, s"
+47,Bagaimana cara menyambungkan ekstensi Remote-SSH dari aplikasi Visual Studio Code (VSCode) ke compute node ALELEON?,2.5,0.7,117.3,2.5,0.111,0.25,0.429,0.0,0.429,0.176,5977.2,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai cara menyambungkan ekstensi Remote-SSH dari aplikasi Visual Studio Code (VSCode) ke compute node ALELEON.
+
+Dokumen hanya menyediakan panduan untuk:
+1.  Koneksi VPN (Linux, Windows/MacOS/Android/iOS).
+2.  Registrasi dan pembuatan SSH Key.
+3.  Login SSH melalui terminal standar, X11, atau aplikasi MobaXTerm.
+4.  Penggunaan Virtualenv Python di dalam terminal ALELEON.
+
+Untuk akses menggunakan VSCode, Anda disarankan meng",5915.5,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai cara menyambungkan ekstensi Remote-SSH dari Visual Studio Code (VSCode) ke *compute node* ALELEON.
+
+Dokumen hanya menjelaskan bahwa:
+1.  User login dan melakukan ""transit"" di **Login Node** melalui terminal SSH atau EFIRO Web Service.
+2.  Komputasi dijalankan di **Compute Node** melalui manajemen Slurm (*batch job* atau sesi interaktif), bukan dengan akses langsung via SSH untuk pengeditan kode seperti di VSCode.
+3.  ",8964.0,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai cara menyambungkan ekstensi Remote-SSH dari aplikasi Visual Studio Code (VSCode) ke compute node ALELEON.
+
+Dokumen hanya menyediakan panduan untuk:
+1.  **Login SSH Terminal:** Menggunakan perintah `ssh` di terminal Linux/MacOS atau PowerShell Windows.
+2.  **Login SSH X11:** Untuk sesi GUI menggunakan flag `-X` (Linux/MacOS) atau aplikasi MobaXTerm (Windows).
+3.  **Membuat dan Mendaftar SSH Key:** Prosedur pembuatan ku",8515.7,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai cara menyambungkan ekstensi Remote-SSH dari aplikasi Visual Studio Code (VSCode) ke *compute node* ALELEON.
+
+Dokumen referensi hanya menyediakan panduan untuk:
+1.  Koneksi VPN (untuk Linux dan Windows/MacOS/Android/iOS).
+2.  Spesifikasi Login Node dan Compute Node.
+3.  Konsep penggunaan Login Node sebagai ruang ""transit"" untuk menyiapkan komputasi, di mana user menjalankan job ke Compute Node via Slurm.
+4.  Panduan me"
+48,Saya adalah user dari Singapura (WNA). Berapa tarif konversi Core Hour ke dalam US Dollar (USD)?,2.5,0.7,107.8,2.3,0.176,0.429,0.429,0.429,0.429,0.538,7463.2,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai tarif konversi Core Hour ke dalam mata uang US Dollar (USD).
+
+Dokumen hanya menyebutkan hal-hal berikut terkait biaya dan status pengguna:
+1.  **Status Pengguna:** Dokumen secara eksplisit menyatakan bahwa untuk golongan perseorangan, pengguna harus merupakan **Warga Negara Indonesia (WNI)** ([Sumber: Pendaftaran dan Biaya ALELEON Supercomputer], Section: 3.1).
+2.  **Mata Uang:** Semua biaya yang tercantum dalam dokum",6311.4,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai tarif konversi Core Hour (CCH/GH) ke dalam mata uang US Dollar (USD) atau mata uang asing lainnya.
+
+Dokumen hanya menyebutkan bahwa:
+1.  Biaya layanan dihitung berdasarkan **biaya per CCH dan GH**.
+2.  Detail biaya tersebut digolongkan di subbab [3] (yang tidak disertakan dalam teks referensi ini).
+3.  Prosedur penambahan kuota melibatkan konfirmasi biaya dan metode pembayaran melalui email `support@efisonlt.com`, nam",9911.0,"Berdasarkan dokumen referensi yang diberikan, berikut adalah jawaban untuk pertanyaan Anda:
+
+1.  **Status Keanggotaan:** Dokumen hanya menjelaskan ketentuan untuk **Golongan Perseorangan** yang merupakan **Warga Negara Indonesia (WNI)**. Tidak ada informasi mengenai tarif atau ketentuan khusus untuk Warga Negara Asing (WNA) seperti dari Singapura.
+2.  **Mata Uang:** Semua biaya yang tercantum dalam dokumen (baik untuk CPU Core Hour maupun GPU Hour) dinyatakan dalam **Rupiah Indonesia (Rp)**, buk",8428.8,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai tarif konversi Core Hour ke dalam mata uang US Dollar (USD) atau tarif khusus untuk Warga Negara Asing (WNA).
+
+Dokumen hanya mencantumkan ketentuan berikut:
+1.  **Kewarganegaraan:** Golongan Perseorangan di ALELEON Supercomputer hanya terbuka bagi **Warga Negara Indonesia (WNI)**.
+2.  **Mata Uang:** Tarif yang tercantum menggunakan **Rupiah (Rp)**, bukan USD.
+    *   CPU Core Hour (CCH): Rp555,- (Akademia) atau Rp888,"
+49,Apa password standar/bawaan dari admin sebelum saya menggantinya di awal?,2.9,0.9,73.5,2.8,0.429,0.429,0.667,0.538,0.667,0.429,5127.0,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai password standar atau bawaan (default) dari admin.
+
+Dokumen hanya menjelaskan prosedur untuk:
+1.  **Login pertama kali:** Menggunakan **password OTP** user (bukan password admin).
+2.  **Membuat password tetap:** User diminta membuat password sendiri setelah login dengan password OTP.
+3.  **Mengganti password:** Dilakukan oleh user melalui menu *Account security > Signing In* di EFIRO Account Manager.
+
+Jika Anda mengal",8025.3,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai password standar atau bawaan (default) yang ditetapkan oleh admin EFISON sebelum pengguna menggantinya.
+
+Dokumen hanya menjelaskan bahwa:
+1.  Pada proses login pertama kali, user diminta menggunakan **password OTP** yang diberikan untuk login awal (Sumber: *Login Pertama ALELEON Supercomputer*, Langkah 1).
+2.  Setelah verifikasi email dan membuka Shell, user wajib membuat **password buatan sendiri** (password tetap) d",6838.5,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai password standar atau bawaan (default) khusus untuk akun admin sebelum diganti.
+
+Dokumen hanya menjelaskan prosedur berikut:
+1.  **Login Pertama Kali:** User menggunakan **password OTP** (One-Time Password) yang dikirimkan saat pendaftaran untuk login awal dan aktivasi akun (Sumber: *Login Pertama ALELEON Supercomputer*).
+2.  **Mengganti Password:** User diminta membuat password baru sendiri melalui menu *Account secu",5982.8,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai password standar atau bawaan (default) yang ditetapkan oleh admin untuk semua user sebelum diganti.
+
+Dokumen hanya menjelaskan bahwa:
+1.  Pada proses login pertama kali, user diminta menggunakan **password OTP** yang diberikan kepada user tersebut (bukan password standar umum).
+2.  User kemudian membuat **password buatan sendiri** sebagai password tetap melalui terminal.
+3.  Untuk kredensial SSH, disebutkan ""Username "
+50,Siapa nama Chief Technology Officer (CTO) dari EFISON yang membangun ALELEON ini?,2.5,3.4,80.3,2.5,0.333,0.667,0.667,0.538,0.538,1.0,4559.3,"Berdasarkan dokumen referensi yang diberikan, tidak ada informasi mengenai nama Chief Technology Officer (CTO) dari EFISON.
+
+Dokumen hanya menyebutkan nama-nama berikut dalam konteks tertentu:
+*   **Wilson Lisan** dan **Laatansa Imroni**: Disebutkan sebagai *Maintainers* untuk spesifikasi software sistem.
+*   **Robert McLay**: Pencipta modul software Lmod.
+
+Tidak disebutkan jabatan CTO atau nama pejabat eksekutif lainnya di luar nama-nama tersebut.",12125.6,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai nama Chief Technology Officer (CTO) dari EFISON atau siapa yang membangun ALELEON Supercomputer.
+
+Dokumen hanya menyebutkan nama-nama berikut:
+*   **Wilson Lisan** dan **Laatansa Imroni** sebagai *Maintainers* sistem software.
+*   **Ohio Supercomputing Center (OSC)** sebagai pemelihara basis Open OnDemand.
+
+Namun, tidak disebutkan jabatan CTO untuk keduanya maupun pihak lain dalam konteks pembangunan ALELEON.",2561.2,"Berdasarkan dokumen referensi yang diberikan, tidak ada informasi mengenai nama Chief Technology Officer (CTO) dari EFISON.
+
+Dokumen hanya menyebutkan nama-nama **Maintainers** untuk Spesifikasi Software Sistem, yaitu:
+*   Wilson Lisan
+*   Laatansa Imroni",3775.5,"Berdasarkan dokumen referensi yang diberikan, tidak ada informasi mengenai nama Chief Technology Officer (CTO) dari EFISON.
+
+Dokumen hanya menyebutkan nama-nama berikut:
+*   **Maintainers:** Wilson Lisan dan Laatansa Imroni.
+*   **Pemilik Lisensi Open OnDemand:** Ohio Supercomputing Center (OSC).
+
+Informasi spesifik tentang jabatan CTO tidak tercantum dalam teks tersebut."
+51,Bagaimana cara menghapus halaman Wiki ALELEON jika saya menemukan typo?,2.7,0.8,60.5,2.9,0.25,0.429,0.429,0.25,0.667,0.25,5172.2,"Berdasarkan dokumen referensi yang diberikan, tidak ada informasi mengenai cara menghapus halaman Wiki ALELEON atau prosedur untuk memperbaiki typo pada halaman wiki.
+
+Dokumen hanya menyediakan informasi tentang:
+1.  Format penulisan wiki (tautan, tombol menu, perintah terminal).
+2.  Cara menghubungi tim support/admin jika mengalami masalah (melalui Support Ticket di EFIRO Web Service atau email ke `support@efisonlt.com`).
+
+Jika Anda menemukan typo dan membutuhkan bantuan teknis terkait hal ters",4833.2,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai cara bagi pengguna untuk menghapus halaman Wiki ALELEON atau memperbaiki typo secara mandiri.
+
+Dokumen hanya menyebutkan bahwa:
+1.  Wiki ini memuat informasi teknis dan panduan penggunaan (seperti spesifikasi, cara menggunakan, mekanisme pendaftaran).
+2.  Untuk masalah teknis atau pertanyaan lain terkait ALELEON Supercomputer, pengguna dapat menghubungi tim admin melalui email `support@efisonlt.com`.
+
+Jika Anda menemu",5999.1,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai cara menghapus halaman Wiki ALELEON atau prosedur untuk memperbaiki typo pada halaman wiki.
+
+Dokumen hanya menjelaskan:
+1.  Format penulisan wiki (tautan, tombol menu, perintah terminal).
+2.  Cara menghubungi tim admin untuk dukungan teknis atau permintaan penambahan alokasi komputasi (melalui Support Ticket di EFIRO Web Service atau email `support@efisonlt.com`).
+3.  Informasi umum tentang apa itu Wiki ALELEON by EFI",5248.6,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai cara menghapus halaman Wiki ALELEON atau prosedur untuk memperbaiki typo pada halaman wiki.
+
+Dokumen hanya memuat informasi tentang:
+1.  Format penulisan wiki (tautan, perintah terminal, tombol menu).
+2.  Spesifikasi dan pengenalan ALELEON Supercomputer Mk.V.
+3.  Cara menghubungi tim support/admin jika mengalami masalah (melalui Support Ticket di EFIRO Web Service atau email ke `support@efisonlt.com`).
+
+Jika Anda mene"
+52,Bagaimana cara membatalkan/mengakhiri perjanjian PKSPIAS untuk akun Institusi sebelum waktunya habis?,2.5,0.8,93.9,2.9,0.429,0.538,0.667,0.667,0.667,0.538,5752.8,"Berdasarkan dokumen referensi yang diberikan, **tidak terdapat informasi** mengenai prosedur atau cara untuk membatalkan/mengakhiri perjanjian PKSPIAS (Perjanjian Kerja Sama Pengguna Institusi ALELEON Supercomputer) sebelum waktunya habis.
+
+Dokumen hanya menyebutkan bahwa:
+1.  PKSPIAS adalah perjanjian resmi yang membahas legal kerjasama dan kesepakatan teknis antara institusi dengan EFISON.
+2.  PKSPIAS ditandatangani atas nama dan dengan kredensial resmi antar institusi.
+3.  Untuk inkuiri aloka",7158.4,"Berdasarkan dokumen referensi yang diberikan, **tidak terdapat informasi** mengenai prosedur atau cara untuk membatalkan/mengakhiri perjanjian PKSPIAS (Perjanjian Kerja Sama Pengguna Institusi ALELEON Supercomputer) sebelum waktunya habis.
+
+Dokumen hanya menyebutkan bahwa:
+1.  PKSPIAS adalah perjanjian kerjasama resmi antara institusi dan EFISON yang membahas legal kerjasama dan kesepakatan teknis.
+2.  PKSPIAS ditandatangani atas nama dan dengan kredensial resmi antar institusi.
+3.  Untuk inkuir",6782.2,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai prosedur atau cara untuk membatalkan/mengakhiri perjanjian PKSPIAS (Perjanjian Kerja Sama Pengguna Institusi ALELEON Supercomputer) sebelum waktunya habis.
+
+Dokumen hanya menyebutkan bahwa:
+1.  PKSPIAS adalah perjanjian resmi yang membahas legal kerjasama dan kesepakatan teknis antara institusi dengan EFISON.
+2.  PKSPIAS ditandatangani atas nama dan dengan kredensial resmi antar institusi.
+3.  Untuk inkuiri alokasi ko",6902.3,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai prosedur atau cara untuk membatalkan/mengakhiri perjanjian PKSPIAS (Perjanjian Kerja Sama Pengguna Institusi ALELEON Supercomputer) sebelum waktunya habis.
+
+Dokumen hanya menjelaskan bahwa:
+1.  PKSPIAS adalah perjanjian resmi antara institusi dan EFISON yang membahas legal kerjasama dan kesepakatan teknis.
+2.  Perjanjian ini ditandatangani atas nama dan dengan kredensial resmi antar institusi.
+3.  Syarat penggunaan pa"
+53,"Jika server ALELEON mati lampu, berapa jam daya tahan baterai UPS yang dimiliki EFISON?",2.2,1.1,82.7,2.8,0.176,0.538,0.429,0.25,0.429,0.25,3058.0,"Berdasarkan dokumen referensi yang diberikan, tidak ada informasi mengenai berapa jam daya tahan baterai UPS yang dimiliki EFISON jika server ALELEON mati lampu.
+
+Dokumen hanya menyediakan informasi mengenai cara menghubungi tim support admin (melalui tiket atau email) dan ketentuan jam operasional respon mereka.",3170.4,"Berdasarkan dokumen referensi yang diberikan, tidak ada informasi mengenai spesifikasi daya tahan baterai UPS atau durasi cadangan daya pada server ALELEON Supercomputer.
+
+Dokumen hanya mencakup informasi tentang program EUREKA!, spesifikasi umum (Login Node, Compute Node, dll), cara penggunaan, serta kontak dukungan teknis (support@efisonlt.com).",6808.8,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai berapa jam daya tahan baterai UPS yang dimiliki EFISON atau ALELEON Supercomputer jika terjadi mati lampu.
+
+Dokumen hanya menyediakan informasi mengenai:
+1.  Cara menghubungi tim support (melalui tiket di EFIRO Web Service atau email ke `support@efisonlt.com`).
+2.  Jam operasional dan ketentuan respon support (Senin - Jumat, 09.00 - 17.30 WIB).
+3.  Spesifikasi teknis sistem operasi, scheduler Slurm, dan modul software",4024.8,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai berapa jam daya tahan baterai UPS yang dimiliki EFISON jika server ALELEON mati lampu.
+
+Dokumen hanya memuat informasi tentang:
+1.  Cara menghubungi tim support (via tiket atau email).
+2.  Jam operasional dan ketentuan respon support.
+3.  Penjelasan mengenai program EUREKA!.
+4.  Informasi umum mengenai ALELEON Supercomputer."
+54,Bagaimana cara menggunakan AutoGluon untuk machine learning di sistem ini?,2.4,1.1,90.9,2.7,0.0,0.176,0.333,0.0,0.333,0.0,9196.8,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai cara menggunakan software **AutoGluon** di sistem ALELEON.
+
+Dokumen hanya mencantumkan daftar software berikut:
+1.  **AI Compilation (Release 0.1 & 1.0.0):** Python, PyTorch, TensorFlow, JAX, PennyLane, XGBoost, CuPy, PySpark, Keras, scikit-learn, NumPy, Pandas, Matplotlib.
+2.  **Library Matematika:** AMD AOCL, Intel oneAPI MKL, FFTW, LAPACK, scaLAPACK, ELPA.
+3.  **Library NVIDIA:** CUDA, NCCL, HPC-X.
+4.  **Instalasi ",6368.6,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai cara menggunakan AutoGluon untuk machine learning di sistem ALELEON.
+
+Dokumen hanya menyediakan informasi tentang:
+1.  Versi modul **Make**, **CMake**, dan **Automake**.
+2.  Panduan teknis untuk menjalankan **Batch Job dengan Slurm** (termasuk pembuatan script submit, perintah `sbatch`, `squeue`, `scancel`, serta pemantauan status job).
+3.  Informasi mengenai penggunaan terminal Linux, upload file via SFTP, dan post-p",6367.3,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai cara menggunakan AutoGluon untuk machine learning di sistem ALELEON Supercomputer.
+
+Dokumen tersebut hanya memuat panduan umum untuk:
+1.  Login ke EWS dan mengakses Aleleon Shell Access.
+2.  Mengelola akun melalui EFIRO Account Manager (EAM).
+3.  Menggunakan tool **Sausage** untuk memantau penggunaan core hour, limit fair usage, dan storage.
+4.  Panduan spesifik untuk menjalankan **AI Compilation r1.0.0** (untuk grup ",5761.7,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai cara menggunakan atau ketersediaan software **AutoGluon** di sistem ALELEON.
+
+Dokumen hanya mencantumkan daftar paket untuk AI Compilation (seperti PyTorch, TensorFlow, JAX, XGBoost, dll) dan library matematika lainnya, namun AutoGluon tidak disebutkan dalam tabel ""Detail Kelengkapan Utama AI Compilation ALELEON"" maupun bagian katalog software lainnya.
+
+Jika Anda memerlukan instalasi versi lain atau software yang tida"
+55,Bagaimana cara membuat conda environment di aleleon?,2.3,0.7,50.5,2.3,0.429,0.818,0.538,0.429,0.818,0.538,21862.1,"Berdasarkan dokumen referensi, berikut adalah langkah-langkah untuk membuat Conda Environment di ALELEON:
+
+**1. Buka Terminal**
+Akses terminal melalui salah satu opsi berikut:
+*   Login SSH; atau
+*   Login ke **EFISO Web Service**, pilih menu **Clusters > Aleleon Shell Access**.
+
+**2. Aktifkan Modul Conda yang Sesuai**
+Pilih dan aktifkan modul Lmod conda (direkomendasikan menggunakan versi terbaru). Berikut adalah tabel pilihan modul berdasarkan dokumentasi:
+
+| Package Manager | Versi Python Def",25862.3,"Berdasarkan dokumen referensi, berikut adalah langkah-langkah untuk membuat Conda Environment di ALELEON:
+
+**1. Buka Terminal**
+Akses terminal melalui salah satu opsi berikut:
+*   Klik aplikasi **Aleleon Shell Access** (menu Apps > Aleleon Shell Access).
+*   Atau gunakan **Login SSH**.
+
+**2. Aktifkan Modul Anaconda atau Mamba**
+Pilih dan aktifkan modul Lmod conda yang sesuai. Tim admin menyarankan menggunakan versi terbaru. Berikut adalah tabel pilihan modul:
+
+| Package Manager | Versi Python De",22058.5,"Berdasarkan dokumen referensi, berikut adalah langkah-langkah untuk membuat Conda Environment di ALELEON:
+
+**1. Buka Terminal**
+Gunakan salah satu opsi berikut untuk membuka terminal ALELEON:
+*   Login via SSH.
+*   Login melalui [EFIRo Web Service], pilih menu **Clusters > Aleleon Shell Access**.
+
+**2. Aktifkan Modul Anaconda atau Mamba**
+Pilih dan aktifkan modul Lmod conda yang diinginkan. Tim admin menyarankan menggunakan versi terbaru (saat ini tersedia beberapa versi).
+
+Perintah aktivasi mod",20407.1,"Berdasarkan dokumen referensi, berikut adalah langkah-langkah untuk membuat Conda Environment di ALELEON:
+
+**1. Buka Terminal ALELEON**
+Gunakan salah satu opsi berikut:
+*   Login via SSH.
+*   Login melalui [EFIRO Web Service], lalu pilih menu **Clusters > Aleleon Shell Access**.
+
+**2. Aktifkan Modul Anaconda atau Mamba**
+Pilih dan aktifkan modul Lmod conda yang diinginkan. Tim admin menyarankan menggunakan versi terbaru. Berikut adalah daftar modul yang tersedia:
+
+| Package Manager | Perintah Me"
+56,bagaimana cara menjalankan jupyter dengan conda environment sendiri?,2.8,0.9,52.0,2.9,0.176,0.538,0.538,0.111,0.429,0.429,34180.4,"Berdasarkan dokumen referensi, berikut adalah langkah-langkah untuk menjalankan sesi Jupyter menggunakan Conda Environment milik Anda sendiri di ALELEON:
+
+### 1. Persiapan (Dilakukan di Login Node)
+Sebelum memulai sesi interaktif, pastikan lingkungan Conda sudah siap. Instalasi package dilakukan di login node agar tidak mengonsumi Core Hour.
+
+*   **Akses Terminal:** Buka aplikasi **Aleleon Shell Access** (via menu Apps atau EFIRO Web Service).
+*   **Muat Modul Anaconda:** Jalankan perintah berik",22635.9,"Berdasarkan dokumen referensi, berikut adalah langkah-langkah untuk menjalankan sesi Jupyter menggunakan *conda environment* (user provided) sendiri di ALELEON:
+
+**1. Login ke EFIRO Web Service**
+Masuk ke portal layanan web ALELEON.
+*   *Opsional:* Untuk efisiensi waktu, Anda dapat mengunggah atau menyiapkan file komputasi terlebih dahulu di direktori HOME melalui menu **Files > Home Directory** (limit 100MB per file). Jika lebih besar, gunakan aplikasi SFTP.
+
+**2. Buka Formulir Aplikasi Interak",26550.4,"Berdasarkan dokumen referensi, berikut adalah langkah-langkah untuk menjalankan sesi Jupyter menggunakan Conda Environment sendiri (User provided):
+
+**1. Persiapan Awal (Upload File & Instalasi Package)**
+*   **Login:** Masuk ke [EFIRO Web Service].
+*   **Upload File:** Siapkan file komputasi di HOME melalui menu *Files > Home Directory* (limit 100MB/file) atau gunakan aplikasi SFTP jika file lebih besar.
+*   **Instalasi Package:** Sebaiknya lengkapi instalasi package sebelum menjalankan sesi ag",30618.7,"Berdasarkan dokumen referensi, berikut adalah langkah-langkah untuk menjalankan sesi Jupyter menggunakan Conda Environment (conda env) milik Anda sendiri di ALELEON Supercomputer:
+
+**1. Persiapan Awal (Di Login Node)**
+Sebelum memulai sesi, pastikan instalasi package sudah lengkap di dalam conda environment Anda agar tidak memakan waktu saat sesi berjalan dan menghindari error *missing package*. Instalasi ini dilakukan di login node sehingga **tidak mengkonsumsi Core Hour**.
+
+*   Buka terminal m"
+57,Versi Python default dari Anaconda3 2025.06-1 apa?,2.4,1.2,70.3,2.7,0.538,0.538,0.667,0.538,0.818,0.538,3921.4,"Berdasarkan dokumen referensi, versi Python default dari **Anaconda3 2025.06-1** adalah **3.13.4**.
+
+Hal ini tercantum dalam tabel pada bagian ""Membuat Conda Env dan Modul pyl"" yang menunjukkan:
+*   Package Manager: Anaconda3 2025.06-1
+*   Python default: 3.13.4",3991.1,"Berdasarkan dokumen referensi, versi Python default dari **Anaconda3 2025.06-1** adalah **3.13.4**.
+
+Hal ini tercantum pada tabel di bagian ""Membuat Conda Env dan Modul Pyload"" yang menyebutkan:
+*   Package Manager: Anaconda3 2025.06-1
+*   Python default: 3.13.4",4048.8,"Berdasarkan dokumen referensi, versi Python default dari **Anaconda3 2025.06-1** adalah **Python 3.13.4**.
+
+Hal ini tercantum pada tabel di bagian ""Membuat Conda Env dan Modul Pyload"" yang menyatakan:
+*   Package Manager: Anaconda3 2025.06-1
+*   Python default: 3.13.4",3732.2,"Berdasarkan dokumen referensi, versi Python default dari **Anaconda3 2025.06-1** adalah **3.13.4**.
+
+Hal ini tercantum pada tabel di bagian ""Membuat Conda Env dan Modul Pyload"" yang menunjukkan:
+*   Package Manager: Anaconda3 2025.06-1
+*   Python default: 3.13.4"
+58,Perintah apa untuk mengaktifkan Mamba 23.11.0-0?,2.3,1.0,69.5,2.4,0.176,0.429,0.538,0.176,0.429,0.429,2659.8,"Berdasarkan dokumen referensi ""Komputasi Python dengan Conda Environment User"", perintah untuk mengaktifkan modul Mamba versi 23.11.0-0 adalah:
+
+`$ ml Mamba/23.11.0-0`",3660.2,"Berdasarkan dokumen referensi, perintah untuk mengaktifkan **Mamba 23.11.0-0** adalah:
+
+```bash
+$ ml Mamba/23.11.0-0
+```
+
+Perintah ini dapat digunakan baik untuk membuat *virtualenv* maupun *conda env*, tergantung pada kebutuhan user.",2599.9,"Berdasarkan dokumen referensi, perintah untuk mengaktifkan modul Mamba versi 23.11.0-0 adalah:
+
+`$ ml Mamba/23.11.0-0`",2387.2,"Berdasarkan dokumen referensi, perintah untuk mengaktifkan Mamba 23.11.0-0 adalah:
+
+`$ ml Mamba/23.11.0-0`"
+59,Bagaimana cara membuat modul pyload setelah conda env aktif?,1.7,3.2,49.8,2.2,0.667,0.818,0.667,0.667,1.0,0.667,5005.4,"Berdasarkan dokumen referensi, berikut adalah cara membuat modul pyload setelah conda environment aktif:
+
+1.  Pastikan Anda sudah mengaktifkan conda env (tanda `(env)` akan muncul di prompt terminal).
+2.  Jalankan perintah `pyl mod`.
+3.  Pilih menu **no.1**.
+4.  Ikuti alur script yang ditampilkan.
+
+**Contoh Perintah:**
+```bash
+(env) $ pyl mod
+```
+
+*Catatan: Jika Anda menggunakan Virtualenv, langkahnya sama yaitu menjalankan `pyl mod` saat virtualenv sudah aktif.*",7054.6,"Berdasarkan dokumen referensi, berikut adalah langkah-langkah untuk membuat modul `pyload` setelah conda env aktif:
+
+1.  **Aktifkan Conda Env** terlebih dahulu menggunakan perintah source:
+    ```bash
+    $ source activate [nama-env]
+    ```
+    *(Pastikan prompt terminal berubah menjadi `(env)` yang menandakan lingkungan sudah aktif).*
+
+2.  **Jalankan perintah pembuatan modul** dengan mengetik:
+    ```bash
+    (env) $ pyl mod
+    ```
+
+3.  **Ikuti alur interaktif** yang muncul di terminal:
+    *",5388.3,"Berdasarkan dokumen referensi, berikut adalah langkah-langkah untuk membuat modul `pyload` setelah *conda env* aktif:
+
+1.  Pastikan Anda telah mengaktifkan *conda env* dengan perintah `source activate [nama-env]`.
+2.  Jalankan perintah berikut di terminal:
+    ```bash
+    pyl mod
+    ```
+3.  Ikuti alur interaktif yang muncul:
+    *   Pilih menu nomor **1**.
+    *   Lanjutkan mengikuti instruksi pada skrip yang berjalan.
+
+Setelah proses ini selesai, modul `pyload` baru akan tersedia untuk digunak",5165.4,"Berdasarkan dokumen referensi, berikut adalah langkah-langkah untuk membuat modul `pyload` setelah `conda env` aktif:
+
+1.  Pastikan Anda telah mengaktifkan `conda env` yang diinginkan (biasanya menggunakan perintah `$ source activate [nama-env]`).
+2.  Jalankan perintah `pyl mod` di dalam terminal yang sudah berada di dalam lingkungan (`env`) tersebut.
+3.  Ikuti alur interaktif yang muncul:
+    *   Pilih menu **no.1**.
+    *   Lanjutkan mengikuti instruksi script selanjutnya.
+
+**Perintah:**
+```ba"
+60,Perintah apa untuk melihat daftar modul pyload yang tersedia?,2.5,2.9,51.3,2.2,0.333,0.333,0.538,0.176,0.667,0.25,2399.8,"Berdasarkan dokumen referensi, perintah untuk melihat daftar modul pyload yang tersedia adalah:
+
+`pyl list`
+
+Perintah ini digunakan untuk mengecek apakah nama modul sudah berubah atau melihat bagian **USER-DEFINED** dari modul yang telah dibuat.",2090.6,"Berdasarkan dokumen referensi, perintah untuk melihat daftar modul pyload yang tersedia adalah:
+
+`$ pyl list`
+
+Perintah ini akan menampilkan bagian **USER-DEFINED** yang berisi modul buatan user.",2739.8,"Berdasarkan dokumen referensi, perintah untuk melihat daftar modul pyload yang tersedia adalah:
+
+`pyl list`
+
+Perintah ini digunakan untuk mengecek nama modul, di mana hasil daftarnya dapat dilihat pada bagian **USER-DEFINED**.",2142.5,"Berdasarkan dokumen referensi, perintah untuk melihat daftar modul pyload yang tersedia adalah:
+
+**`pyl list`**
+
+Perintah ini akan menampilkan daftar modul, termasuk bagian **USER-DEFINED** yang berisi modul buatan user."
+61,Di partisi GPU mana batch job conda berjalan?,2.2,0.7,47.0,4.3,0.667,0.667,0.667,0.429,0.667,0.429,2904.4,"Berdasarkan dokumen referensi, batch job conda berjalan di partisi **ampere**.
+
+Hal ini tercantum pada konfigurasi SBATCH:
+`#SBATCH --partition=ampere`",2718.7,"Berdasarkan dokumen referensi, batch job conda berjalan di partisi GPU **ampere**.
+
+Hal ini tercantum dalam konfigurasi SBATCH pada dokumen:
+`#SBATCH --partition=ampere`",2911.7,"Berdasarkan dokumen referensi, batch job conda berjalan di partisi GPU bernama **ampere**.
+
+Hal ini tercantum dalam konfigurasi SBATCH pada dokumen:
+`#SBATCH --partition=ampere`",3382.7,"Berdasarkan dokumen referensi, batch job conda berjalan di partisi GPU **ampere**.
+
+Hal ini tercantum pada konfigurasi SBATCH:
+`#SBATCH --partition=ampere`
+
+Partisi ini digunakan untuk alokasi komputasi GPU (dengan perintah `#SBATCH --gpus=1`)."
+62,Apa email support admin ALELEON?,1.8,1.1,36.9,2.5,0.429,0.818,0.538,0.538,0.818,0.538,2005.1,"Berdasarkan dokumen referensi yang diberikan, email untuk menghubungi tim support admin ALELEON adalah:
+
+**support@efisonlt.com**",2090.7,"Berdasarkan dokumen referensi yang diberikan, email untuk menghubungi tim support admin ALELEON adalah:
+
+**support@efisonlt.com**",1878.2,"Berdasarkan dokumen referensi yang diberikan, email untuk menghubungi tim support admin ALELEON adalah:
+
+**support@efisonlt.com**",2060.2,"Berdasarkan dokumen referensi yang diberikan, email untuk menghubungi tim support admin ALELEON adalah:
+
+**support@efisonlt.com**"
+63,Jam kerja support EFISON kapan?,1.7,0.7,36.2,2.8,0.333,0.333,0.667,0.25,0.538,0.333,3795.2,"Berdasarkan dokumen referensi, jam kerja support EFISON adalah:
+
+*   **Hari:** Senin - Jumat
+*   **Waktu:** 09.00 - 17.30 WIB
+
+Respon cepat diberikan pada hari dan jam kerja tersebut. Pada hari libur (Sabtu - Minggu, Hari Libur Nasional, dan Cuti Bersama Pemerintah Indonesia), waktu respon tim admin mungkin tidak secepat saat hari kerja.",3894.6,"Berdasarkan dokumen referensi, jam kerja support EFISON adalah:
+
+*   **Hari:** Senin - Jumat
+*   **Waktu:** 09.00 - 17.30 WIB
+
+Selain waktu tersebut (Sabtu, Minggu, Hari Libur Nasional, dan Cuti Bersama Pemerintah Indonesia), tim admin tetap dapat membalas tiket atau email, namun dengan waktu respon yang tidak secepat pada hari/jam kerja.",3774.4,"Berdasarkan dokumen referensi, jam kerja support EFISON adalah:
+
+*   **Hari:** Senin - Jumat
+*   **Waktu:** 09.00 - 17.30 WIB
+
+Respon cepat diberikan pada hari dan jam kerja tersebut. Pada hari libur (Sabtu - Minggu, Hari Libur Nasional, dan Cuti Bersama Pemerintah Indonesia), waktu respon tim admin mungkin tidak secepat saat hari kerja.",3801.9,"Berdasarkan dokumen referensi yang diberikan, jam kerja support EFISON adalah:
+
+*   **Hari:** Senin - Jumat
+*   **Waktu:** 09.00 - 17.30 WIB
+
+Selain waktu tersebut (Sabtu, Minggu, Hari Libur Nasional, dan Cuti Bersama Pemerintah Indonesia), tim admin tetap dapat membalas tiket atau email, namun dengan waktu respon yang tidak secepat pada hari dan jam kerja."
+64,Apa saja pilihan cara menjalankan komputasi Python dengan conda env di ALELEON?,1.7,0.7,75.0,2.4,0.538,0.667,0.818,0.667,0.667,0.818,9473.7,"Berdasarkan dokumen referensi, berikut adalah pilihan cara menjalankan komputasi Python dengan conda env di ALELEON:
+
+1.  **Batch job**
+    *   Digunakan untuk menjalankan script Python yang sudah siap dan tidak membutuhkan interaksi user.
+    *   File Jupyter (`.ipynb`) harus dikonversi terlebih dahulu menjadi file Python (`.py`).
+    *   Job dijalankan oleh Slurm dan akan berhenti jika program selesai, menyentuh batas waktu, atau mengalami error.
+    *   Koneksi user tidak mempengaruhi jalanny",9623.0,"Berdasarkan dokumen referensi, berikut adalah pilihan cara menjalankan komputasi Python dengan conda environment (conda env) di ALELEON:
+
+1.  **Batch Job**
+    *   Digunakan untuk menjalankan script Python yang sudah siap jalan dan tidak membutuhkan interaksi user.
+    *   File Notebook (`.ipynb`) harus dikonversi terlebih dahulu menjadi file Python (`.py`).
+    *   Job dijalankan oleh Slurm dan user menunggu hingga selesai.
+    *   Koneksi user tidak mempengaruhi jalannya job; job tidak akan be",10595.4,"Berdasarkan dokumen referensi, berikut adalah pilihan cara menjalankan komputasi Python dengan conda environment di ALELEON:
+
+1.  **Batch job**
+    *   Digunakan untuk menjalankan script Python siap jalan yang tidak membutuhkan interaksi user.
+    *   File notebook (`.ipynb`) harus dikonversi terlebih dahulu menjadi file Python (`.py`).
+    *   Job dijalankan oleh Slurm dan akan berhenti jika program selesai, menyentuh batas waktu, atau mengalami error.
+    *   Koneksi user tidak mempengaruhi ja",9766.3,"Berdasarkan dokumen referensi, berikut adalah pilihan cara menjalankan komputasi Python dengan conda env di ALELEON:
+
+1.  **Batch job**
+    *   Digunakan untuk menjalankan script Python yang sudah siap jalan dan tidak membutuhkan interaksi user (file `.ipynb` harus dikonversi ke `.py`).
+    *   Job dijalankan oleh Slurm.
+    *   Berjalan pada **Compute node** (Partisi epyc atau Partisi ampere).
+    *   Koneksi user tidak mempengaruhi jalannya job; job akan terus berjalan meskipun user log out at"
+65,Apa perbedaan antara menjalankan batch job via Job Composer EWS dan via terminal Slurm?,2.6,0.8,72.1,2.3,0.111,0.429,0.333,0.111,0.538,0.176,25365.8,"Berdasarkan dokumen referensi, berikut adalah perbedaan antara menjalankan batch job melalui **Job Composer EWS** dan **Terminal Slurm**:
+
+**1. Antarmuka (Interface)**
+*   **Job Composer EWS:** Dilakukan secara grafis melalui web browser dengan login ke **[EFIRO Web Service]**. User membuka menu *Jobs > Job Composer*.
+*   **Terminal Slurm:** Dilakukan melalui baris perintah (command line) di terminal Linux. Akses terminal dapat dilakukan via **[Login SSH]** atau melalui menu **[Clusters > Aleleo",11004.2,"Berdasarkan dokumen referensi, berikut adalah perbedaan antara menjalankan batch job melalui **Job Composer EWS** dan **terminal Slurm**:
+
+1.  **Tampilan dan Alur Kerja (UI/UX):**
+    *   **Job Composer EWS:** Menggunakan tampilan grafis (*graphical interface*) yang diakses melalui aplikasi Job Composer di [EFIRO Web Service].
+    *   **Terminal Slurm:** Menggunakan antarmuka baris perintah (*command line interface*) langsung di terminal Linux (melalui Login SSH atau menu Clusters > Aleleon Shel",8739.2,"Berdasarkan dokumen referensi yang diberikan, **tidak ada informasi** mengenai cara menjalankan batch job secara langsung melalui terminal Slurm (misalnya menggunakan perintah `sbatch`).
+
+Dokumen hanya menjelaskan prosedur menjalankan Batch Job melalui **Job Composer EWS** (antarmuka web), dengan langkah-langkah berikut:
+1.  Login ke EFIRO Web Service.
+2.  Buka menu Jobs > Job Composer.
+3.  Membuat ruang job (New Jobs > From Template).
+4.  Mengunggah file komputasi via menu [Edit Files] atau Apl",10136.0,"Berdasarkan dokumen referensi, berikut adalah perbedaan antara menjalankan batch job melalui **Job Composer EWS** dan **terminal Slurm**:
+
+1.  **Tampilan dan Alur Kerja (UI/UX):**
+    *   **Job Composer EWS:** Menggunakan tampilan grafis (GUI) yang diakses melalui menu Jobs > Job Composer pada [EFIRO Web Service].
+    *   **Terminal Slurm:** Menggunakan antarmuka baris perintah (CLI) di terminal Linux (melalui Login SSH atau Aleleon Shell Access).
+
+2.  **Performa Komputasi:**
+    *   Dokumen men"
+66,Bagaimana langkah lengkap membuat conda env baru dan modul pyload dari awal?,2.3,0.7,62.7,2.2,0.538,0.667,0.818,0.538,0.667,0.538,25325.9,"Berdasarkan dokumen referensi, berikut adalah langkah lengkap untuk membuat *Conda Environment* (conda env) baru dan modul *pyload* dari awal di ALELEON:
+
+**1. Buka Terminal ALELEON**
+Pilih salah satu opsi berikut untuk mengakses terminal:
+*   Login via SSH ([Login SSH]).
+*   Login melalui [EFIRO Web Service], lalu pilih menu **Clusters > Aleleon Shell Access**.
+
+**2. Aktifkan Modul Lmod Conda**
+Pilih dan aktifkan modul *conda* yang sesuai. Tim admin menyarankan menggunakan versi terbaru jika ti",23746.1,"Berdasarkan dokumen referensi, berikut adalah langkah lengkap untuk membuat **Conda Environment** baru dan **Modul Pyload** dari awal di terminal ALELEON:
+
+**1. Buka Terminal ALELEON**
+Pilih salah satu opsi berikut untuk mengakses terminal:
+*   Login via SSH (`[ Login SSH ]`).
+*   Login melalui [ EFIRO Web Service ], pilih menu `Clusters` > `Aleleon Shell Access`.
+
+**2. Aktifkan Modul Lmod Conda**
+Pilih dan aktifkan modul Lmod conda yang sesuai. Tim admin menyarankan menggunakan versi terbaru ji",25763.8,"Berdasarkan dokumen referensi, berikut adalah langkah lengkap untuk membuat **Conda Environment** baru dan **Modul Pyload** dari awal di ALELEON:
+
+### 1. Buka Terminal ALELEON
+Login ke terminal menggunakan salah satu opsi berikut:
+*   **[Login SSH]**; atau
+*   Login melalui **[EFIRO Web Service]**, pilih menu **Clusters > Aleleon Shell Access**.
+
+### 2. Aktifkan Modul Lmod Conda
+Pilih dan aktifkan modul Lmod conda yang sesuai. Tim admin menyarankan menggunakan versi terbaru jika tidak ada prefer",25499.5,"Berdasarkan dokumen referensi, berikut adalah langkah lengkap untuk membuat **Conda Environment** baru dan **Modul Pyload** dari awal di sistem ALELEON:
+
+### 1. Buka Terminal
+Masuk ke terminal ALELEON melalui salah satu opsi berikut:
+*   Login via SSH (**Login SSH**); atau
+*   Login melalui [EFIRO Web Service], pilih menu **Clusters > Aleleon Shell Access**.
+
+### 2. Aktifkan Modul Lmod Conda
+Pilih dan aktifkan modul Lmod conda yang sesuai. Tim admin menyarankan menggunakan versi terbaru (kecuali"
+67,Apa saja status job di squeue dan artinya masing-masing?,2.6,0.7,64.4,2.3,0.429,0.667,0.818,0.333,0.538,0.667,7218.5,"Berdasarkan dokumen referensi, berikut adalah daftar status job (ST / STATE) di `squeue` beserta artinya:
+
+*   **Tidak ada di squeue**: Job bersangkutan telah selesai.
+*   **PD (PENDING)**: Job mengantri dan belum jalan.
+*   **R (RUN)**: Job sedang berjalan.
+*   **CG (COMPLETING)**: Job selesai dan sedang dalam proses *clean-up*.
+*   **CA (CANCELED)**: Job dibatalkan oleh user.
+*   **PR (PREEMPETED)**: Job dibatalkan oleh tim admin (notifikasi dan alasan dikabarkan via email support).
+*   **S (S",7160.0,"Berdasarkan dokumen referensi, berikut adalah daftar status job (ST / STATE) di `squeue` beserta artinya:
+
+*   **Tidak ada di squeue**: Job bersangkutan telah selesai.
+*   **PD (PENDING)**: Job mengantri dan belum jalan.
+*   **R (RUN)**: Job sedang berjalan.
+*   **CG (COMPLETING)**: Job selesai dan sedang dalam proses *clean-up*.
+*   **CA (CANCELED)**: Job dibatalkan oleh user.
+*   **PR (PREEMPETED)**: Job dibatalkan oleh tim admin (notifikasi dan alasan dikabarkan via email support).
+*   **S (S",7995.6,"Berdasarkan dokumen referensi, berikut adalah status job (kolom ST atau STATE) di `squeue` beserta artinya:
+
+*   **R (RUN)**: Job sedang berjalan.
+*   **PD (PENDING)**: Job tertahan/mengantri dan belum berjalan.
+*   **CG (COMPLETING)**: Job telah selesai dan sedang dalam proses *clean-up*.
+*   **CA (CANCELED)**: Job dibatalkan oleh user.
+*   **PR (PREEMPETED)**: Job dibatalkan oleh admin (alasan dikabarkan via email).
+*   **S (SUSPENDED)**: Job ditahan oleh admin (alasan dikabarkan via email).
+
+",7158.0,"Berdasarkan dokumen referensi, berikut adalah daftar status job (ST / STATE) di `squeue` beserta artinya:
+
+*   **Tidak ada di squeue**: Job bersangkutan telah selesai.
+*   **PD (PENDING)**: Job mengantri dan belum jalan.
+*   **R (RUN)**: Job sedang berjalan.
+*   **CG (COMPLETING)**: Job selesai dan sedang dalam proses *clean-up*.
+*   **CA (CANCELED)**: Job dibatalkan oleh user.
+*   **PR (PREEMPETED)**: Job dibatalkan oleh tim admin (notifikasi dan alasan dikabarkan via email support).
+*   **S (S"
+68,Bagaimana cara mengisi formulir Jupyter di EWS untuk conda env user?,2.1,1.2,81.0,2.2,0.667,0.818,0.818,0.667,0.818,0.818,16530.6,"Berdasarkan dokumen referensi, berikut adalah panduan cara mengisi formulir Jupyter di EWS (EFIRO Web Service) untuk menggunakan **Conda Environment User**:
+
+**1. Menuju Formulir**
+*   Login ke web EFIRO.
+*   Klik menu **Interactive Apps > Jupyter**.
+
+**2. Pengisian Formulasi**
+Isi kolom-kolom berikut sesuai kebutuhan dan konfigurasi conda env user Anda:
+
+*   **Number of CPU threads:** Masukkan jumlah alokasi core CPU yang diinginkan.
+*   **Use GPU for the job:** Pilih `no` (tanpa GPU) atau `yes",22979.6,"Berdasarkan dokumen referensi, berikut adalah cara mengisi formulir Jupyter di EWS (EFIRO Web Service) untuk menggunakan *Conda Environment* (conda env) user:
+
+**1. Login dan Akses Menu**
+*   Login ke web **EFIRO**.
+*   Klik menu **Interactive Apps > Jupyter** (atau klik app Jupyter di homepage).
+
+**2. Pengisian Formulir**
+Isi kolom-kolom berikut sesuai panduan:
+
+*   **Choose Jupyter version:** Pilih preferensi Anda (**Jupyter Lab** atau **Notebook**).
+*   **Partition:** Pilih sesuai kebutuhan k",18723.2,"Berdasarkan dokumen referensi, berikut adalah panduan cara mengisi formulir Jupyter di EWS (EFIRO Web Service) untuk menggunakan **Conda Environment User**:
+
+**1. Akses Menu Jupyter**
+*   Login ke web EFIRO.
+*   Klik menu **Interactive Apps > Jupyter** (atau menu *Apps > Jupyter*).
+
+**2. Isi Formulir dengan Detail Berikut:**
+
+*   **Number of CPU threads:** Masukkan jumlah alokasi core CPU yang dibutuhkan (sesuai sisa Core Hour dan limit akun).
+*   **Use GPU for the job:** Pilih:
+    *   `no` jik",23597.7,"Berdasarkan dokumen referensi, berikut adalah panduan cara mengisi formulir Jupyter di EWS (EFIRO Web Service) untuk menggunakan *Conda Environment* user:
+
+**1. Login dan Akses Menu**
+*   Login ke web **EFIRO**.
+*   Klik aplikasi **Jupyter** di homepage atau masuk melalui menu **Apps > Jupyter**.
+
+**2. Mengisi Formulir Pemulaan Sesi Jupyter**
+Isi kolom-kolom berikut sesuai kebutuhan dan konfigurasi *conda env* Anda:
+
+*   **Choose Jupyter version:** Pilih preferensi Anda (**Jupyter Lab** atau **N"
