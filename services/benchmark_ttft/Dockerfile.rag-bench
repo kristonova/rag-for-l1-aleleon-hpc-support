@@ -1,0 +1,22 @@
+# Dockerfile.rag-bench — RAG API Benchmark Service
+# =============================================================================
+# Mengirim pertanyaan nyata ke endpoint POST /ask secara konkuren
+# dan mengukur latency (avg, P50, P99) serta throughput (RPS).
+# =============================================================================
+
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install aiohttp (satu-satunya dependensi tambahan)
+RUN --mount=type=cache,target=/root/.cache/pip,Z \
+    pip install aiohttp
+
+# Copy benchmark script
+COPY services/benchmark_ttft/run-rag-bench.py .
+
+# Output directory (untuk volume mount)
+RUN mkdir -p /app/output/benchmark_ttft
+
+# Default: jalankan benchmark
+CMD ["python", "run-rag-bench.py"]

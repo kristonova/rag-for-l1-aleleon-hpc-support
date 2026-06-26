@@ -1,0 +1,656 @@
+{
+  "summary": {
+    "concurrency": 4,
+    "total_requests": 69,
+    "successful": 52,
+    "failed": 17,
+    "avg_latency_s": 63.0609,
+    "min_latency_s": 15.3776,
+    "max_latency_s": 123.3824,
+    "p50_latency_s": 60.6848,
+    "p99_latency_s": 113.7137,
+    "stdev_latency_s": 23.1673,
+    "throughput_rps": 0.0542,
+    "wall_clock_s": 958.9057
+  },
+  "requests": [
+    {
+      "request_id": 1,
+      "question": "Berapa kapasitas RAM efektif per node di partisi epyc-jumbo?",
+      "status": 200,
+      "latency_s": 60.685,
+      "answer_length": 377,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 2,
+      "question": "Berapa batas maksimal walltime (waktu komputasi) per job untuk golongan akun per",
+      "status": 200,
+      "latency_s": 15.3776,
+      "answer_length": 967,
+      "num_sources": 8,
+      "success": true
+    },
+    {
+      "request_id": 3,
+      "question": "Saya ingin pakai partisi GPU. GPU jenis apa yang terpasang di partisi ampere?",
+      "status": 200,
+      "latency_s": 60.6849,
+      "answer_length": 704,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 4,
+      "question": "Apa alamat website portal EFIRO Web Service (EWS) untuk login?",
+      "status": 200,
+      "latency_s": 60.6846,
+      "answer_length": 398,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 5,
+      "question": "Perintah apa yang harus saya ketik di terminal untuk melihat daftar environment ",
+      "status": 200,
+      "latency_s": 61.394,
+      "answer_length": 755,
+      "num_sources": 9,
+      "success": true
+    },
+    {
+      "request_id": 6,
+      "question": "Berapa harga 1 GPU Hour (GH) untuk pengguna golongan perseorangan non-akademia?",
+      "status": -1,
+      "latency_s": 16.0868,
+      "answer_length": 0,
+      "num_sources": 0,
+      "success": false,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "request_id": 7,
+      "question": "Saya mau cek sisa kuota core hour saya. Perintah sausage apa yang harus diketik?",
+      "status": 200,
+      "latency_s": 31.0817,
+      "answer_length": 894,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 8,
+      "question": "Apa itu PKSPIAS dalam pendaftaran akun ALELEON?",
+      "status": -1,
+      "latency_s": 16.0868,
+      "answer_length": 0,
+      "num_sources": 0,
+      "success": false,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "request_id": 9,
+      "question": "Jika saya pakai aplikasi SFTP seperti FileZilla, apakah ada limit ukuran file ya",
+      "status": 200,
+      "latency_s": 29.0203,
+      "answer_length": 817,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 10,
+      "question": "OS (Sistem Operasi) apa yang digunakan oleh ALELEON Mk.V?",
+      "status": 200,
+      "latency_s": 84.767,
+      "answer_length": 452,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 11,
+      "question": "Versi SLURM berapa yang terpasang di sistem ALELEON saat ini?",
+      "status": 200,
+      "latency_s": 58.7958,
+      "answer_length": 418,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 12,
+      "question": "Bagaimana cara membatalkan/menghentikan job yang berstatus PENDING di terminal?",
+      "status": 200,
+      "latency_s": 43.8012,
+      "answer_length": 820,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 13,
+      "question": "Berapa kapasitas limit storage HOME untuk akun perseorangan?",
+      "status": 200,
+      "latency_s": 55.7468,
+      "answer_length": 721,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 14,
+      "question": "Apakah sistem ALELEON memiliki backup jika saya tidak sengaja menghapus data di ",
+      "status": 200,
+      "latency_s": 41.0861,
+      "answer_length": 738,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 15,
+      "question": "Email resmi apa yang harus saya hubungi jika ingin submit support ticket?",
+      "status": -1,
+      "latency_s": 25.9708,
+      "answer_length": 0,
+      "num_sources": 0,
+      "success": false,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "request_id": 16,
+      "question": "Saya mau menjalankan simulasi GROMACS, apa nama binary MPI yang dipakai? Apakah ",
+      "status": -1,
+      "latency_s": 15.1149,
+      "answer_length": 0,
+      "num_sources": 0,
+      "success": false,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "request_id": 17,
+      "question": "Di EFIRO Account Manager, aplikasi authenticator apa saja yang didukung untuk fi",
+      "status": 200,
+      "latency_s": 27.6211,
+      "answer_length": 652,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 18,
+      "question": "Apa perintah terminal untuk mengecek status antrian job saya di Slurm?",
+      "status": 200,
+      "latency_s": 61.2247,
+      "answer_length": 817,
+      "num_sources": 9,
+      "success": true
+    },
+    {
+      "request_id": 19,
+      "question": "Apakah ALELEON mendukung instalasi package Python menggunakan pip?",
+      "status": 200,
+      "latency_s": 46.1097,
+      "answer_length": 928,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 20,
+      "question": "Modul Lmod apa yang harus saya load jika ingin menggunakan compiler GCC versi 15",
+      "status": 200,
+      "latency_s": 94.4048,
+      "answer_length": 1078,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 21,
+      "question": "Saya ingin buka sesi interaktif JupyterLab menggunakan GPU. Apa bedanya partisi ",
+      "status": 200,
+      "latency_s": 81.8987,
+      "answer_length": 1422,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 22,
+      "question": "Saya punya file simulasi.ipynb. Bagaimana urutan langkah menjalankannya sebagai ",
+      "status": -1,
+      "latency_s": 48.2951,
+      "answer_length": 0,
+      "num_sources": 0,
+      "success": false,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "request_id": 23,
+      "question": "Jelaskan perbedaan arti status job 'PD' dan 'CG' saat saya mengecek squeue. Lalu",
+      "status": 200,
+      "latency_s": 66.3424,
+      "answer_length": 1072,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 24,
+      "question": "Sebagai pengguna dari Akun Institusi, apakah job saya dibatasi maksimal 128 core",
+      "status": 200,
+      "latency_s": 41.4437,
+      "answer_length": 1664,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 25,
+      "question": "Saya mau ganti password akun ALELEON saya. Di portal web mana saya harus login, ",
+      "status": -1,
+      "latency_s": 18.0472,
+      "answer_length": 0,
+      "num_sources": 0,
+      "success": false,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "request_id": 26,
+      "question": "File upload saya ukurannya 500 MB. Kenapa saya selalu gagal upload lewat menu Fi",
+      "status": 200,
+      "latency_s": 88.2572,
+      "answer_length": 1242,
+      "num_sources": 9,
+      "success": true
+    },
+    {
+      "request_id": 27,
+      "question": "Saya ingin mengkompilasi code C++ menggunakan compiler AMD target Zen 2 dan Open",
+      "status": 200,
+      "latency_s": 70.2101,
+      "answer_length": 1267,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 28,
+      "question": "Saya mau pre-processing data GROMACS menggunakan binary gmx_mpi. Boleh tidak say",
+      "status": 200,
+      "latency_s": 123.3824,
+      "answer_length": 1177,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 29,
+      "question": "Jika saya menjalankan batch job lalu tiba-tiba koneksi internet rumah saya mati ",
+      "status": 200,
+      "latency_s": 99.9862,
+      "answer_length": 893,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 30,
+      "question": "Apa bedanya Effective Core Hour dengan Actual Core Hour di dalam sistem ALELEON?",
+      "status": 200,
+      "latency_s": 88.1616,
+      "answer_length": 2323,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 31,
+      "question": "Saya menjalankan simulasi FLACS-CFD dengan 192 proses MPI murni. Di partisi epyc",
+      "status": -1,
+      "latency_s": 53.1722,
+      "answer_length": 0,
+      "num_sources": 0,
+      "success": false,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "request_id": 32,
+      "question": "(Troubleshooting) Saya submit job GROMACS tapi selalu gagal dengan pesan error I",
+      "status": 200,
+      "latency_s": 55.0227,
+      "answer_length": 1111,
+      "num_sources": 7,
+      "success": true
+    },
+    {
+      "request_id": 33,
+      "question": "Saya submit 3 batch job berturut-turut. Job 1 pakai 64 CPU. Job 2 pakai 32 CPU. ",
+      "status": -1,
+      "latency_s": 34.989,
+      "answer_length": 0,
+      "num_sources": 0,
+      "success": false,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "request_id": 34,
+      "question": "(Troubleshooting) Job saya berstatus PD dengan alasan AssocMaxWallDurationPerJob",
+      "status": 200,
+      "latency_s": 99.0007,
+      "answer_length": 1236,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 35,
+      "question": "Saya mau menjalankan 10 simulasi FLACS-CFD sekaligus menggunakan fitur Slurm Arr",
+      "status": 200,
+      "latency_s": 64.0119,
+      "answer_length": 1442,
+      "num_sources": 8,
+      "success": true
+    },
+    {
+      "request_id": 36,
+      "question": "Saya menjalankan script dengan #SBATCH --ntasks=4 dan #SBATCH --cpus-per-task=8 ",
+      "status": 200,
+      "latency_s": 104.4242,
+      "answer_length": 787,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 37,
+      "question": "Saya butuh komputasi memori raksasa sebesar 350 GB untuk satu aplikasi yang non-",
+      "status": 200,
+      "latency_s": 84.3907,
+      "answer_length": 1044,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 38,
+      "question": "Saya mencoba mengisi form Sesi JupyterLab di EFIRO. Saya set waktu 3 hari (72 ja",
+      "status": 200,
+      "latency_s": 63.3436,
+      "answer_length": 1351,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 39,
+      "question": "Kenapa saat saya meminta alokasi #SBATCH --ntasks=7, sistem Slurm ALELEON akan m",
+      "status": -1,
+      "latency_s": 40.4123,
+      "answer_length": 0,
+      "num_sources": 0,
+      "success": false,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "request_id": 40,
+      "question": "Apakah ada gunanya saya upload file Slaster-Koster (SK) ke setiap ruang Job Comp",
+      "status": -1,
+      "latency_s": 22.9309,
+      "answer_length": 0,
+      "num_sources": 0,
+      "success": false,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "request_id": 41,
+      "question": "Berapa kapasitas ukuran penyimpanan (storage) SSD untuk satu node Login di ALELE",
+      "status": 200,
+      "latency_s": 37.408,
+      "answer_length": 732,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 42,
+      "question": "Bagaimana langkah-langkah submit job menggunakan aplikasi MATLAB di ALELEON?",
+      "status": 200,
+      "latency_s": 67.8043,
+      "answer_length": 674,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 43,
+      "question": "Berapa biaya denda yang harus dibayar jika file di HOME saya melebihi kuota 150G",
+      "status": 200,
+      "latency_s": 44.8736,
+      "answer_length": 821,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 44,
+      "question": "Apakah saya bisa menginstal package R menggunakan perintah conda install r-seura",
+      "status": 200,
+      "latency_s": 77.0773,
+      "answer_length": 1139,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 45,
+      "question": "Berapa kecepatan internet/bandwidth VPN jika saya akses dari luar pulau Jawa?",
+      "status": 200,
+      "latency_s": 62.6002,
+      "answer_length": 629,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 46,
+      "question": "Bagaimana cara mereset environment Python bawaan sistem (python 3.9) ke kondisi ",
+      "status": 200,
+      "latency_s": 47.4616,
+      "answer_length": 677,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 47,
+      "question": "Apakah tersedia modul aplikasi ANSYS Fluent di ALELEON?",
+      "status": -1,
+      "latency_s": 32.2037,
+      "answer_length": 0,
+      "num_sources": 0,
+      "success": false,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "request_id": 48,
+      "question": "Bagaimana cara menyambungkan ekstensi Remote-SSH dari aplikasi Visual Studio Cod",
+      "status": -1,
+      "latency_s": 15.2575,
+      "answer_length": 0,
+      "num_sources": 0,
+      "success": false,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "request_id": 49,
+      "question": "Saya adalah user dari Singapura (WNA). Berapa tarif konversi Core Hour ke dalam ",
+      "status": 200,
+      "latency_s": 30.8552,
+      "answer_length": 758,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 50,
+      "question": "Apa password standar/bawaan dari admin sebelum saya menggantinya di awal?",
+      "status": 200,
+      "latency_s": 59.8679,
+      "answer_length": 619,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 51,
+      "question": "Siapa nama Chief Technology Officer (CTO) dari EFISON yang membangun ALELEON ini",
+      "status": 200,
+      "latency_s": 44.6103,
+      "answer_length": 702,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 52,
+      "question": "Bagaimana cara menghapus halaman Wiki ALELEON jika saya menemukan typo?",
+      "status": 200,
+      "latency_s": 104.4061,
+      "answer_length": 729,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 53,
+      "question": "Bagaimana cara membatalkan/mengakhiri perjanjian PKSPIAS untuk akun Institusi se",
+      "status": 200,
+      "latency_s": 59.7948,
+      "answer_length": 746,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 54,
+      "question": "Jika server ALELEON mati lampu, berapa jam daya tahan baterai UPS yang dimiliki ",
+      "status": -1,
+      "latency_s": 30.782,
+      "answer_length": 0,
+      "num_sources": 0,
+      "success": false,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "request_id": 55,
+      "question": "Bagaimana cara menggunakan AutoGluon untuk machine learning di sistem ini?",
+      "status": 200,
+      "latency_s": 59.7957,
+      "answer_length": 517,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 56,
+      "question": "Bagaimana cara membuat conda environment di aleleon?",
+      "status": -1,
+      "latency_s": 29.0137,
+      "answer_length": 0,
+      "num_sources": 0,
+      "success": false,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "request_id": 57,
+      "question": "bagaimana cara menjalankan jupyter dengan conda environment sendiri?",
+      "status": 200,
+      "latency_s": 58.5889,
+      "answer_length": 2355,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 58,
+      "question": "Versi Python default dari Anaconda3 2025.06-1 apa?",
+      "status": -1,
+      "latency_s": 0.0003,
+      "answer_length": 0,
+      "num_sources": 0,
+      "success": false,
+      "error": "Server disconnected"
+    },
+    {
+      "request_id": 59,
+      "question": "Perintah apa untuk mengaktifkan Mamba 23.11.0-0?",
+      "status": 200,
+      "latency_s": 45.6682,
+      "answer_length": 521,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 60,
+      "question": "Bagaimana cara membuat modul pyload setelah conda env aktif?",
+      "status": 200,
+      "latency_s": 98.7515,
+      "answer_length": 780,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 61,
+      "question": "Perintah apa untuk melihat daftar modul pyload yang tersedia?",
+      "status": 200,
+      "latency_s": 70.8354,
+      "answer_length": 657,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 62,
+      "question": "Di partisi GPU mana batch job conda berjalan?",
+      "status": 200,
+      "latency_s": 41.2606,
+      "answer_length": 678,
+      "num_sources": 5,
+      "success": true
+    },
+    {
+      "request_id": 63,
+      "question": "Apa email support admin ALELEON?",
+      "status": 200,
+      "latency_s": 53.0833,
+      "answer_length": 517,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 64,
+      "question": "Jam kerja support EFISON kapan?",
+      "status": 200,
+      "latency_s": 41.8077,
+      "answer_length": 637,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 65,
+      "question": "Apa saja pilihan cara menjalankan komputasi Python dengan conda env di ALELEON?",
+      "status": -1,
+      "latency_s": 27.9156,
+      "answer_length": 0,
+      "num_sources": 0,
+      "success": false,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "request_id": 66,
+      "question": "Apa perbedaan antara menjalankan batch job via Job Composer EWS dan via terminal",
+      "status": 200,
+      "latency_s": 46.9879,
+      "answer_length": 2902,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 67,
+      "question": "Bagaimana langkah lengkap membuat conda env baru dan modul pyload dari awal?",
+      "status": -1,
+      "latency_s": 13.8917,
+      "answer_length": 0,
+      "num_sources": 0,
+      "success": false,
+      "error": "[Errno 104] Connection reset by peer"
+    },
+    {
+      "request_id": 68,
+      "question": "Apa saja status job di squeue dan artinya masing-masing?",
+      "status": 200,
+      "latency_s": 88.579,
+      "answer_length": 884,
+      "num_sources": 10,
+      "success": true
+    },
+    {
+      "request_id": 69,
+      "question": "Bagaimana cara mengisi formulir Jupyter di EWS untuk conda env user?",
+      "status": 200,
+      "latency_s": 74.6872,
+      "answer_length": 1512,
+      "num_sources": 10,
+      "success": true
+    }
+  ]
+}

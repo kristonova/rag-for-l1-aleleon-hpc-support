@@ -1,3 +1,30 @@
-.roo/
-.vscode/
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment files (may contain secrets)
+.env
+.env.local
+.env.*
+
+# Output directory (large experiment results)
+output/
+
+# Qdrant directory
+qdrant_db/
+
+# Legacy ChromaDB directory
 chroma_db/
+
+# Roo code directory
+.roo/
+
+# VSCode settings and workspace
+.vscode/
+
+# Model directory
+.models/
+
+# Archive (legacy/unused code)
+archive/

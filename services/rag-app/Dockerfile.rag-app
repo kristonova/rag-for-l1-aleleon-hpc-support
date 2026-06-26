@@ -1,0 +1,40 @@
+# Dockerfile.rag-app — RAG Application for Podman
+# =============================================================================
+# This Dockerfile builds the RAG application that orchestrates the RAG chain
+# using embedding-service, vllm-rocm, and qdrant services.
+# =============================================================================
+
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install langchain dependencies (vllm served by API)
+RUN --mount=type=cache,target=/root/.cache/pip,Z \
+    pip install \
+    langchain \
+    langchain-core \
+    langchain-community \
+    langchain-text-splitters \
+    langchain-huggingface \
+    langchain-qdrant \
+    qdrant-client \
+    openai \
+    lxml \
+    beautifulsoup4 \
+    fastapi \
+    uvicorn[standard]
+
+# Copy application code
+COPY services/rag-app/rag_app.py .
+COPY services/rag-app/rag_api.py .
+
+# Expose port for debugging (optional)
+EXPOSE 8080
+
+# Run the API server
+CMD ["uvicorn", "rag_api:app", "--host", "0.0.0.0", "--port", "8080"]

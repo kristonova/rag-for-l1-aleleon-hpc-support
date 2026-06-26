@@ -1,0 +1,12 @@
+{
+  "num_documents": 411,
+  "embedding_time_s": 324.8,
+  "dense_ingest_s": 0.2,
+  "sparse_ingest_s": 0.0,
+  "multivec_ingest_s": 13.0,
+  "hybrid_ingest_s": 0.2,
+  "bench_dense_points": 411,
+  "bench_sparse_points": 411,
+  "bench_multivec_points": 411,
+  "bench_hybrid_points": 411
+}
