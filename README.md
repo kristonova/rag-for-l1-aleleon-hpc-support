@@ -6,7 +6,7 @@ A Retrieval-Augmented Generation (RAG) system that serves as an AI assistant for
 
 ```
 ┌───────────────────────────────────────────────────────────────────────────────┐
-│                       Pipeline RAG (Podman Container)                        │
+│                       Pipeline RAG (Podman Container)                         │
 │                                                                               │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────┐  ┌─────────────┐            │
 │  │   INGESTION  │→ │  EMBEDDING   │→ │ RETRIEVAL│→ │  GENERASI   │            │
@@ -39,37 +39,61 @@ A Retrieval-Augmented Generation (RAG) system that serves as an AI assistant for
 
 ```
 rag-for-l1-aleleon-hpc-support/
-├── services/
-│   ├── embedding/
-│   │   ├── Dockerfile.embedding
-│   │   └── embedding_api.py
+├── compose.yml                  # Podman multi-container orchestration
+├── README.md                    # This file
+│
+├── services/                    # Microservices (masing-masing punya Dockerfile)
 │   ├── rag-app/
 │   │   ├── Dockerfile.rag-app
 │   │   ├── rag_app.py           # Core RAG logic (ingestion, retrieval, generation)
-│   │   └── rag_api.py           # FastAPI REST API (/ask, /review-script)
+│   │   └── rag_api.py           # FastAPI REST API (/ask, /review-script, /refresh)
+│   ├── embedding/
+│   │   ├── Dockerfile.embedding
+│   │   └── embedding_api.py     # Embedding REST API (BAAI/bge-m3)
 │   ├── telegram-bot/
 │   │   ├── Dockerfile.telegram
 │   │   └── telegram_bot.py      # Telegram Bot (/ask, /askscript commands)
 │   ├── benchmark_retrieval/
 │   │   ├── Dockerfile.benchmark
-│   │   └── benchmark_retrieval.py
+│   │   └── benchmark_retrieval.py  # Dense/Sparse/Hybrid retrieval benchmark
 │   ├── benchmark_ttft/
-│   │   └── Dockerfile.rag-bench
-│   └── promtail/
-│       └── config.yml           # Promtail log scraping config
-├── compose.yml                  # Podman multi-container orchestration
-├── Dockerfile.rocm              # Container image for AMD ROCm GPUs (legacy)
-├── rag_slurm_vllm.py            # Standalone script (legacy)
-├── HOW IT WORKS.md              # Detailed explanation document
-├── MICROSERVICES_ARCHITECTURE.md # Microservices architecture doc
-├── inspect_chroma.py            # Inspect Qdrant vector store contents
-├── debug_parse_sitemap.py       # Debug sitemap parsing
-├── benchmark_chart_generator.py # Generate charts from benchmark results
-├── embedding_chart_generator.py # Generate charts for embedding benchmarks
-├── pyproject.toml               # Python project metadata & dependencies
+│   │   ├── Dockerfile.rag-bench
+│   │   ├── run-rag-bench.py     # TTFT & latency benchmark
+│   │   ├── run-vllm-bench.sh    # vLLM benchmark script
+│   │   └── question.txt         # Benchmark questions
+│   ├── promtail/
+│   │   └── config.yml           # Promtail log scraping config
+│   └── Dockerfile.rocm          # Container image for AMD ROCm GPUs
+│
+├── docs/                        # Dokumentasi
+│   ├── HOW_IT_WORKS.md          # Detailed explanation of the RAG pipeline
+│   ├── MICROSERVICES_ARCHITECTURE.md  # Microservices architecture doc
+│   ├── MONITORING_README.md     # Monitoring setup guide
+│   └── plans/
+│       └── rag-architecture-plan-updated.md
+│
+├── scripts/                     # Utility scripts
+│   ├── benchmark_chart_generator.py   # Generate charts from benchmark results
+│   ├── embedding_chart_generator.py   # Generate charts for embedding benchmarks
+│   ├── debug_parse_sitemap.py         # Debug sitemap parsing
+│   ├── extract_qa.py                  # Extract Q&A pairs
+│   ├── inspect_chroma.py              # Inspect vector store contents
+│   └── parse_tokens.py                # Token parsing utility
+│
+├── data/                        # Data & benchmark questions
+│   └── question-benchmark-google.txt  # 69 test questions (5 difficulty levels)
+│
 ├── tests/
 │   └── test_services.py
-└── README.md                    # This file
+│
+├── archive/                     # Legacy/unused code (gitignored)
+│   └── rag_slurm_vllm.py       # Standalone RAG script (superseded by services/)
+│
+└── output/                      # Experiment results (gitignored)
+    ├── benchmark/               # Retrieval benchmark results
+    ├── benchmark_embedding_*/   # Embedding benchmark results
+    ├── benchmark_ttft/          # TTFT benchmark results
+    └── logs/                    # User question logs
 ```
 
 ## How It Works
@@ -164,53 +188,109 @@ The `if __name__ == '__main__'` guard is **required** because vLLM v1 uses `spaw
 
 ### Software
 
-- Podman or Docker
+- Podman (with podman-compose) or Docker
 - ROCm drivers installed on host
 - ~15GB disk for the container image
 - ~25GB disk for the Qwen3.5-35B-A3B-GPTQ-Int4 model weights (auto-downloaded)
 
 ## Quick Start (Podman Compose)
 
-### 1. Start Services
+### 1. Start Infrastructure Services
 
 ```bash
-podman-compose --profile backend up -d embedding-service qdrant vllm-rocm
+# Start embedding, vLLM, and Qdrant
+podman-compose --profile infra up -d
 ```
 
-### 2. Run the RAG App
+### 2. Run the Interactive RAG CLI
 
 ```bash
-podman-compose --profile rag-app run --rm rag-app
+podman-compose --profile rag-app run rag-app
 ```
 
-### 3. Optional: Start All in One
+### 3. Full Stack (API + Telegram Bot)
 
 ```bash
-podman-compose --profile test up
+podman-compose --profile infra --profile api --profile telegram up -d
 ```
 
-or
+### 4. Run Benchmarks
 
 ```bash
-podman-compose --profile embedding-service --profile vllm-rocm --profile qdrant --profile rag-app up
+# Retrieval benchmark (Dense vs Sparse vs Hybrid)
+podman-compose --profile infra up -d
+podman-compose --profile benchmark run benchmark
+
+# TTFT / Latency benchmark
+podman-compose --profile infra --profile api up -d
+podman-compose --profile benchmark-ttft run benchmark-ttft
 ```
 
-## Dockerfile.rocm — Build Details (Legacy)
+### 5. Stop & Cleanup
 
-The Dockerfile uses `rocm/vllm-dev:nightly` as the base image (includes PyTorch ROCm + vLLM). Key design decisions:
+```bash
+podman-compose --profile infra --profile api --profile telegram down
 
-| Challenge | Solution |
-|---|---|
-| Qdrant vector store | Install `qdrant-client` and `langchain-qdrant` for vector store integration |
-| `pip install sentence-transformers` pulls CUDA torch | Install with `--no-deps`, add sub-dependencies separately |
-| `pip install onnxruntime` pulls CUDA torch | Install with `--no-deps` |
-| LangChain 1.x API changes | Uses direct Python functions instead of chain helpers |
-| Wiki HTML parsing | Installs `lxml` and `beautifulsoup4` for `HTMLSectionSplitter` |
-| Build-time verification | `assert torch.version.hip is not None` ensures PyTorch ROCm survives all pip installs |
+# Remove volumes too
+podman-compose --profile infra --profile api --profile telegram down -v
+```
+
+### 6. Rebuild After Code Changes
+
+```bash
+podman-compose --profile infra --profile api --profile telegram up -d --build
+```
+
+## API Endpoints
+
+The RAG API (`rag-api` service) exposes the following endpoints on port **8080**:
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/ask` | Send a question, get a RAG-generated answer with sources |
+| `POST` | `/review-script` | Review a Bash/Slurm script (LLM analysis + HPC policy validation) |
+| `POST` | `/refresh` | Trigger incremental sitemap sync to Qdrant (background) |
+| `GET` | `/refresh/status` | Check status of the last sync |
+| `GET` | `/health` | Health check |
+
+**Example usage:**
+
+```bash
+# Ask a question
+curl -X POST http://localhost:8080/ask \
+  -H "Content-Type: application/json" \
+  -d '{"question": "Bagaimana cara membuat conda environment?"}'
+
+# Review a script
+curl -X POST http://localhost:8080/review-script \
+  -H "Content-Type: application/json" \
+  -d '{"script": "#!/bin/bash\n#SBATCH --mem=64G\nsrun gmx_mpi mdrun"}'
+
+# Trigger sync
+curl -X POST http://localhost:8080/refresh
+
+# Check sync status
+curl -X GET http://localhost:8080/refresh/status
+```
+
+## Compose Profiles
+
+| Profile | Services | Description |
+|---|---|---|
+| `infra` | embedding-service, vllm-rocm, qdrant | Full backend stack |
+| `embedding` | embedding-service | Embedding service only |
+| `vllm` | vllm-rocm | LLM service only |
+| `qdrant` | qdrant | Vector DB only |
+| `rag-app` | rag-app | Interactive CLI |
+| `api` | rag-api | REST API (port 8080) |
+| `telegram` | telegram-bot | Telegram Bot |
+| `benchmark` | benchmark | Retrieval benchmark |
+| `benchmark-ttft` | benchmark-ttft | TTFT/Latency benchmark |
+| `monitoring` | promtail | Promtail log scraping |
 
 ## Test Questions & Expected Results
 
-The script includes **69 test questions** across 5 difficulty levels:
+The benchmark suite includes **69 test questions** across 5 difficulty levels:
 
 | Level | Count | Description |
 |---|---|---|
@@ -224,7 +304,7 @@ The script includes **69 test questions** across 5 difficulty levels:
 
 ### Changing the Knowledge Base
 
-The system loads documents dynamically from the wiki sitemap. To change the source, update the sitemap URL in the script:
+The system loads documents dynamically from the wiki sitemap. To change the source, update the sitemap URL in `services/rag-app/rag_app.py`:
 
 ```python
 splits = load_wiki_documents(
@@ -235,11 +315,11 @@ splits = load_wiki_documents(
 
 ### Changing the LLM Model
 
-Edit the `--model` argument in [compose.yml](compose.yml#L33) (service `vllm-rocm`).
+Edit the `--model` argument in [compose.yml](compose.yml) (service `vllm-rocm`).
 
 ### Changing the Embedding Model
 
-Edit `MODEL_NAME` in [compose.yml](compose.yml#L28) (service `embedding-service`).
+Edit `MODEL_NAME` in [compose.yml](compose.yml) (service `embedding-service`).
 
 ### Adjusting for Different GPUs
 
@@ -267,36 +347,56 @@ rocminfo | grep "Name:" | grep "gfx"
 | `k` (similarity_search) | 10 | Number of chunks retrieved per question (more = richer context, larger prompt) |
 | `requests_per_second` | 2 | Rate limit for fetching wiki pages |
 
-## Dependencies
+## Key Dependencies
 
-Managed via Poetry (`pyproject.toml`):
+Dependencies are managed per-service via Dockerfiles:
 
 - **langchain-core** / **langchain-community** — Document loading and retriever utilities
 - **langchain-text-splitters** — `HTMLSectionSplitter` and `RecursiveCharacterTextSplitter`
 - **langchain-qdrant** — Qdrant vector store integration via LangChain
 - **qdrant-client** — Qdrant Python client for collection management
 - **openai** — OpenAI-compatible client for vLLM
+- **FastAPI** / **uvicorn** — REST API framework
 - **requests** — HTTP calls to embedding-service and health checks
 - **beautifulsoup4** / **lxml** — HTML parsing for wiki page extraction
 - **vLLM** — High-performance LLM inference engine (inside the vllm-rocm container)
+- **python-telegram-bot** — Telegram Bot integration
 
-## New Features
+## Features
 
-### 1. Persistent Question Logging
+### Persistent Question Logging
+
 Every user question sent to the `/ask` endpoint is automatically logged with a UTC timestamp. These logs are saved persistently to a mounted volume (`./output/logs` on the host mapped to `/app/logs` in the container) in the `user_questions.logs` file. This is useful for auditing and understanding user behavior.
 
-### 2. Incremental Sitemap Sync
+### Incremental Sitemap Sync
+
 The `rag-api` service automatically detects changes to the wiki source by reading the `<lastmod>` tags in the `sitemap.xml`.
 - **Startup Sync:** When the container starts, it automatically syncs with the wiki, making sure Qdrant is up-to-date.
 - **Manual Sync via API:** You can manually trigger a background sync without restarting the container:
   ```bash
   # Start the sync in the background
   curl -X POST http://localhost:8080/refresh
-  
+
   # Check the status of the sync
   curl -X GET http://localhost:8080/refresh/status
   ```
 The sync process is smart: it skips unchanged pages, deletes pages removed from the sitemap, and only scrapes/embeds newly added or recently modified pages.
+
+### Script Review (Hybrid)
+
+The `/review-script` endpoint uses a hybrid approach:
+- **LLM Technical Analysis** — Analyzes the script for syntax errors, best practices, and optimization opportunities.
+- **RAG Policy Validation** — If the script contains resource parameters (`#SBATCH`), retrieves relevant HPC policies from the knowledge base to validate against institutional limits and quotas.
+
+### Relevance Filtering
+
+Both `/ask` and `/review-script` endpoints include a lightweight relevance check (`is_question_relevant`) that filters out off-topic questions before consuming expensive LLM inference cycles.
+
+## Further Documentation
+
+- [HOW_IT_WORKS.md](docs/HOW_IT_WORKS.md) — Detailed explanation of the RAG pipeline
+- [MICROSERVICES_ARCHITECTURE.md](docs/MICROSERVICES_ARCHITECTURE.md) — Microservices architecture documentation
+- [MONITORING_README.md](docs/MONITORING_README.md) — Monitoring setup with Promtail
 
 ## License
 
