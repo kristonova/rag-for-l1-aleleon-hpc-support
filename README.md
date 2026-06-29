@@ -1,6 +1,6 @@
-# RAG-Kristo: Retrieval-Augmented Generation for HPC Support
+# RAG-ALELEON: Retrieval-Augmented Generation for L1 HPC Support
 
-A Retrieval-Augmented Generation (RAG) system that serves as an AI assistant for ALELEON Supercomputer administration. It answers user questions about HPC Conda environments, Slurm job management, and troubleshooting by ingesting wiki pages from **wiki.efisonlt.com** and using locally-hosted LLM inference on **AMD ROCm GPUs** via vLLM.
+A Retrieval-Augmented Generation (RAG) system that serves as an AI assistant for L1 HPC Support on ALELEON Supercomputer administration. It answers user questions about HPC Conda environments, Slurm job management, and troubleshooting by ingesting wiki pages from **wiki.efisonlt.com** and using locally-hosted LLM inference on **AMD ROCm GPUs** via vLLM.
 
 ## Architecture
 
@@ -21,7 +21,7 @@ A Retrieval-Augmented Generation (RAG) system that serves as an AI assistant for
 │  │ (BAAI/bge-m3)   │ │ (Qwen3.5-35B-A3B     │ │ (Vektor) │                    │
 │  │ Port 8001       │ │  GPTQ-Int4)          │ │ Port 6333│                    │
 │  └─────────────────┘ │ Port 8000            │ └──────────┘                    │
-│                       └──────────────────────┘                                │
+│                      └──────────────────────┘                                 │
 │  Layanan Aplikasi:                                                            │
 │  ┌──────────────┐ ┌────────────────────┐ ┌───────────────┐                    │
 │  │   rag-app    │ │      rag-api       │ │ telegram-bot  │                    │
@@ -402,6 +402,5 @@ Both `/ask` and `/review-script` endpoints include a lightweight relevance check
 
 Private project — EFISON HPC Support.
 
-## Author
-
-Kristo Nova (krisostomus.nova.r@efisonlt.com)
+## Acknowledgement
+This project was developed by Krisostomus Nova RAHMANTO (krisostomus.nova.r@efisonlt.com) as a master's thesis project during an internship to attain a Master of Computer Science degree from EURECOM, France.
