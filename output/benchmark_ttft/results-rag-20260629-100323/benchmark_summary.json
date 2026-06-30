@@ -1,0 +1,68 @@
+{
+  "benchmark_info": {
+    "target_url": "http://rag-api:8080/ask",
+    "total_questions": 48,
+    "requests_per_level": 49,
+    "concurrency_levels": [1, 2, 4, 8],
+    "timestamp": "20260629-100323",
+    "note": "Concurrency 16 excluded — caused hardware crash (OOM)"
+  },
+  "results": [
+    {
+      "concurrency": 1,
+      "total_requests": 49,
+      "successful": 49,
+      "failed": 0,
+      "avg_latency_s": 21.2334,
+      "min_latency_s": 0.2163,
+      "max_latency_s": 32.6613,
+      "p50_latency_s": 20.6618,
+      "p99_latency_s": 32.2342,
+      "stdev_latency_s": 5.8721,
+      "throughput_rps": 0.0471,
+      "wall_clock_s": 1040.4362
+    },
+    {
+      "concurrency": 2,
+      "total_requests": 49,
+      "successful": 49,
+      "failed": 0,
+      "avg_latency_s": 27.1756,
+      "min_latency_s": 0.2554,
+      "max_latency_s": 60.9958,
+      "p50_latency_s": 25.0937,
+      "p99_latency_s": 52.2962,
+      "stdev_latency_s": 9.4863,
+      "throughput_rps": 0.0731,
+      "wall_clock_s": 669.8569
+    },
+    {
+      "concurrency": 4,
+      "total_requests": 49,
+      "successful": 49,
+      "failed": 0,
+      "avg_latency_s": 54.099,
+      "min_latency_s": 27.0446,
+      "max_latency_s": 81.797,
+      "p50_latency_s": 52.9216,
+      "p99_latency_s": 79.1678,
+      "stdev_latency_s": 13.3516,
+      "throughput_rps": 0.0723,
+      "wall_clock_s": 677.612
+    },
+    {
+      "concurrency": 8,
+      "total_requests": 49,
+      "successful": 49,
+      "failed": 0,
+      "avg_latency_s": 103.8526,
+      "min_latency_s": 25.5456,
+      "max_latency_s": 157.6503,
+      "p50_latency_s": 113.5468,
+      "p99_latency_s": 151.2211,
+      "stdev_latency_s": 28.7715,
+      "throughput_rps": 0.0725,
+      "wall_clock_s": 675.9581
+    }
+  ]
+}
