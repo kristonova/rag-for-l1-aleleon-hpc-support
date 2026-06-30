@@ -9,7 +9,7 @@ __pycache__/
 .env.*
 
 # Output directory (large experiment results)
-output/
+#output/
 
 # Qdrant directory
 qdrant_db/

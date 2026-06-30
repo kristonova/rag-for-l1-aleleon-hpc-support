@@ -1,0 +1,459 @@
+{
+  "summary": {
+    "concurrency": 2,
+    "total_requests": 49,
+    "successful": 49,
+    "failed": 0,
+    "avg_latency_s": 27.1756,
+    "min_latency_s": 0.2554,
+    "max_latency_s": 60.9958,
+    "p50_latency_s": 25.0937,
+    "p99_latency_s": 52.2962,
+    "stdev_latency_s": 9.4863,
+    "throughput_rps": 0.0731,
+    "wall_clock_s": 669.8569
+  },
+  "requests": [
+    {
+      "request_id": 1,
+      "question": "Bagaimana perintah lengkap di terminal untuk menghapus sebuah conda environment ",
+      "status": 200,
+      "latency_s": 33.3167,
+      "answer_length": 988,
+      "num_sources": 0,
+      "success": true
+    },
+    {
+      "request_id": 2,
+      "question": "Arsitektur prosesor AMD generasi apa yang secara spesifik digunakan pada seluruh",
+      "status": 200,
+      "latency_s": 20.0039,
+      "answer_length": 405,
+      "num_sources": 2,
+      "success": true
+    },
+    {
+      "request_id": 3,
+      "question": "Di direktori mana admin menyarankan pengguna untuk menyimpan folder file Slaster",
+      "status": 200,
+      "latency_s": 21.2817,
+      "answer_length": 744,
+      "num_sources": 0,
+      "success": true
+    },
+    {
+      "request_id": 4,
+      "question": "Apa perintah spesifik pyload yang harus saya jalankan di terminal untuk mengakti",
+      "status": 200,
+      "latency_s": 21.9405,
+      "answer_length": 495,
+      "num_sources": 1,
+      "success": true
+    },
+    {
+      "request_id": 5,
+      "question": "Apa alamat tautan (URL) lengkap dari portal EFIRO Web Service (EWS) yang menjadi",
+      "status": 200,
+      "latency_s": 28.1542,
+      "answer_length": 530,
+      "num_sources": 9,
+      "success": true
+    },
+    {
+      "request_id": 6,
+      "question": "Siapa target spesifik kewarganegaraan dan tujuan dari diselenggarakannya program",
+      "status": 200,
+      "latency_s": 0.2554,
+      "answer_length": 110,
+      "num_sources": 0,
+      "success": true
+    },
+    {
+      "request_id": 7,
+      "question": "Apa nama profil conda environment bawaan sistem atau perintah pyload yang harus ",
+      "status": 200,
+      "latency_s": 22.781,
+      "answer_length": 596,
+      "num_sources": 1,
+      "success": true
+    },
+    {
+      "request_id": 8,
+      "question": "Berapa jumlah maksimal job komputasi yang diizinkan untuk berstatus berjalan ata",
+      "status": 200,
+      "latency_s": 30.7514,
+      "answer_length": 1469,
+      "num_sources": 0,
+      "success": true
+    },
+    {
+      "request_id": 9,
+      "question": "Sebutkan nama modul Lmod yang tepat untuk memuat NVIDIA HPC SDK Compilers versi ",
+      "status": 200,
+      "latency_s": 19.4424,
+      "answer_length": 564,
+      "num_sources": 0,
+      "success": true
+    },
+    {
+      "request_id": 10,
+      "question": "Berapa megabyte (MB) batas maksimal ukuran file yang dizinkan untuk diunggah lan",
+      "status": 200,
+      "latency_s": 24.5077,
+      "answer_length": 706,
+      "num_sources": 1,
+      "success": true
+    },
+    {
+      "request_id": 11,
+      "question": "Tombol menu apa yang harus saya klik secara presisi pada antarmuka aplikasi Job ",
+      "status": 200,
+      "latency_s": 31.0076,
+      "answer_length": 629,
+      "num_sources": 3,
+      "success": true
+    },
+    {
+      "request_id": 12,
+      "question": "Apa kepanjangan dan arti dari kode status \"CG\" ketika saya mengecek antrian job ",
+      "status": 200,
+      "latency_s": 22.3587,
+      "answer_length": 447,
+      "num_sources": 0,
+      "success": true
+    },
+    {
+      "request_id": 13,
+      "question": "Saya ingin menjalankan simulasi NAMD versi 2.14 khusus CPU murni menggunakan met",
+      "status": 200,
+      "latency_s": 31.3658,
+      "answer_length": 1399,
+      "num_sources": 0,
+      "success": true
+    },
+    {
+      "request_id": 14,
+      "question": "Saya ingin membuka sesi JupyterLab dengan container PyTorch 2.3.0 berbasis ROCm ",
+      "status": 200,
+      "latency_s": 25.0937,
+      "answer_length": 857,
+      "num_sources": 0,
+      "success": true
+    },
+    {
+      "request_id": 15,
+      "question": "Jika saya ingin menggunakan modul cp2k/2025.2-gcc-13.4.0-cuda-12.9.0-k6i untuk k",
+      "status": 200,
+      "latency_s": 23.5238,
+      "answer_length": 691,
+      "num_sources": 0,
+      "success": true
+    },
+    {
+      "request_id": 16,
+      "question": "Job saya PENDING dengan alasan QOSMaxMemoryPerUserLimit. Apa definisi dari error",
+      "status": 200,
+      "latency_s": 40.9604,
+      "answer_length": 1290,
+      "num_sources": 8,
+      "success": true
+    },
+    {
+      "request_id": 17,
+      "question": "Saya menggunakan template LAMMPS 22 July 2025 versi CPU dengan 150 proses MPI mu",
+      "status": 200,
+      "latency_s": 28.14,
+      "answer_length": 1178,
+      "num_sources": 0,
+      "success": true
+    },
+    {
+      "request_id": 18,
+      "question": "Saya perlu mengunggah file input sebesar 2GB ke dalam ruang job Quantum ESPRESSO",
+      "status": 200,
+      "latency_s": 25.3127,
+      "answer_length": 1029,
+      "num_sources": 1,
+      "success": true
+    },
+    {
+      "request_id": 19,
+      "question": "Saya ingin mengubah profil akun ALELEON Mk.V saya dan mengaktifkan 2FA menggunak",
+      "status": 200,
+      "latency_s": 39.3103,
+      "answer_length": 1501,
+      "num_sources": 3,
+      "success": true
+    },
+    {
+      "request_id": 20,
+      "question": "Jika saya menutup secara paksa tab browser web saya saat sesi JupyterLab saya se",
+      "status": 200,
+      "latency_s": 23.661,
+      "answer_length": 921,
+      "num_sources": 0,
+      "success": true
+    },
+    {
+      "request_id": 21,
+      "question": "Apa perbedaan mendasar cara kerja dan metode pencatatan antara 'Total Core Hour ",
+      "status": 200,
+      "latency_s": 34.7847,
+      "answer_length": 1997,
+      "num_sources": 1,
+      "success": true
+    },
+    {
+      "request_id": 22,
+      "question": "Saya ingin melakukan kompilasi software mandiri menggunakan CMake versi 3.31.8 y",
+      "status": 200,
+      "latency_s": 23.775,
+      "answer_length": 639,
+      "num_sources": 1,
+      "success": true
+    },
+    {
+      "request_id": 23,
+      "question": "Saya mensubmit job menggunakan modul openmpi/5.0.8-gcc-15.2.0-cuda-12.9.0-neq. B",
+      "status": 200,
+      "latency_s": 22.0375,
+      "answer_length": 694,
+      "num_sources": 0,
+      "success": true
+    },
+    {
+      "request_id": 24,
+      "question": "Saya adalah pengguna akun golongan Perseorangan. Apa yang akan terjadi secara te",
+      "status": 200,
+      "latency_s": 31.4299,
+      "answer_length": 974,
+      "num_sources": 1,
+      "success": true
+    },
+    {
+      "request_id": 25,
+      "question": "Saya memiliki saldo 100 CCH. Saya mensubmit job dengan alokasi 16 core CPU dan m",
+      "status": 200,
+      "latency_s": 33.5462,
+      "answer_length": 1738,
+      "num_sources": 0,
+      "success": true
+    },
+    {
+      "request_id": 26,
+      "question": "Saya mensubmit script simulasi dengan alokasi #SBATCH --nodes=2, #SBATCH --ntask",
+      "status": 200,
+      "latency_s": 40.1742,
+      "answer_length": 2221,
+      "num_sources": 1,
+      "success": true
+    },
+    {
+      "request_id": 27,
+      "question": "Saya ingin menjalankan simulasi dinamika molekuler NAMD berat yang dikonfigurasi",
+      "status": 200,
+      "latency_s": 24.9466,
+      "answer_length": 1016,
+      "num_sources": 1,
+      "success": true
+    },
+    {
+      "request_id": 28,
+      "question": "Di dalam dokumen rujukan disebutkan bahwa GROMACS versi CUDA merupakan salah sat",
+      "status": 200,
+      "latency_s": 27.3708,
+      "answer_length": 1199,
+      "num_sources": 0,
+      "success": true
+    },
+    {
+      "request_id": 29,
+      "question": "Saya menjalankan simulasi CP2K dengan murni MPI dan secara spesifik mengatur nil",
+      "status": 200,
+      "latency_s": 41.9865,
+      "answer_length": 1687,
+      "num_sources": 2,
+      "success": true
+    },
+    {
+      "request_id": 30,
+      "question": "Saya mempunyai program Python custom (non-MPI) yang didesain untuk memuat dan me",
+      "status": 200,
+      "latency_s": 23.639,
+      "answer_length": 918,
+      "num_sources": 0,
+      "success": true
+    },
+    {
+      "request_id": 31,
+      "question": "Saya bermaksud mengeksekusi perintah gmx_mpi untuk melakukan pre-processing sist",
+      "status": 200,
+      "latency_s": 29.642,
+      "answer_length": 1253,
+      "num_sources": 0,
+      "success": true
+    },
+    {
+      "request_id": 32,
+      "question": "Saya mencoba mengisi formulir sesi JupyterLab di EWS untuk partisi tilla dengan ",
+      "status": 200,
+      "latency_s": 60.9958,
+      "answer_length": 3418,
+      "num_sources": 0,
+      "success": true
+    },
+    {
+      "request_id": 33,
+      "question": "Saya membuka aplikasi squeue dan melihat dua riwayat job historis saya. Job X te",
+      "status": 200,
+      "latency_s": 21.434,
+      "answer_length": 800,
+      "num_sources": 0,
+      "success": true
+    },
+    {
+      "request_id": 34,
+      "question": "Grup riset saya baru saja memborong pembelian kuota GPU Hour (GH) dalam jumlah b",
+      "status": 200,
+      "latency_s": 31.8719,
+      "answer_length": 1519,
+      "num_sources": 2,
+      "success": true
+    },
+    {
+      "request_id": 35,
+      "question": "Sebagai pengguna akun golongan Perseorangan standar, saya mensubmit tiga batch j",
+      "status": 200,
+      "latency_s": 30.2788,
+      "answer_length": 1418,
+      "num_sources": 0,
+      "success": true
+    },
+    {
+      "request_id": 36,
+      "question": "Dokumen menjelaskan bahwa Slurm ALELEON secara otomatis mendistribusikan proses ",
+      "status": 200,
+      "latency_s": 42.8716,
+      "answer_length": 1135,
+      "num_sources": 4,
+      "success": true
+    },
+    {
+      "request_id": 37,
+      "question": "Bagaimana contoh format pembuatan submit script lengkap beserta argumen module l",
+      "status": 200,
+      "latency_s": 24.3567,
+      "answer_length": 1020,
+      "num_sources": 0,
+      "success": true
+    },
+    {
+      "request_id": 38,
+      "question": "Jika saya berstatus sebagai mahasiswa peneliti pascasarjana internasional yang b",
+      "status": 200,
+      "latency_s": 26.1234,
+      "answer_length": 1144,
+      "num_sources": 1,
+      "success": true
+    },
+    {
+      "request_id": 39,
+      "question": "Tolong sebutkan merk pabrikan komersial (vendor brand) spesifik dari kartu memor",
+      "status": 200,
+      "latency_s": 23.5769,
+      "answer_length": 541,
+      "num_sources": 1,
+      "success": true
+    },
+    {
+      "request_id": 40,
+      "question": "Apa kombinasi syntax atau perintah bypass administrator khusus di dalam manajeme",
+      "status": 200,
+      "latency_s": 24.757,
+      "answer_length": 1100,
+      "num_sources": 0,
+      "success": true
+    },
+    {
+      "request_id": 41,
+      "question": "Berdasarkan catatan arsip historis di dokumen EUREKA! Periode 1 dan Periode 2, p",
+      "status": 200,
+      "latency_s": 0.3025,
+      "answer_length": 110,
+      "num_sources": 0,
+      "success": true
+    },
+    {
+      "request_id": 42,
+      "question": "Saya memiliki skrip Python yang secara otomatis mengunduh dataset CIFAR-100 sebe",
+      "status": 200,
+      "latency_s": 30.5545,
+      "answer_length": 1070,
+      "num_sources": 0,
+      "success": true
+    },
+    {
+      "request_id": 43,
+      "question": "Berikan saya step-by-step tutorial mengenai bagaimana cara merutekan (forwarding",
+      "status": 200,
+      "latency_s": 27.0652,
+      "answer_length": 1363,
+      "num_sources": 0,
+      "success": true
+    },
+    {
+      "request_id": 44,
+      "question": "Organisasi saya adalah pemegang Akun Institusi berbayar. Apakah kami secara perj",
+      "status": 200,
+      "latency_s": 29.7051,
+      "answer_length": 1480,
+      "num_sources": 0,
+      "success": true
+    },
+    {
+      "request_id": 45,
+      "question": "Berapa besar persentase nilai pengembalian dana (refund) tunai atau kompensasi k",
+      "status": 200,
+      "latency_s": 23.3609,
+      "answer_length": 768,
+      "num_sources": 0,
+      "success": true
+    },
+    {
+      "request_id": 46,
+      "question": "Saya memiliki image kontainer Docker kustom yang mengharuskan eksekusi skrip ent",
+      "status": 200,
+      "latency_s": 23.0986,
+      "answer_length": 801,
+      "num_sources": 0,
+      "success": true
+    },
+    {
+      "request_id": 47,
+      "question": "Sesuai spesifikasi arsitektur kelas atas ALELEON, berapa nilai estimasi performa",
+      "status": 200,
+      "latency_s": 21.3146,
+      "answer_length": 667,
+      "num_sources": 0,
+      "success": true
+    },
+    {
+      "request_id": 48,
+      "question": "Jika file proyek penelitian skripsi saya terhapus tanpa sengaja akibat salah ket",
+      "status": 200,
+      "latency_s": 22.7716,
+      "answer_length": 727,
+      "num_sources": 0,
+      "success": true
+    },
+    {
+      "request_id": 49,
+      "question": "Bagaimana perintah lengkap di terminal untuk menghapus sebuah conda environment ",
+      "status": 200,
+      "latency_s": 20.6664,
+      "answer_length": 885,
+      "num_sources": 0,
+      "success": true
+    }
+  ]
+}

@@ -5,6 +5,7 @@ Endpoint: POST /ask  →  { "question": "..." }  →  { "answer": "...", "source
 Endpoint: POST /review-script  →  { "script": "..." }  →  { "review": "...", "issues_found": N }
 """
 
+import asyncio
 import os
 import threading
 from datetime import datetime, timezone
@@ -42,6 +43,13 @@ embeddings_global = None
 # ── Sync State ─────────────────────────────────────────────
 _sync_lock = threading.Lock()
 _sync_status = {"running": False, "last_result": None, "last_sync_time": None}
+
+# ── Inference Concurrency Limiter ─────────────────────────
+# Batasi max concurrent inference agar request yang melebihi
+# kapasitas di-queue (menunggu), bukan ditolak/connection reset.
+# Nilai 2 dipilih berdasarkan benchmark: concurrency 2 = sweet spot
+# (0% failure, throughput optimal 0.051 req/s).
+_inference_semaphore = asyncio.Semaphore(2)
 
 
 # ── Pydantic Models ──────────────────────────────────────────
@@ -153,7 +161,11 @@ async def ask(req: AskRequest):
     _log_question(req.question)
 
     try:
-        result = rag_chain(req.question)
+        # Semaphore: antri jika sudah ada 2 request aktif (graceful degradation)
+        # to_thread: jalankan blocking rag_chain() di thread pool agar
+        # event loop uvicorn tidak terblokir dan tetap bisa menerima koneksi
+        async with _inference_semaphore:
+            result = await asyncio.to_thread(rag_chain, req.question)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error saat memproses: {str(e)}")
 
@@ -197,24 +209,28 @@ async def review_script_endpoint(req: ReviewScriptRequest):
     if llm_api_url is None:
         raise HTTPException(status_code=503, detail="LLM belum siap, coba lagi nanti.")
 
-    # Cek relevansi skrip sebelum proses review (sama seperti /ask)
-    if not is_question_relevant(req.script, llm_api_url):
-        return ReviewScriptResponse(
-            review="Skrip yang Anda kirim tidak relevan dengan layanan ALELEON HPC. "
-                   "Silakan kirim skrip Bash/Slurm yang berkaitan dengan komputasi HPC.",
-            issues_found=0,
-            policy_sources=None,
-        )
+    # Semaphore + to_thread: sama seperti /ask — mencegah blocking & connection reset
+    async with _inference_semaphore:
+        # Cek relevansi skrip sebelum proses review (sama seperti /ask)
+        is_relevant = await asyncio.to_thread(is_question_relevant, req.script, llm_api_url)
+        if not is_relevant:
+            return ReviewScriptResponse(
+                review="Skrip yang Anda kirim tidak relevan dengan layanan ALELEON HPC. "
+                       "Silakan kirim skrip Bash/Slurm yang berkaitan dengan komputasi HPC.",
+                issues_found=0,
+                policy_sources=None,
+            )
 
-    try:
-        result = review_script_hybrid(
-            req.script,
-            api_url=llm_api_url,
-            qdrant_client=qdrant_client_global,
-            embeddings=embeddings_global,
-        )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error saat review skrip: {str(e)}")
+        try:
+            result = await asyncio.to_thread(
+                review_script_hybrid,
+                req.script,
+                api_url=llm_api_url,
+                qdrant_client=qdrant_client_global,
+                embeddings=embeddings_global,
+            )
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Error saat review skrip: {str(e)}")
 
     # Build policy_sources for response
     policy_sources = None
