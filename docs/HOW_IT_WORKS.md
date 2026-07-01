@@ -115,13 +115,13 @@ urls = [
 Sitemap XML
     │
     ▼  Parse tag <loc> + filter non-webpage
-┌──────────────────────────────────────────────────┐
-│ URL 1: https://wiki.efisonlt.com/wiki/Spesifikasi│ ✅ webpage
-│ URL 2: https://wiki.efisonlt.com/wiki/Conda_Env  │ ✅ webpage
+┌───────────────────────────────────────────────────┐
+│ URL 1: https://wiki.efisonlt.com/wiki/Spesifikasi │ ✅ webpage
+│ URL 2: https://wiki.efisonlt.com/wiki/Conda_Env   │ ✅ webpage
 │ URL 3: https://wiki.efisonlt.com/wiki/Berkas:x.png│ ❌ di-skip
-│ URL 4: https://wiki.efisonlt.com/wiki/MPI_Guide  │ ✅ webpage
-│ ...                                              │
-└──────────────────────────────────────────────────┘
+│ URL 4: https://wiki.efisonlt.com/wiki/MPI_Guide   │ ✅ webpage
+│ ...                                               │
+└───────────────────────────────────────────────────┘
 ```
 
 ### Langkah 2 — Ambil & Ekstrak Konten HTML
@@ -146,7 +146,7 @@ HTML Halaman Wiki Penuh
 │ <div id="mw-content-text">   │
 │   <h2>Spesifikasi</h2>       │  ← Tag heading dipertahankan
 │   <p>ALELEON memiliki...</p> │
-│   <h3>Compute Node</h3>     │
+│   <h3>Compute Node</h3>      │
 │   <table>...</table>         │  ← Tabel dipertahankan
 │   <h3>Interactive Node</h3>  │
 │   <p>...</p>                 │
@@ -245,7 +245,7 @@ chunk_overlap=900   → 900 karakter diulang antar chunk berurutan
 HTMLSectionSplitter output:
 ┌──────────┐ ┌──────────┐ ┌────────────────┐ ┌──────────┐
 │ Section 1│ │ Section 2│ │ Section 3      │ │ Section 4│
-│ 2100 chr │ │ 3800 chr │ │ 7200 chr ← BIG│ │ 1500 chr │
+│ 2100 chr │ │ 3800 chr │ │ 7200 chr ← BIG │ │ 1500 chr │
 │    OK    │ │    OK    │ │ needs fallback │ │    OK    │
 └──────────┘ └──────────┘ └───────┬────────┘ └──────────┘
                                   │
@@ -351,20 +351,20 @@ class EmbeddingServiceClient(Embeddings):
 rag-app / rag-api container          embedding-service container
 ┌──────────────────────┐            ┌──────────────────────────────────┐
 │ EmbeddingService     │            │ FastAPI + FlagEmbedding          │
-│ Client               │            │ BGEM3FlagModel (BAAI/bge-m3)    │
+│ Client               │            │ BGEM3FlagModel (BAAI/bge-m3)     │
 │                      │            │                                  │
-│ embed_documents()    │  /embed    │ → Dense vectors (1024D)         │
+│ embed_documents()    │  /embed    │ → Dense vectors (1024D)          │
 │ embed_query()        │ ─────────→ │                                  │
 │                      │            │                                  │
-│ embed_multi()        │ /embed/    │ → Dense + Sparse (lexical       │
-│ embed_query_multi()  │  multi     │   weights) + ColBERT (optional) │
+│ embed_multi()        │ /embed/    │ → Dense + Sparse (lexical        │
+│ embed_query_multi()  │  multi     │   weights) + ColBERT (optional)  │
 │                      │ ─────────→ │                                  │
 │                      │            │                                  │
-│ rerank()             │ /rerank    │ → ColBERT late-interaction      │
-│                      │ ─────────→ │   scoring (passage reranking)   │
+│ rerank()             │ /rerank    │ → ColBERT late-interaction       │
+│                      │ ─────────→ │   scoring (passage reranking)    │
 │                      │            │                                  │
-│                      │ ←───────── │ JSON response                   │
-│                      │            │ Port 8001                       │
+│                      │ ←───────── │ JSON response                    │
+│                      │            │ Port 8001                        │
 └──────────────────────┘            └──────────────────────────────────┘
 ```
 
@@ -464,15 +464,15 @@ client.upsert(QDRANT_COLLECTION_NAME, points)
 ```
 Qdrant Hybrid Collection (persistent — server di http://qdrant:6333)
 ┌──────────────────────────────────────────────────────────────────────────────┐
-│ ID (UUID)│ Dense (1024D)            │ Sparse (token→weight) │ Payload       │
-├──────────┼──────────────────────────┼───────────────────────┼───────────────┤
-│ a1b2c3.. │ [0.03, -0.12, 0.24,...] │ {42:0.83, 1505:0.61}  │ text, title,  │
-│          │                          │                       │ source,       │
-│ d4e5f6.. │ [0.08, -0.05, 0.19,...] │ {789:0.44, 33:0.71}   │ Header 2,     │
-│          │                          │                       │ Header 3,     │
-│ g7h8i9.. │ [-0.07, 0.14, 0.03,...]│ {102:0.55, 45:0.32}   │ lastmod       │
-│ ...      │ ...                      │ ...                   │ ...           │
-└──────────┴──────────────────────────┴───────────────────────┴───────────────┘
+│ ID (UUID)│ Dense (1024D)            │ Sparse (token→weight) │ Payload        │
+├──────────┼──────────────────────────┼───────────────────────┼────────────────┤
+│ a1b2c3.. │ [0.03, -0.12, 0.24,...]  │ {42:0.83, 1505:0.61}  │ text, title,   │
+│          │                          │                       │ source,        │
+│ d4e5f6.. │ [0.08, -0.05, 0.19,...]  │ {789:0.44, 33:0.71}   │ Header 2,      │
+│          │                          │                       │ Header 3,      │
+│ g7h8i9.. │ [-0.07, 0.14, 0.03,...]. │ {102:0.55, 45:0.32}   │ lastmod        │
+│ ...      │ ...                      │ ...                   │ ...            │
+└──────────┴──────────────────────────┴───────────────────────┴────────────────┘
 ```
 
 **Qdrant** adalah database vektor yang:
@@ -588,15 +588,15 @@ User: "Bagaimana cara membuat conda environment?"
     │  TAHAP 1: Multi-Mode Embedding                                   │
     │  embed_query_multi(question) → POST /embed/multi                 │
     │                                                                  │
-    │  → Dense vector: [0.029, -0.121, 0.238, ..., 0.071] (1024D)    │
-    │  → Sparse vector: {42:0.83, 1505:0.61, ...}                    │
+    │  → Dense vector: [0.029, -0.121, 0.238, ..., 0.071] (1024D)      │
+    │  → Sparse vector: {42:0.83, 1505:0.61, ...}                      │
     └────┬─────────────────────────────────────────────────────────────┘
          │
     ┌────┴─────────────────────────────────────────────────────────────┐
     │  TAHAP 2: Dual-Path Retrieval dari Qdrant                        │
     │                                                                  │
-    │  Dense path:  query dense vector → cosine similarity → 40 hits  │
-    │  Sparse path: query sparse vector → keyword match    → 40 hits  │
+    │  Dense path:  query dense vector → cosine similarity → 40 hits   │
+    │  Sparse path: query sparse vector → keyword match    → 40 hits   │
     └────┬─────────────────────────────────────────────────────────────┘
          │
     ┌────┴─────────────────────────────────────────────────────────────┐
@@ -604,23 +604,23 @@ User: "Bagaimana cara membuat conda environment?"
     │                                                                  │
     │  Gabungkan ranking dari dense dan sparse:                        │
     │                                                                  │
-    │           1                1                                      │
-    │  RRF = ────── + ──────  (k = 60 default)                        │
+    │           1                1                                     │
+    │  RRF = ────── + ──────  (k = 60 default)                         │
     │        k+rank_d   k+rank_s                                       │
     │                                                                  │
-    │  → 20 candidates teratas (RERANK_FETCH_MULTIPLIER × TOP_K)      │
+    │  → 20 candidates teratas (RERANK_FETCH_MULTIPLIER × TOP_K)       │
     └────┬─────────────────────────────────────────────────────────────┘
          │
     ┌────┴─────────────────────────────────────────────────────────────┐
     │  TAHAP 4: ColBERT Reranking                                      │
     │                                                                  │
-    │  embeddings.rerank(question, 20 passages) → POST /rerank        │
-    │  ColBERT late-interaction scoring:                                │
+    │  embeddings.rerank(question, 20 passages) → POST /rerank         │
+    │  ColBERT late-interaction scoring:                               │
     │                                                                  │
-    │  Setiap token query ↔ setiap token passage                      │
-    │  → Max similarity per query token → Sum → Score                 │
+    │  Setiap token query ↔ setiap token passage                       │
+    │  → Max similarity per query token → Sum → Score                  │
     │                                                                  │
-    │  Sort by score → Ambil top 10 (TOP_K)                           │
+    │  Sort by score → Ambil top 10 (TOP_K)                            │
     └────┬─────────────────────────────────────────────────────────────┘
          │
          ▼
@@ -857,32 +857,32 @@ Pertanyaan Pengguna
     │
     ▼
 ┌────────────────────┐
-│ is_question_relevant│ → TIDAK → return "tidak relevan"
+│is_question_relevant│ → TIDAK → return "tidak relevan"
 │ (LLM filter)       │
 └─────────┬──────────┘
           │ YA
-    ┌─────┴──────────────┐     ┌──────────────────────┐
+    ┌─────┴───────────────┐     ┌───────────────────────┐
     │ embed_query_multi() │ ──→ │ query_points()        │
     │ (dense + sparse)    │     │ (Prefetch dense +     │
-    │                     │     │  Prefetch sparse +     │
-    │                     │     │  RRF Fusion)           │
-    └─────────────────────┘     └───────────┬────────────┘
+    │                     │     │  Prefetch sparse +    │
+    │                     │     │  RRF Fusion)          │
+    └─────────────────────┘     └───────────┬───────────┘
                                             │ 20 candidates
                                 ┌───────────┴────────────┐
-                                │ rerank()                │
-                                │ (ColBERT scoring)       │
-                                │ → top 10 docs           │
+                                │ rerank()               │
+                                │ (ColBERT scoring)      │
+                                │ → top 10 docs          │
                                 └───────────┬────────────┘
                                             │
                                 ┌───────────┴────────────┐
-                                │ generate_response()     │
-                                │ (OpenAI messages → vLLM)│
+                                │ generate_response()    │
+                                │(OpenAI messages → vLLM)│
                                 └───────────┬────────────┘
                                             │
                                 ┌───────────┴────────────┐
-                                │ generate_source_        │
-                                │ justifications()        │
-                                │ → filter TIDAK RELEVAN  │
+                                │ generate_source_       │
+                                │ justifications()       │
+                                │ → filter TIDAK RELEVAN │
                                 └───────────┬────────────┘
                                             │
                                             ▼
@@ -931,8 +931,8 @@ def sync_vectorstore(client, embeddings):
 ```
 Sync Flow:
 ┌─────────────────┐       ┌──────────────────┐
-│ Sitemap terkini  │       │  Qdrant stored   │
-│ (URL + lastmod)  │       │  (URL + lastmod) │
+│ Sitemap terkini │       │  Qdrant stored   │
+│ (URL + lastmod  │       │  (URL + lastmod) │
 └────────┬────────┘       └────────┬─────────┘
          │                         │
          └──────────┬──────────────┘
@@ -961,26 +961,26 @@ def review_script_hybrid(script_content, api_url=None, qdrant_client=None, embed
 ```
 Script Slurm dari user
        │
-  ┌────┴────────────────────────────────────────────┐
+  ┌────┴─────────────────────────────────────────────┐
   │ STEP 0: Cek batas maksimal panjang skrip         │
   │ (Maksimal 10.000 karakter, jika lebih ditolak)   │
   └────┬─────────────────────────────────────────────┘
        │
-  ┌────┴────────────────────────────────────────────┐
+  ┌────┴─────────────────────────────────────────────┐
   │ STEP 1: extract_resource_params()                │
-  │ LLM → parsing #SBATCH → JSON                    │
+  │ LLM → parsing #SBATCH → JSON                     │
   │ {"partition": "ampere", "mem": "64G", ...}       │
   └────┬─────────────────────────────────────────────┘
        │
-  ┌────┴────────────────────────────────────────────┐
+  ┌────┴─────────────────────────────────────────────┐
   │ STEP 2: retrieve_policy_context()                │
   │ Berdasarkan params → targeted queries ke Qdrant  │
   │ Misal: "kapasitas RAM partisi ampere"            │
   │ → Retrieve kebijakan HPC yang relevan            │
   └────┬─────────────────────────────────────────────┘
        │
-  ┌────┴────────────────────────────────────────────┐
-  │ STEP 3: LLM Review                              │
+  ┌────┴─────────────────────────────────────────────┐
+  │ STEP 3: LLM Review                               │
   │ Review teknis (syntax, best practice) +          │
   │ Validasi kebijakan (limit partisi, walltime, dll)│
   │ → Output: review text + issues count +           │
@@ -1131,92 +1131,92 @@ Model besar (35B params) memerlukan waktu loading ke VRAM. Fungsi ini polling `/
 ## Diagram End-to-End Lengkap
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                     FASE STARTUP                                │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│  [0] wait_for_vllm() — polling /health tiap 10 dtk (maks 10 mnt)│
-│         │                                                       │
-│         ▼                                                       │
-│  [1] qdrant_collection_exists()? ── YA ──→ load_vectorstore()  │
-│         │                                   (skip to [7])      │
-│         TIDAK                                                   │
-│         │                                                       │
-│  Wiki Sitemap XML                                               │
+┌─────────────────────────────────────────────────────────────────────┐
+│                     FASE STARTUP                                    │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  [0] wait_for_vllm() — polling /health tiap 10 dtk (maks 10 mnt)    │
+│         │                                                           │
+│         ▼                                                           │
+│  [1] qdrant_collection_exists()? ── YA ──→ load_vectorstore()       │
+│         │                                   (skip to [7])           │
+│         TIDAK                                                       │
+│         │                                                           │
+│  Wiki Sitemap XML                                                   │
 │  (https://wiki.efisonlt.com/sitemap/sitemap-wiki.efisonlt.com-0.xml)│
-│         │                                                       │
-│  [2] Parse XML → filter non-webpage → ekstrak URL halaman wiki │
-│         │                                                       │
-│  [3] Untuk setiap URL:                                          │
-│      requests.get() → BeautifulSoup                             │
-│      → extract <div id="mw-content-text">                      │
-│         │                                                       │
-│  [4] HTMLSectionSplitter (split berdasarkan heading h1/h2/h3)  │
-│      → Fallback: RecursiveCharacterTextSplitter                │
-│        (4500 chars, 900 overlap)                                │
-│         │                                                       │
-│  [5] Add source labels:                                         │
-│      "[Sumber: title] [Section: header]"                       │
-│         │                                                       │
-│  ~450 Chunks                                                    │
-│         │                                                       │
-│  [6] BAAI/bge-m3 via API /embed/multi                           │
-│      Dibatch @16 chunk per request                              │
-│      Each chunk → Dense vector (1024D) + Sparse vector          │
-│         │                                                       │
-│      build_vectorstore() →                                      │
-│  [7] Qdrant Hybrid Collection (http://qdrant:6333)              │
-│      Collection: "wiki_aleleon_qdrant"                          │
-│      ~450 points: dense + sparse + text + metadata              │
-│      Podman volume: qdrant-data:/qdrant/storage                │
-│         │                                                       │
-│  [8] sync_vectorstore() — incremental sync sitemap              │
-│      (pada startup API dan via POST /refresh)                   │
-│                                                                 │
-├─────────────────────────────────────────────────────────────────┤
-│                  FASE PER PERTANYAAN                             │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│  User: "Bagaimana cara membuat conda env?"                      │
-│  (via Telegram /ask, REST API POST /ask, atau CLI)              │
-│         │                                                       │
-│  [a] is_question_relevant() — LLM filter (YA/TIDAK)           │
-│         │ YA                                                    │
-│  [b] Embed question → Dense + Sparse                            │
-│      (BAAI/bge-m3 via /embed/multi)                            │
-│         │                                                       │
-│  [c] Hybrid search: Dense path + Sparse path                   │
-│      → RRF Fusion → 20 candidates                              │
-│         │                                                       │
-│  [d] ColBERT reranking (/rerank) → top 10 docs                 │
-│         │                                                       │
-│  [e] generate_response() → OpenAI messages format              │
-│      with 11 anti-hallucination rules (0-10)                   │
-│      + hospitality tone                                         │
-│         │                                                       │
-│  [f] Send to Qwen3.5-35B-A3B-GPTQ-Int4 via vLLM               │
-│      (OpenAI-compatible API, AMD ROCm GPU)                     │
-│      temperature=0.3, presence_penalty=1.5                     │
-│         │                                                       │
-│  [g] Model menghasilkan jawaban                                  │
-│         │                                                       │
-│  [h] generate_source_justifications()                           │
-│      LLM → 1 kalimat justifikasi per sumber                   │
-│      → Filter "TIDAK RELEVAN"                                  │
-│         │                                                       │
-│  [i] Display answer + source attribution + justifications      │
-│      (de-duplicated title/section/URL + 💡 Why)                │
-│         │                                                       │
-│         ▼                                                       │
-│  "Selamat datang! Terima kasih telah menghubungi layanan        │
-│   support ALELEON. Untuk membuat conda environment:             │
-│   1. module load anaconda3/2025.06-1                            │
-│   2. conda create -n myenv python=3.12..."                      │
-│                                                                 │
-│      📚 Sumber (10 chunks):                                     │
-│      • Conda Environment User → Membuat Conda Environment      │
-│        (https://wiki.efisonlt.com/wiki/...)                     │
-│        💡 Why: Berisi langkah lengkap pembuatan conda env       │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
+│         │                                                           │
+│  [2] Parse XML → filter non-webpage → ekstrak URL halaman wiki      │
+│         │                                                           │
+│  [3] Untuk setiap URL:                                              │
+│      requests.get() → BeautifulSoup                                 │
+│      → extract <div id="mw-content-text">                           │
+│         │                                                           │
+│  [4] HTMLSectionSplitter (split berdasarkan heading h1/h2/h3)       │
+│      → Fallback: RecursiveCharacterTextSplitter                     │
+│        (4500 chars, 900 overlap)                                    │
+│         │                                                           │
+│  [5] Add source labels:                                             │
+│      "[Sumber: title] [Section: header]"                            │
+│         │                                                           │
+│  ~450 Chunks                                                        │
+│         │                                                           │
+│  [6] BAAI/bge-m3 via API /embed/multi                               │
+│      Dibatch @16 chunk per request                                  │
+│      Each chunk → Dense vector (1024D) + Sparse vector              │
+│         │                                                           │
+│      build_vectorstore() →                                          │
+│  [7] Qdrant Hybrid Collection (http://qdrant:6333)                  │
+│      Collection: "wiki_aleleon_qdrant"                              │
+│      ~450 points: dense + sparse + text + metadata                  │
+│      Podman volume: qdrant-data:/qdrant/storage                     │
+│         │                                                           │
+│  [8] sync_vectorstore() — incremental sync sitemap                  │
+│      (pada startup API dan via POST /refresh)                       │
+│                                                                     │
+├─────────────────────────────────────────────────────────────────────┤
+│                  FASE PER PERTANYAAN                                │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  User: "Bagaimana cara membuat conda env?"                          │
+│  (via Telegram /ask, REST API POST /ask, atau CLI)                  │
+│         │                                                           │
+│  [a] is_question_relevant() — LLM filter (YA/TIDAK)                 │
+│         │ YA                                                        │
+│  [b] Embed question → Dense + Sparse                                │
+│      (BAAI/bge-m3 via /embed/multi)                                 │
+│         │                                                           │
+│  [c] Hybrid search: Dense path + Sparse path                        │
+│      → RRF Fusion → 20 candidates                                   │
+│         │                                                           │
+│  [d] ColBERT reranking (/rerank) → top 10 docs                      │
+│         │                                                           │
+│  [e] generate_response() → OpenAI messages format                   │
+│      with 11 anti-hallucination rules (0-10)                        │
+│      + hospitality tone                                             │
+│         │                                                           │
+│  [f] Send to Qwen3.5-35B-A3B-GPTQ-Int4 via vLLM                     │
+│      (OpenAI-compatible API, AMD ROCm GPU)                          │
+│      temperature=0.3, presence_penalty=1.5                          │
+│         │                                                           │
+│  [g] Model menghasilkan jawaban                                     │
+│         │                                                           │
+│  [h] generate_source_justifications()                               │
+│      LLM → 1 kalimat justifikasi per sumber                         │
+│      → Filter "TIDAK RELEVAN"                                       │
+│         │                                                           │
+│  [i] Display answer + source attribution + justifications           │
+│      (de-duplicated title/section/URL + 💡 Why)                     │
+│         │                                                           │
+│         ▼                                                           │
+│  "Selamat datang! Terima kasih telah menghubungi layanan            │
+│   support ALELEON. Untuk membuat conda environment:                 │
+│   1. module load anaconda3/2025.06-1                                │
+│   2. conda create -n myenv python=3.12..."                          │
+│                                                                     │
+│      📚 Sumber (10 chunks):                                         │
+│      • Conda Environment User → Membuat Conda Environment           │
+│        (https://wiki.efisonlt.com/wiki/...)                         │
+│        💡 Why: Berisi langkah lengkap pembuatan conda env           │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
 ```
