@@ -4,31 +4,32 @@
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────┐
-│                Pipeline RAG — Microservices (Kontainer Podman)                │
+│                Pipeline RAG — Microservices (Kontainer Podman)               │
 │                                                                              │
-│  ┌──────────────┐  ┌──────────────────┐  ┌───────────────┐  ┌───────────┐   │
-│  │   INGESTI    │→ │    EMBEDDING     │→ │   RETRIEVAL   │→ │  GENERASI │   │
-│  │  (HTML Wiki) │  │ Dense+Sparse+    │  │ Hybrid Search │  │   (LLM)   │   │
-│  │              │  │ ColBERT Rerank   │  │ + RRF Fusion  │  │           │   │
-│  └──────────────┘  └──────────────────┘  └───────────────┘  └───────────┘   │
+│  ┌──────────────┐  ┌──────────────────┐  ┌───────────────┐  ┌───────────┐    │
+│  │   INGESTI    │→ │    EMBEDDING     │→ │   RETRIEVAL   │→ │  GENERASI │    │
+│  │  (HTML Wiki) │  │ Dense+Sparse+    │  │ Hybrid Search │  │   (LLM)   │    │
+│  │              │  │ ColBERT Rerank   │  │ + RRF Fusion  │  │           │    │
+│  └──────────────┘  └──────────────────┘  └───────────────┘  └───────────┘    │
 │                                                                              │
-│  Fase 1: Ambil & Split   Fase 2: Vektorisasi   Fase 3: Menjawab             │
+│  Fase 1: Ambil & Split   Fase 2: Vektorisasi   Fase 3: Menjawab              │
 │                                                                              │
 │  Layanan:                                                                    │
-│  ┌─────────────────┐ ┌─────────────┐ ┌──────────┐ ┌──────────────┐          │
-│  │ embedding-service│ │  vllm-rocm  │ │  qdrant  │ │   rag-api    │          │
-│  │ (BAAI/bge-m3)   │ │ (Qwen3.5)   │ │ (Vektor) │ │ (REST API)   │          │
-│  │ Port 8001       │ │ Port 8000   │ │ Port 6333│ │ Port 8080    │          │
-│  │ Dense+Sparse+   │ │ OpenAI API  │ │ REST+gRPC│ │ /ask         │          │
-│  │ ColBERT Rerank  │ │             │ │          │ │ /review-script│          │
-│  └─────────────────┘ └─────────────┘ └──────────┘ │ /refresh     │          │
-│                                                    └──────┬───────┘          │
-│                                                           │                  │
-│                                                    ┌──────┴───────┐          │
-│                                                    │ telegram-bot │          │
-│                                                    │ /ask         │          │
-│                                                    │ /askscript   │          │
-│                                                    └──────────────┘          │
+│  ┌─────────────────┐ ┌─────────────┐ ┌──────────┐ ┌──────────────┐           │
+│  │embedding-service│ │  vllm-rocm  │ │  qdrant  │ │   rag-api    │           │
+│  │ (BAAI/bge-m3)   │ │ (Qwen3.5)   │ │ (Vektor) │ │ (REST v1.3.0)│           │
+│  │ Port 8001       │ │ Port 8000   │ │ Port 6333│ │ Port 8080    │           │
+│  │ Dense+Sparse+   │ │ OpenAI API  │ │ REST+gRPC│ │ /ask         │           │
+│  │ ColBERT Rerank  │ │             │ │          │ │/review-script│           │
+│  │ v2.0.0          │ │             │ │          │ │ /refresh     │           │
+│  └─────────────────┘ └─────────────┘ └──────────┘ │ Semaphore(2) │           │
+│                                                   └──────┬───────┘           │
+│                                                          │                   │
+│                                                   ┌──────┴───────┐           │
+│                                                   │ telegram-bot │           │
+│                                                   │ /ask         │           │
+│                                                   │ /askscript   │           │
+│                                                   └──────────────┘           │
 └──────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -36,12 +37,12 @@
 
 | Service | Deskripsi | Port | Profile |
 |---|---|---|---|
-| `embedding-service` | REST API embedding BAAI/bge-m3 (dense + sparse + ColBERT reranking) | 8001 | infra |
+| `embedding-service` | REST API embedding BAAI/bge-m3 (dense + sparse + ColBERT reranking), v2.0.0 | 8001 | infra |
 | `vllm-rocm` | LLM inference Qwen3.5-35B via OpenAI-compatible API (AMD ROCm) | 8000 | infra |
 | `qdrant` | Database vektor persisten (dense + sparse hybrid collection) | 6333, 6334 | infra |
-| `rag-api` | FastAPI REST API — orkestrator RAG (`/ask`, `/review-script`, `/refresh`) | 8080 | api |
+| `rag-api` | FastAPI REST API v1.3.0 — orkestrator RAG (`/ask`, `/review-script`, `/refresh`) + concurrency limiter (Semaphore=2) | 8080 | api |
 | `telegram-bot` | Bot Telegram — `/ask` dan `/askscript` via RAG API | — | telegram |
-| `benchmark` | Benchmark retrieval (Dense vs Sparse vs Hybrid) | — | benchmark |
+| `benchmark` | Benchmark retrieval (Dense vs Sparse vs Multi-Vector vs Hybrid) | — | benchmark |
 | `benchmark-ttft` | Benchmark TTFT/latency concurrency test | — | benchmark-ttft |
 | `promtail` | Log scraping ke Grafana Loki | — | monitoring |
 
@@ -772,6 +773,11 @@ vllm serve Qwen/Qwen3.5-35B-A3B-GPTQ-Int4 \
 | Arsitektur | Mixture of Experts (MoE) |
 | Disajikan via | vLLM pada GPU AMD ROCm |
 
+### Token Logging & Filter Output LLM
+
+1. **Token Logging:** Setiap pemanggilan API ke LLM mencatat rincian penggunaan token (`prompt_tokens`, `completion_tokens`, `total_tokens`) di logs untuk memonitor biaya komputasi.
+2. **Filter `<think>`:** Meskipun `enable_thinking=False` (menonaktifkan model output chain of thought), terkadang model (terutama Qwen3.5 varian Coder) masih menyisipkan tag `<think>...</think>`. Aplikasi menggunakan RegExp (`re.sub(r"<think>.*?</think>", "", raw, flags=re.DOTALL)`) pada setiap hasil LLM untuk membersihkan pemikiran sisa tersebut agar tidak tampil ke user.
+
 ### Pelacakan Sumber + Justifikasi "Why This Source"
 
 Setelah setiap jawaban, sistem **menampilkan sumber dokumen** yang dipakai dan **justifikasi relevansi** setiap sumber. Justifikasi di-generate oleh LLM terpisah:
@@ -956,6 +962,11 @@ def review_script_hybrid(script_content, api_url=None, qdrant_client=None, embed
 Script Slurm dari user
        │
   ┌────┴────────────────────────────────────────────┐
+  │ STEP 0: Cek batas maksimal panjang skrip         │
+  │ (Maksimal 10.000 karakter, jika lebih ditolak)   │
+  └────┬─────────────────────────────────────────────┘
+       │
+  ┌────┴────────────────────────────────────────────┐
   │ STEP 1: extract_resource_params()                │
   │ LLM → parsing #SBATCH → JSON                    │
   │ {"partition": "ampere", "mem": "64G", ...}       │
@@ -974,6 +985,12 @@ Script Slurm dari user
   │ Validasi kebijakan (limit partisi, walltime, dll)│
   │ → Output: review text + issues count +           │
   │   policy sources + template skrip standar        │
+  └────┬─────────────────────────────────────────────┘
+       │
+  ┌────┴────────────────────────────────────────────┐
+  │ STEP 4: generate_source_justifications()         │
+  │ LLM menilai tiap policy source. Jika             │
+  │ "TIDAK RELEVAN", buang. Dibatasi maks 10 sumber. │
   └──────────────────────────────────────────────────┘
 ```
 
@@ -984,6 +1001,21 @@ Script Slurm dari user
 4. Potensi error (variabel tidak didefinisikan, path salah)
 5. Keamanan (`rm -rf` tanpa konfirmasi, hardcoded password)
 6. **Validasi kebijakan HPC ALELEON** (dari dokumen di Qdrant — limit partisi, walltime, RAM, dll.)
+
+**Template Standar ALELEON:**
+LLM akan memformat ulang skrip ke dalam template standar ALELEON jika perlu perbaikan. Template menggunakan format:
+```bash
+#!/bin/bash
+# --------------------------------------------------
+# [NAMA SOFTWARE/PROGRAM]
+# rev.[TANGGAL]
+# ...
+#SBATCH --partition=////
+#SBATCH --cpus-per-task=////
+#SBATCH --mem=////GB
+#SBATCH --time=////
+# ...
+```
 
 ### Telegram Bot — Interface Chat
 
@@ -1005,7 +1037,7 @@ Bot Telegram menyediakan interface chat yang terhubung ke RAG API:
 - Fallback ke plain text jika HTML parsing gagal
 - Justifikasi sumber ditampilkan dengan emoji 💡
 
-### REST API — FastAPI Endpoints
+### REST API — FastAPI Endpoints (v1.3.0)
 
 ```
 POST /ask
@@ -1024,12 +1056,53 @@ GET /refresh/status
 
 GET /health
   Response: {"status": "ready", "service": "rag-api"}
+
+GET /
+  Response: {"service": "ALELEON HPC RAG API", "version": "1.3.0", "endpoints": {...}}
 ```
 
-**Fitur API tambahan:**
-- **Question logging** — Setiap pertanyaan dicatat ke `logs/user_questions.logs` dengan timestamp UTC.
-- **Startup sync** — Saat API mulai, otomatis cek perubahan sitemap.
-- **Background sync** — `POST /refresh` menjalankan sync di background thread, tidak blocking.
+**Fitur API:**
+
+| Fitur | Detail |
+|---|---|
+| **Inference Concurrency Limiter** | `asyncio.Semaphore(2)` — maksimal 2 request inference berjalan paralel. Request ke-3+ di-queue (menunggu), bukan ditolak/connection reset. Nilai 2 dipilih berdasarkan benchmark: concurrency 2 = sweet spot (0% failure, throughput optimal 0.051 req/s). |
+| **Non-blocking Inference** | `asyncio.to_thread()` — setiap panggilan blocking (`rag_chain()`, `review_script_hybrid()`, `is_question_relevant()`) dijalankan di thread pool agar event loop uvicorn tetap bisa menerima koneksi. |
+| **Relevance Filter untuk /review-script** | Sebelum review, skrip divalidasi dengan `is_question_relevant()` — jika skrip tidak relevan dengan HPC, langsung ditolak tanpa membuang resource LLM. |
+| **Question Logging** | Setiap pertanyaan di `/ask` dicatat ke `logs/user_questions.logs` dengan timestamp UTC. |
+| **Startup Sync** | Saat API mulai, otomatis cek perubahan sitemap via `sync_vectorstore()`. |
+| **Background Sync** | `POST /refresh` menjalankan sync di background thread (daemon), tidak blocking API. Dilindungi `threading.Lock()` agar tidak ada sync duplikat. |
+
+```python
+# Inference Concurrency Limiter
+_inference_semaphore = asyncio.Semaphore(2)
+
+@app.post("/ask")
+async def ask(req: AskRequest):
+    _log_question(req.question)  # Log ke file
+    async with _inference_semaphore:  # Queue jika sudah ada 2 request
+        result = await asyncio.to_thread(rag_chain, req.question)  # Non-blocking
+    ...
+
+@app.post("/review-script")
+async def review_script_endpoint(req: ReviewScriptRequest):
+    async with _inference_semaphore:
+        # Pre-filter: cek relevansi skrip sebelum review
+        is_relevant = await asyncio.to_thread(is_question_relevant, req.script, llm_api_url)
+        if not is_relevant:
+            return ReviewScriptResponse(review="Skrip tidak relevan...", issues_found=0)
+        result = await asyncio.to_thread(review_script_hybrid, req.script, ...)
+    ...
+```
+
+```
+Concurrency Flow:
+  Request 1 (→ acquire semaphore) [██████████ processing ]
+  Request 2 (→ acquire semaphore) [      ██████████ processing ]
+  Request 3 (→ waiting...)        [              ▒▒▒▒ queue ████████ processing]
+                                    ↑                 ↑
+                              Semaphore(2)      Request 1 selesai,
+                              penuh             slot tersedia
+```
 
 ### Menunggu vLLM — Pemeriksaan Kesehatan
 
